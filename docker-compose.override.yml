@@ -1,0 +1,12 @@
+services:
+  db:
+    ports:
+      - "${DATABASE_PORT}:${DATABASE_PORT}" # Publica a porta do DB para acesso externo em dev
+
+  api:
+    command: npm run start:dev # Comando para rodar em modo de desenvolvimento
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    volumes:
+      - .:/usr/src/app # Volume para hot-reload do código
+      - /usr/src/app/node_modules # "Truque" para isolar o node_modules

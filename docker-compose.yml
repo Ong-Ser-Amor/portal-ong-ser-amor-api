@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:17
+    container_name: db-portal-ong-ser-amor
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-portal-ong-ser-amor
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+    driver: local

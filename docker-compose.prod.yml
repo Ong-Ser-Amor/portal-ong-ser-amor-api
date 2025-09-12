@@ -1,0 +1,13 @@
+services:
+  db:
+    restart: unless-stopped # Política de reinício robusta para produção
+
+  api:
+    build:
+      target: production # DIZ AO DOCKER PARA CONSTRUIR A IMAGEM A PARTIR DO ESTÁGIO 'production'
+    restart: unless-stopped
+    # Em produção, geralmente não se expõe a porta diretamente,
+    # pois a API estaria atrás de um proxy reverso (como Nginx).
+    # Mas se precisar, pode descomentar a linha abaixo.
+    # ports:
+    #   - "3000:3000"
