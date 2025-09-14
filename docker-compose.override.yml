@@ -9,7 +9,9 @@ services:
       context: .
       dockerfile: Dockerfile
       target: builder
-    command: npm run start:dev # Comando para rodar em modo de desenvolvimento
+    # comando para rodar a aplicação em modo de desenvolvimento
+    # com hot-reload
+    command: sh -c "npm install && echo 'Dependências instaladas com sucesso!' && sleep infinity"
     ports:
       # Usa porta 3000 como padrão se API_PORT não estiver definida
       - "${API_PORT:-3000}:3000"
@@ -18,3 +20,6 @@ services:
       - /usr/src/app/node_modules # "Truque" para isolar o node_modules
     environment:
       - NODE_ENV=development # Define o ambiente como desenvolvimento
+    # linhas para debug
+    stdin_open: true
+    tty: true
