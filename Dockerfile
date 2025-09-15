@@ -6,7 +6,7 @@
 FROM node:22.19.0-trixie-slim AS builder
 
 # Atualiza e instala pacotes úteis que queremos no nosso ambiente de dev
-RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y git git-flow
 
 WORKDIR /usr/src/app
 
