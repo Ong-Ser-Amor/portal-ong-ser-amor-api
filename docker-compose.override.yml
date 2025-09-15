@@ -9,9 +9,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: builder
-    # comando para rodar a aplicação em modo de desenvolvimento
-    # com hot-reload
-    command: sh -c "npm install && echo 'Dependências instaladas com sucesso!' && sleep infinity"
+    command: sh -c "npm install && npm run start:dev"
     ports:
       # Usa porta 3000 como padrão se API_PORT não estiver definida
       - "${API_PORT:-3000}:3000"
