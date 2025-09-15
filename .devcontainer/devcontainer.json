@@ -54,7 +54,7 @@
 	// "shutdownAction": "none",
 
 	// Descomente a próxima linha para executar comandos após a criação do contêiner.
-	"postCreateCommand": "cp .env.example .env",
+	"postCreateCommand": "echo 'Dev Container criado com sucesso!' && cp .env.example .env && echo 'Arquivo .env criado!'",
 
 	// Customizações do VS Code (extensões e configurações)
 	"customizations": {

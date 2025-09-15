@@ -9,7 +9,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: builder
-    command: npm run start:dev
+    command: sleep infinity
     ports:
       # Usa porta 3000 como padrão se API_PORT não estiver definida
       - "${API_PORT:-3000}:3000"
