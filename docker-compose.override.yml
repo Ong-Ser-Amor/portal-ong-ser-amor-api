@@ -18,6 +18,3 @@ services:
       - /usr/src/app/node_modules # "Truque" para isolar o node_modules
     environment:
       - NODE_ENV=development # Define o ambiente como desenvolvimento
-    # linhas para debug
-    stdin_open: true
-    tty: true
