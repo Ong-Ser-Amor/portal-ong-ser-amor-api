@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,6 +10,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   const port = configService.get<string>('API_PORT', process.env.PORT) || 3000;
+  const host =
+    configService.get<string>('API_HOST', process.env.HOST) || 'localhost';
 
   const config = new DocumentBuilder()
     .setTitle('Portal ONG Ser Amor API')
@@ -23,5 +25,10 @@ async function bootstrap() {
   );
 
   await app.listen(port);
+
+  Logger.log(
+    `🚀 Aplicação está rodando em: http://${host}:${port}`,
+    'Bootstrap',
+  );
 }
 bootstrap();
