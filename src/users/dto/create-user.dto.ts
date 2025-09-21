@@ -10,5 +10,5 @@ export class CreateUserDto {
 
   @IsNotEmpty({ message: 'Password is required' })
   @IsString({ message: 'Password must be a string' })
-  passwordHash: string;
+  password: string;
 }
