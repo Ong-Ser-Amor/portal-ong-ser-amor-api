@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -9,28 +14,45 @@ import { SignInDto } from './dto/sign-in.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
   ) {}
 
   async signIn(signInDto: SignInDto) {
-    const user: User | undefined = (await this.userService
-      .findOneByEmailWithPassword(signInDto.email)
-      .catch(() => undefined)) as User | undefined;
+    try {
+      const user = await this.userService.findOneByEmailWithPassword(
+        signInDto.email,
+      );
 
-    if (
-      !user ||
-      !(await comparePassword(signInDto.password, user.passwordHash || ''))
-    ) {
-      throw new UnauthorizedException('Email or password invalid!');
+      if (!user) {
+        throw new UnauthorizedException('Email or password invalid!');
+      }
+
+      const isPasswordMatch = await comparePassword(
+        signInDto.password,
+        user.passwordHash,
+      );
+
+      if (!isPasswordMatch) {
+        throw new UnauthorizedException('Email or password invalid!');
+      }
+
+      const payload = new SignInPayloadDto(user);
+      const accessToken = this.jwtService.sign({ ...payload });
+
+      return {
+        access_token: accessToken,
+        user: user,
+      };
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      this.logger.error('Error during sign-in process', error);
+      throw new InternalServerErrorException('An internal error occurred');
     }
-
-    return {
-      access_token: this.jwtService.sign({
-        ...new SignInPayloadDto(user),
-      }),
-      user: user,
-    };
   }
 }

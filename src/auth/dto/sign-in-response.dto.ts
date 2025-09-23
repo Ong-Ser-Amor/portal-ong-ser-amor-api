@@ -1,7 +1,7 @@
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 import { User } from 'src/users/entities/user.entity';
 
-export class ReturnSignInDto {
+export class SignInResponseDto {
   access_token: string;
   user?: UserResponseDto;
 
