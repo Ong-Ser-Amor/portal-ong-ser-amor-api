@@ -11,7 +11,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Public } from 'src/decorators/is-public.decorator';
 import { UserDecorator } from 'src/decorators/user.decorator';
 
 import { CreateUserDto } from './dto/create-user.dto';
@@ -25,7 +24,6 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Public()
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({
