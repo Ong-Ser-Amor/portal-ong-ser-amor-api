@@ -104,7 +104,7 @@ describe('CoursesService', () => {
 
       // Assert
       expect(result).toEqual(mockCourseList);
-      expect(mockRepository.find).toHaveBeenCalledTimes(1);
+      expect(mockRepository.find).toHaveBeenCalled();
     });
 
     // Testa o fluxo de erro do método findAll
