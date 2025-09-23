@@ -56,7 +56,6 @@ describe('StudentsController', () => {
       const result = await controller.create(mockCreateStudentDto);
 
       // Assert
-      // Verifica se o resultado é uma instância de StudentResponseDto
       expect(result).toEqual(new StudentResponseDto(mockStudent));
       expect(result).toBeInstanceOf(StudentResponseDto);
       expect(mockStudentsService.create).toHaveBeenCalledWith(
