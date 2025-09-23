@@ -35,7 +35,7 @@ describe('UsersController', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks(); // Limpa os mocks após cada teste
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -44,7 +44,7 @@ describe('UsersController', () => {
   });
 
   describe('create', () => {
-    // Valida o fluxo de sucesso
+    // Testa o fluxo de sucesso
     it('should create a user and return UserResponseDto', async () => {
       // Arrange
       mockUsersService.create.mockResolvedValue(mockUser);
@@ -53,15 +53,16 @@ describe('UsersController', () => {
       const result = await controller.create(mockCreateUserDto);
 
       // Assert
-      // Verifica se o resultado é uma instância de UserResponseDto
       expect(result).toBeInstanceOf(UserResponseDto);
+
       // Garante que o DTO de resposta filtrou os campos sensíveis
       expect(result).not.toHaveProperty('passwordHash');
+
       expect(mockUsersService.create).toHaveBeenCalledWith(mockCreateUserDto);
       expect(result).toEqual(new UserResponseDto(mockUser));
     });
 
-    // Valida o fluxo de erro - Conflito (e-mail já cadastrado)
+    // Testa o fluxo de erro - Conflito (e-mail já cadastrado)
     it('should throw ConflictException when email already exists', async () => {
       // Arrange
       mockUsersService.create.mockRejectedValue(new ConflictException());
@@ -75,7 +76,7 @@ describe('UsersController', () => {
   });
 
   describe('findOne', () => {
-    // Valida o fluxo de sucesso
+    // Testa o fluxo de sucesso
     it('should return UserResponseDto when user is found', async () => {
       // Arrange
       mockUsersService.findOne.mockResolvedValue(mockUser);
@@ -90,7 +91,7 @@ describe('UsersController', () => {
       expect(result).toEqual(new UserResponseDto(mockUser));
     });
 
-    // Valida o fluxo de erro - Usuário não encontrado
+    // Testa o fluxo de erro - Usuário não encontrado
     it('should throw NotFoundException when user is not found', async () => {
       // Arrange
       const nonExistentId = 99;
@@ -105,7 +106,7 @@ describe('UsersController', () => {
   });
 
   describe('update', () => {
-    // Valida o fluxo de sucesso
+    // Testa o fluxo de sucesso
     it('should update a user and return UserResponseDto', async () => {
       // Arrange
       const updatedUser = { ...mockUser, name: 'Updated Name' };
@@ -125,7 +126,7 @@ describe('UsersController', () => {
       expect(result).toEqual(new UserResponseDto(updatedUser));
     });
 
-    // valida o fluxo de erro - Conflito (e-mail já cadastrado)
+    // Testa o fluxo de erro - Conflito (e-mail já cadastrado)
     it('should throw ConflictException when email is already in use by another user', async () => {
       // Arrange
       mockUsersService.update.mockRejectedValue(new ConflictException());
@@ -136,7 +137,7 @@ describe('UsersController', () => {
       ).rejects.toThrow(ConflictException);
     });
 
-    // Valida o fluxo de erro - Usuário não encontrado
+    // Testa o fluxo de erro - Usuário não encontrado
     it('should throw NotFoundException when trying to update a non-existent user', async () => {
       // Arrange
       const nonExistentId = 99;
@@ -158,7 +159,7 @@ describe('UsersController', () => {
       newPassword: 'newStrongPassword',
     };
 
-    // Valida o fluxo de sucesso
+    // Testa o fluxo de sucesso
     it('should update the user password', async () => {
       // Arrange
       mockUsersService.updatePassword.mockResolvedValue(undefined);
@@ -177,7 +178,7 @@ describe('UsersController', () => {
       );
     });
 
-    // Valida o fluxo de erro - Usuário não encontrado
+    // Testa o fluxo de erro - Usuário não encontrado
     it('should throw NotFoundException when user is not found', async () => {
       // Arrange
       mockUsersService.updatePassword.mockRejectedValue(
@@ -192,7 +193,7 @@ describe('UsersController', () => {
   });
 
   describe('remove', () => {
-    // Valida o fluxo de sucesso
+    // Testa o fluxo de sucesso
     it('should remove the user', async () => {
       // Arrange
       mockUsersService.remove.mockResolvedValue(undefined);
@@ -205,7 +206,7 @@ describe('UsersController', () => {
       expect(mockUsersService.remove).toHaveBeenCalledWith(mockUser.id);
     });
 
-    // Valida o fluxo de erro - Usuário não encontrado
+    // Testa o fluxo de erro - Usuário não encontrado
     it('should throw NotFoundException when trying to remove a non-existent user', async () => {
       // Arrange
       const nonExistentId = 99;
