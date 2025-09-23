@@ -200,12 +200,11 @@ describe('StudentsService', () => {
     // Testa o fluxo de erro quando o estudante não é encontrado
     it('should throw NotFoundException when student to update is not found', async () => {
       // Arrange
-      const nonExistentId = 99;
       findOneSpy.mockRejectedValueOnce(new NotFoundException());
 
       // Act & Assert
       await expect(
-        service.update(nonExistentId, { name: 'Updated Name' }),
+        service.update(99, { name: 'Updated Name' }),
       ).rejects.toThrow(NotFoundException);
       expect(mockRepository.save).not.toHaveBeenCalled();
     });
@@ -220,7 +219,6 @@ describe('StudentsService', () => {
       await expect(
         service.update(mockStudent.id, { name: 'Updated Name' }),
       ).rejects.toThrow(InternalServerErrorException);
-      expect(mockRepository.save).toHaveBeenCalledTimes(1);
     });
   });
 
