@@ -4,12 +4,17 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { SignInPayloadDto } from './dto/sign-in-payload.dto';
-import { Reflector } from '@nestjs/core';
+
 import { IS_PUBLIC_KEY } from './../decorators/is-public.decorator';
-import { ConfigService } from '@nestjs/config';
+import { SignInPayloadDto } from './dto/sign-in-payload.dto';
+
+interface RequestWithUser extends Request {
+  user: SignInPayloadDto;
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -28,7 +33,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<RequestWithUser>();
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
@@ -37,11 +42,11 @@ export class AuthGuard implements CanActivate {
 
     try {
       const secret = this.configService.get<string>('JWT_SECRET_KEY');
-      const payload = (await this.jwtService.verifyAsync<SignInPayloadDto>(
+      const payload = await this.jwtService.verifyAsync<SignInPayloadDto>(
         token,
         { secret },
-      )) as SignInPayloadDto;
-      (request as any)['user'] = payload;
+      );
+      request.user = payload;
     } catch {
       throw new UnauthorizedException('Invalid or expired token');
     }
