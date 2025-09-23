@@ -4,6 +4,7 @@ import {
   createParamDecorator,
 } from '@nestjs/common';
 import { Request } from 'express';
+
 import { authorizationToLoginPayload } from './../utils/base-64.converter';
 
 export const UserDecorator = createParamDecorator(
