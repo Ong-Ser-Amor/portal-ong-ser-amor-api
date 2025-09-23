@@ -1,7 +1,4 @@
-import {
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { StudentResponseDto } from '../dto/student-response.dto';
