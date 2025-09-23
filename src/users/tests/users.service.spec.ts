@@ -35,7 +35,7 @@ describe('UsersService', () => {
   };
 
   // Mock do repositório para simular o banco de dados
-  const userRepositoryMock = {
+  const mockRepository = {
     create: jest.fn().mockImplementation((dto: CreateUserDto) => dto),
     comparePassword: jest.fn(),
     save: jest.fn(),
@@ -63,7 +63,7 @@ describe('UsersService', () => {
         UsersService,
         {
           provide: getRepositoryToken(User),
-          useValue: userRepositoryMock,
+          useValue: mockRepository,
         },
       ],
     })
@@ -86,18 +86,16 @@ describe('UsersService', () => {
     // Valida o fluxo de sucesso
     it('should create a user, save it with hashed password, and return the user', async () => {
       // Arrange
-      userRepositoryMock.save.mockImplementation(() =>
-        Promise.resolve(mockUser),
-      );
+      mockRepository.save.mockImplementation(() => Promise.resolve(mockUser));
       (createPasswordHash as jest.Mock).mockResolvedValue('hashedPassword');
 
       // Act
       const result = await service.create(mockCreateUserDto);
 
       // Assert
-      expect(userRepositoryMock.save).toHaveBeenCalledTimes(1);
+      expect(mockRepository.save).toHaveBeenCalledTimes(1);
       // Garante que a propriedade passwordHash foi passada com a senha hasheada
-      expect(userRepositoryMock.save).toHaveBeenCalledWith(
+      expect(mockRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
           name: mockCreateUserDto.name,
           email: mockCreateUserDto.email,
@@ -105,7 +103,7 @@ describe('UsersService', () => {
         }),
       );
       // Garante que a senha original não foi passada para o save
-      expect(userRepositoryMock.save).not.toHaveBeenCalledWith(
+      expect(mockRepository.save).not.toHaveBeenCalledWith(
         expect.objectContaining({
           password: mockCreateUserDto.password,
         }),
@@ -116,7 +114,7 @@ describe('UsersService', () => {
     // Valida a chamada ao helper de senha
     it('should hash the password before saving', async () => {
       // Arrange
-      userRepositoryMock.save.mockResolvedValue(mockUser);
+      mockRepository.save.mockResolvedValue(mockUser);
 
       // Act
       await service.create(mockCreateUserDto);
@@ -136,14 +134,14 @@ describe('UsersService', () => {
       await expect(service.create(mockCreateUserDto)).rejects.toThrow(
         ConflictException,
       );
-      expect(userRepositoryMock.save).not.toHaveBeenCalled();
+      expect(mockRepository.save).not.toHaveBeenCalled();
     });
 
     // Valida o tratamento de erro genérico
     it('should throw error if repository.save fails', async () => {
       // Arrange
       const errorMessage = 'Database error';
-      userRepositoryMock.save.mockRejectedValueOnce(new Error(errorMessage));
+      mockRepository.save.mockRejectedValueOnce(new Error(errorMessage));
 
       // Act & Assert
       await expect(service.create(mockCreateUserDto)).rejects.toThrow(
@@ -156,14 +154,14 @@ describe('UsersService', () => {
     // Valida o fluxo de sucesso
     it('should return a user by id', async () => {
       // Arrange
-      userRepositoryMock.findOneByOrFail.mockResolvedValue(mockUser);
+      mockRepository.findOneByOrFail.mockResolvedValue(mockUser);
 
       // Act
       const result = await service.findOne(mockUser.id);
 
       // Assert
       expect(result).toEqual(mockUser);
-      expect(userRepositoryMock.findOneByOrFail).toHaveBeenCalledWith({
+      expect(mockRepository.findOneByOrFail).toHaveBeenCalledWith({
         id: mockUser.id,
       });
     });
@@ -171,23 +169,26 @@ describe('UsersService', () => {
     // Valida o tratamento de erro quando o usuário não é encontrado
     it('should throw NotFoundException if user not found', async () => {
       // Arrange
-      userRepositoryMock.findOneByOrFail.mockRejectedValueOnce(
-        new EntityNotFoundError(User, { id: 99 }),
+      const nonExistentId = 99;
+      mockRepository.findOneByOrFail.mockRejectedValueOnce(
+        new EntityNotFoundError(User, { id: nonExistentId }),
       );
 
       // Act & Assert
-      await expect(service.findOne(99)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne(nonExistentId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     // Valida o tratamento de erro genérico
     it('should throw InternalServerErrorException if repository.findOne fails', async () => {
       // Arrange
-      userRepositoryMock.findOneByOrFail.mockRejectedValueOnce(
+      mockRepository.findOneByOrFail.mockRejectedValueOnce(
         new Error('Database error'),
       );
 
       // Act & Assert
-      await expect(service.findOne(99)).rejects.toThrow(
+      await expect(service.findOne(mockUser.id)).rejects.toThrow(
         InternalServerErrorException,
       );
     });
@@ -197,14 +198,14 @@ describe('UsersService', () => {
     // Valida o fluxo de sucesso
     it('should return a user when the email exists', async () => {
       // Arrange
-      userRepositoryMock.findOneBy.mockResolvedValue(mockUser);
+      mockRepository.findOneBy.mockResolvedValue(mockUser);
 
       // Act
       const result = await service.findOneByEmail(mockUser.email);
 
       // Assert
       expect(result).toEqual(mockUser);
-      expect(userRepositoryMock.findOneBy).toHaveBeenCalledWith({
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({
         email: mockUser.email,
       });
     });
@@ -212,14 +213,14 @@ describe('UsersService', () => {
     // Valida o retorno undefined quando o usuário não é encontrado
     it('should return undefined when the email does not exist', async () => {
       // Arrange
-      userRepositoryMock.findOneBy.mockResolvedValue(undefined);
+      mockRepository.findOneBy.mockResolvedValue(undefined);
 
       // Act
       const result = await service.findOneByEmail('non.existent@email.com');
 
       // Assert
       expect(result).toBeUndefined();
-      expect(userRepositoryMock.findOneBy).toHaveBeenCalledWith({
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({
         email: 'non.existent@email.com',
       });
     });
@@ -227,9 +228,7 @@ describe('UsersService', () => {
     // Valida o tratamento de erro genérico
     it('should throw InternalServerErrorException if repository.findOne fails', async () => {
       // Arrange
-      userRepositoryMock.findOneBy.mockRejectedValue(
-        new Error('Database error'),
-      );
+      mockRepository.findOneBy.mockRejectedValue(new Error('Database error'));
 
       // Act & Assert
       await expect(service.findOneByEmail('any@email.com')).rejects.toThrow(
@@ -273,7 +272,7 @@ describe('UsersService', () => {
     // Valida o tratamento de erro genérico
     it('should throw InternalServerErrorException if repository.findOne fails', async () => {
       // Arrange
-      userRepositoryMock.findOneByOrFail.mockRejectedValueOnce(
+      mockRepository.findOneByOrFail.mockRejectedValueOnce(
         new Error('Database error'), // Mantemos o erro genérico aqui
       );
 
@@ -286,7 +285,7 @@ describe('UsersService', () => {
 
   describe('findOneByEmailWithPassword', () => {
     beforeEach(() => {
-      userRepositoryMock.createQueryBuilder.mockReturnValue(
+      mockRepository.createQueryBuilder.mockReturnValue(
         mockQueryBuilder as unknown as SelectQueryBuilder<User>,
       );
     });
@@ -300,9 +299,7 @@ describe('UsersService', () => {
       const result = await service.findOneByEmailWithPassword(mockUser.email);
 
       // Assert
-      expect(userRepositoryMock.createQueryBuilder).toHaveBeenCalledWith(
-        'user',
-      );
+      expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('user');
       expect(mockQueryBuilder.where).toHaveBeenCalledWith(
         'user.email = :email',
         { email: mockUser.email },
@@ -345,7 +342,6 @@ describe('UsersService', () => {
     let findOneByEmailSpy: jest.SpyInstance;
 
     beforeEach(() => {
-      // Adicionamos o spy que estava faltando
       findOneSpy = jest.spyOn(service, 'findOne');
       findOneByEmailSpy = jest.spyOn(service, 'findOneByEmail');
     });
@@ -357,16 +353,35 @@ describe('UsersService', () => {
 
       findOneSpy.mockResolvedValue(mockUser);
 
-      userRepositoryMock.save.mockImplementation((user) =>
-        Promise.resolve(user),
-      );
+      mockRepository.save.mockImplementation((user) => Promise.resolve(user));
 
       // Act
       const result = await service.update(mockUser.id, updateUserDto);
 
       // Assert
-      expect(result.name).toEqual('Updated Name');
-      expect(userRepositoryMock.save).toHaveBeenCalledWith(mockUser);
+      expect(result.name).toEqual({ ...mockUser, ...updateUserDto }.name);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockUser);
+      expect(findOneSpy).toHaveBeenCalledWith(mockUser.id);
+    });
+
+    // Valida o tratamento de erro quando o e-mail já está em uso
+    it('should throw ConflictException if updating email to one that is already in use', async () => {
+      // Arrange
+      const updateUserDto = { email: 'existing@email.com' };
+      const existingUserWithEmail = {
+        ...mockUser,
+        id: 2,
+        email: 'existing@email.com',
+      }; // Outro usuário com o email
+
+      findOneSpy.mockResolvedValue(mockUser);
+      findOneByEmailSpy.mockResolvedValue(existingUserWithEmail);
+
+      // Act & Assert
+      await expect(service.update(mockUser.id, updateUserDto)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(mockRepository.save).not.toHaveBeenCalled();
     });
 
     // Valida o tratamento de erro quando o usuário não é encontrado
@@ -378,15 +393,14 @@ describe('UsersService', () => {
       await expect(service.update(99, { name: 'New Name' })).rejects.toThrow(
         NotFoundException,
       );
+      expect(mockRepository.save).not.toHaveBeenCalled();
     });
 
     // Valida o tratamento de erro genérico
     it('should throw InternalServerErrorException if update fails', async () => {
       // Arrange
       findOneSpy.mockResolvedValue(mockUser);
-      userRepositoryMock.save.mockRejectedValueOnce(
-        new Error('Database error'),
-      );
+      mockRepository.save.mockRejectedValueOnce(new Error('Database error'));
 
       // Act & Assert
       await expect(
@@ -419,7 +433,7 @@ describe('UsersService', () => {
       findOneByIdWithPasswordSpy.mockResolvedValue(mockUser);
       (comparePassword as jest.Mock).mockResolvedValue(true);
       (createPasswordHash as jest.Mock).mockResolvedValue('newHashedPassword');
-      userRepositoryMock.save.mockResolvedValue(undefined);
+      mockRepository.save.mockResolvedValue(undefined);
 
       // Act
       await service.updatePassword(mockUser.id, updatePasswordDto);
@@ -432,7 +446,7 @@ describe('UsersService', () => {
       expect(createPasswordHash).toHaveBeenCalledWith(
         updatePasswordDto.newPassword,
       );
-      expect(userRepositoryMock.save).toHaveBeenCalledWith(
+      expect(mockRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({ passwordHash: 'newHashedPassword' }),
       );
     });
@@ -461,7 +475,7 @@ describe('UsersService', () => {
 
       // Garante que, se a senha estiver errada, nada mais é executado
       expect(createPasswordHash).not.toHaveBeenCalled();
-      expect(userRepositoryMock.save).not.toHaveBeenCalled();
+      expect(mockRepository.save).not.toHaveBeenCalled();
     });
 
     // Valida o tratamento de erro genérico
@@ -470,7 +484,7 @@ describe('UsersService', () => {
       findOneByIdWithPasswordSpy.mockResolvedValue(mockUser);
       (comparePassword as jest.Mock).mockResolvedValue(true);
       (createPasswordHash as jest.Mock).mockResolvedValue('newHashedPassword');
-      userRepositoryMock.save.mockRejectedValue(new Error('Database error'));
+      mockRepository.save.mockRejectedValue(new Error('Database error'));
 
       // Act & Assert
       await expect(
@@ -487,23 +501,18 @@ describe('UsersService', () => {
       findOneSpy = jest.spyOn(service, 'findOne');
     });
 
-    afterEach(() => {
-      // Restaura o espião após cada teste.
-      jest.restoreAllMocks();
-    });
-
     // Valida o fluxo de sucesso
     it('should soft delete the user', async () => {
       // Arrange
       findOneSpy.mockResolvedValue(mockUser);
-      userRepositoryMock.softDelete.mockResolvedValue({ affected: 1 });
+      mockRepository.softDelete.mockResolvedValue({ affected: 1 });
 
       // Act
       await service.remove(mockUser.id);
 
       // Assert
       expect(findOneSpy).toHaveBeenCalledWith(mockUser.id);
-      expect(userRepositoryMock.softDelete).toHaveBeenCalledWith(mockUser.id);
+      expect(mockRepository.softDelete).toHaveBeenCalledWith(mockUser.id);
     });
 
     // Valida o erro de usuário não encontrado
@@ -513,16 +522,14 @@ describe('UsersService', () => {
 
       // Act & Assert
       await expect(service.remove(99)).rejects.toThrow(NotFoundException);
-      expect(userRepositoryMock.softDelete).not.toHaveBeenCalled();
+      expect(mockRepository.softDelete).not.toHaveBeenCalled();
     });
 
     // Valida o tratamento de erro genérico
     it('should throw InternalServerErrorException if delete fails', async () => {
       // Arrange
       findOneSpy.mockResolvedValue(mockUser);
-      userRepositoryMock.softDelete.mockRejectedValue(
-        new Error('Database error'),
-      );
+      mockRepository.softDelete.mockRejectedValue(new Error('Database error'));
 
       // Act & Assert
       await expect(service.remove(mockUser.id)).rejects.toThrow(
