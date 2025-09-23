@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -25,7 +26,7 @@ export class Student {
   @UpdateDateColumn({ name: 'updated_at', nullable: false })
   updatedAt: Date;
 
-  @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt: Date | null;
 
   constructor(partial: Partial<Student>) {
