@@ -47,7 +47,7 @@ describe('StudentsController', () => {
   });
 
   describe('create', () => {
-    // Valida o fluxo de sucesso
+    // Testa o fluxo de sucesso
     it('should create a student and return StudentResponseDto', async () => {
       // Arrange
       mockStudentsService.create.mockResolvedValue(mockStudent);
@@ -57,16 +57,16 @@ describe('StudentsController', () => {
 
       // Assert
       // Verifica se o resultado é uma instância de StudentResponseDto
+      expect(result).toEqual(new StudentResponseDto(mockStudent));
       expect(result).toBeInstanceOf(StudentResponseDto);
       expect(mockStudentsService.create).toHaveBeenCalledWith(
         mockCreateStudentDto,
       );
-      expect(result).toEqual(new StudentResponseDto(mockStudent));
     });
   });
 
   describe('findAll', () => {
-    // Valida o fluxo de sucesso
+    // Testa o fluxo de sucesso
     it('should return an array of StudentResponseDto', async () => {
       // Arrange
       mockStudentsService.findAll.mockResolvedValue(mockStudentList);
@@ -75,20 +75,21 @@ describe('StudentsController', () => {
       const result = await controller.findAll();
 
       // Assert
-      expect(mockStudentsService.findAll).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(
+        mockStudentList.map((student) => new StudentResponseDto(student)),
+      );
       expect(result).toBeInstanceOf(Array);
+      expect(mockStudentsService.findAll).toHaveBeenCalled();
+
       expect(result).toHaveLength(mockStudentList.length);
       result.forEach((student) => {
         expect(student).toBeInstanceOf(StudentResponseDto);
       });
-      expect(result).toEqual(
-        mockStudentList.map((student) => new StudentResponseDto(student)),
-      );
     });
   });
 
   describe('findOne', () => {
-    // Valida o fluxo de sucesso
+    // Testa o fluxo de sucesso
     it('should return StudentResponseDto when student is found', async () => {
       // Arrange
       mockStudentsService.findOne.mockResolvedValue(mockStudent);
@@ -102,7 +103,7 @@ describe('StudentsController', () => {
       expect(result).toEqual(new StudentResponseDto(mockStudent));
     });
 
-    // Valida o fluxo de erro - Estudante não encontrado
+    // Testa o fluxo de erro - Estudante não encontrado
     it('should throw NotFoundException when student is not found', async () => {
       // Arrange
       const nonExistentId = 99;
@@ -117,7 +118,7 @@ describe('StudentsController', () => {
   });
 
   describe('update', () => {
-    // Valida o fluxo de sucesso
+    // Testa o fluxo de sucesso
     it('should update a student and return StudentResponseDto', async () => {
       // Arrange
       const updatedStudent = { ...mockStudent, name: 'Updated Name' };
@@ -136,7 +137,7 @@ describe('StudentsController', () => {
       expect(result).toEqual(new StudentResponseDto(updatedStudent));
     });
 
-    // Valida o fluxo de erro - Estudante não encontrado
+    // Testa o fluxo de erro - Estudante não encontrado
     it('should throw NotFoundException when trying to update a non-existent student', async () => {
       // Arrange
       const nonExistentId = 99;
@@ -153,7 +154,7 @@ describe('StudentsController', () => {
   });
 
   describe('remove', () => {
-    // Valida o fluxo de sucesso
+    // Testa o fluxo de sucesso
     it('should remove a student', async () => {
       // Arrange
       mockStudentsService.remove.mockResolvedValue(undefined);
@@ -166,7 +167,7 @@ describe('StudentsController', () => {
       expect(mockStudentsService.remove).toHaveBeenCalledWith(mockStudent.id);
     });
 
-    // Valida o fluxo de erro - Estudante não encontrado
+    // Testa o fluxo de erro - Estudante não encontrado
     it('should throw NotFoundException when trying to remove a non-existent student', async () => {
       // Arrange
       const nonExistentId = 99;

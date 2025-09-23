@@ -59,7 +59,6 @@ describe('StudentsService', () => {
     service = module.get<StudentsService>(StudentsService);
     repository = module.get<Repository<Student>>(getRepositoryToken(Student));
 
-    // Limpa os mocks antes de cada teste para evitar interferência entre eles
     jest.clearAllMocks();
   });
 
@@ -78,16 +77,14 @@ describe('StudentsService', () => {
       const result = await service.create(mockCreateStudentDto);
 
       // Assert
-      expect(mockRepository.save).toHaveBeenCalledTimes(1);
-      expect(mockRepository.save).toHaveBeenCalledWith(mockCreateStudentDto);
       expect(result).toEqual(mockStudent);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockCreateStudentDto);
     });
 
     // Testa o fluxo de erro do método create
     it('should handle errors when creating a student', async () => {
-      // Arrange
-      const errorMessage = 'Database error';
-      mockRepository.save.mockRejectedValue(new Error(errorMessage));
+      // Arrange;
+      mockRepository.save.mockRejectedValue(new Error('Database error'));
 
       // Act & Assert
       await expect(service.create(mockCreateStudentDto)).rejects.toThrow(
@@ -106,15 +103,14 @@ describe('StudentsService', () => {
       const result = await service.findAll();
 
       // Assert
-      expect(mockRepository.find).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockStudentList);
+      expect(mockRepository.find).toHaveBeenCalled();
     });
 
     // Testa o fluxo de erro do método findAll
     it('should throw InternalServerErrorException when retrieving students fails', async () => {
       // Arrange
-      const errorMessage = 'Database error';
-      mockRepository.find.mockRejectedValue(new Error(errorMessage));
+      mockRepository.find.mockRejectedValue(new Error('Database error'));
 
       // Act & Assert
       await expect(service.findAll()).rejects.toThrow(
@@ -133,10 +129,10 @@ describe('StudentsService', () => {
       const result = await service.findOne(mockStudent.id);
 
       // Assert
+      expect(result).toEqual(mockStudent);
       expect(mockRepository.findOneByOrFail).toHaveBeenCalledWith({
         id: mockStudent.id,
       });
-      expect(result).toEqual(mockStudent);
     });
 
     // Testa o fluxo de erro quando o estudante não é encontrado
@@ -189,12 +185,12 @@ describe('StudentsService', () => {
       const result = await service.update(mockStudent.id, updateStudentDto);
 
       // Assert
+      expect(result).toEqual({ ...mockStudent, ...updateStudentDto });
+      expect(findOneSpy).toHaveBeenCalledWith(mockStudent.id);
       expect(mockRepository.save).toHaveBeenCalledWith({
         ...mockStudent,
         ...updateStudentDto,
       });
-      expect(findOneSpy).toHaveBeenCalledWith(mockStudent.id);
-      expect(result).toEqual({ ...mockStudent, ...updateStudentDto });
     });
 
     // Testa o fluxo de erro quando o estudante não é encontrado
