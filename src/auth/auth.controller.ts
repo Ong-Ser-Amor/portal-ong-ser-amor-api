@@ -16,13 +16,19 @@ export class AuthController {
   @Post('signin')
   @ApiOperation({ summary: 'Sign in to obtain an access token' })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Successfully signed in',
     type: SignInResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Bad Request' })
-  @ApiResponse({ status: 401, description: 'Invalid email or password' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request' })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Invalid email or password',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
   async signIn(@Body() signInDto: SignInDto): Promise<SignInResponseDto> {
     return new SignInResponseDto(await this.authService.signIn(signInDto));
   }

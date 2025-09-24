@@ -25,11 +25,14 @@ export class StudentsController {
   @Post()
   @ApiOperation({ summary: 'Create a new student' })
   @ApiResponse({
-    status: 201,
+    status: HttpStatus.CREATED,
     description: 'The student has been successfully created',
     type: StudentResponseDto,
   })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
   async create(
     @Body() createStudentDto: CreateStudentDto,
   ): Promise<StudentResponseDto> {
@@ -41,11 +44,14 @@ export class StudentsController {
   @Get()
   @ApiOperation({ summary: 'Get all students' })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'The students have been successfully retrieved',
     type: [StudentResponseDto],
   })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
   async findAll(): Promise<StudentResponseDto[]> {
     const students = await this.studentsService.findAll();
     return students.map((student) => new StudentResponseDto(student));
@@ -54,12 +60,18 @@ export class StudentsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get student by ID' })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'The student has been successfully retrieved',
     type: StudentResponseDto,
   })
-  @ApiResponse({ status: 404, description: 'Student not found' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Student not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
   async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<StudentResponseDto> {
@@ -69,12 +81,18 @@ export class StudentsController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update student by ID' })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'The student has been successfully updated',
     type: StudentResponseDto,
   })
-  @ApiResponse({ status: 404, description: 'Student not found' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Student not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateStudentDto: UpdateStudentDto,
@@ -88,11 +106,17 @@ export class StudentsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete student by ID' })
   @ApiResponse({
-    status: 204,
+    status: HttpStatus.NO_CONTENT,
     description: 'The student has been successfully deleted',
   })
-  @ApiResponse({ status: 404, description: 'Student not found' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Student not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.studentsService.remove(id);
   }
