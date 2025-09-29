@@ -1,8 +1,10 @@
+import { CourseClass } from 'src/course-classes/entities/course-class.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -41,6 +43,12 @@ export class User {
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt: Date | null;
+
+  @ManyToMany(
+    () => CourseClass,
+    (courseClass: CourseClass) => courseClass.teachers,
+  )
+  courseClasses: CourseClass[];
 
   constructor(partial: Partial<User>) {
     Object.assign(this, partial);

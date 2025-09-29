@@ -1,5 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { UserResponseDto } from 'src/users/dto/user-response.dto';
+import { mockTeacher } from 'src/users/mocks/user.mock';
 
 import { CourseClassesController } from '../course-classes.controller';
 import { CourseClassesService } from '../course-classes.service';
@@ -7,6 +9,7 @@ import { CourseClassResponseDto } from '../dto/course-class-response.dto';
 import {
   mockCourseClass,
   mockCourseClassList,
+  mockCourseClassWithTeacher,
   mockCreateCourseClassDto,
 } from '../mocks/course-class.mock';
 
@@ -20,6 +23,9 @@ describe('CourseClassesController', () => {
     findOne: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
+    addTeacherToClass: jest.fn(),
+    removeTeacherFromClass: jest.fn(),
+    getTeachersFromClass: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -57,6 +63,7 @@ describe('CourseClassesController', () => {
 
       // Assert
       expect(result).toBeInstanceOf(CourseClassResponseDto);
+      expect(result.teachers).toEqual([]);
       expect(mockCourseClassesService.create).toHaveBeenCalledWith(
         mockCreateCourseClassDto,
       );
@@ -74,8 +81,10 @@ describe('CourseClassesController', () => {
       const result = await controller.findAll();
 
       // Assert
-      expect(mockCourseClassesService.findAll).toHaveBeenCalled();
       expect(result).toBeInstanceOf(Array);
+      expect(result[0]).toBeInstanceOf(CourseClassResponseDto);
+      expect(result[1].teachers[0]).toBeInstanceOf(UserResponseDto);
+      expect(mockCourseClassesService.findAll).toHaveBeenCalled();
       expect(result).toHaveLength(mockCourseClassList.length);
       result.forEach((item) => {
         expect(item).toBeInstanceOf(CourseClassResponseDto);
@@ -92,17 +101,22 @@ describe('CourseClassesController', () => {
     // Testa o fluxo de sucesso
     it('should return CourseClassResponseDto when found', async () => {
       // Arrange
-      mockCourseClassesService.findOne.mockResolvedValue(mockCourseClass);
+      mockCourseClassesService.findOne.mockResolvedValue(
+        mockCourseClassWithTeacher,
+      );
 
       // Act
-      const result = await controller.findOne(mockCourseClass.id);
+      const result = await controller.findOne(mockCourseClassWithTeacher.id);
 
       // Assert
       expect(result).toBeInstanceOf(CourseClassResponseDto);
+      expect(result.teachers[0].id).toEqual(mockTeacher.id);
       expect(mockCourseClassesService.findOne).toHaveBeenCalledWith(
-        mockCourseClass.id,
+        mockCourseClassWithTeacher.id,
       );
-      expect(result).toEqual(new CourseClassResponseDto(mockCourseClass));
+      expect(result).toEqual(
+        new CourseClassResponseDto(mockCourseClassWithTeacher),
+      );
     });
 
     // Testa o fluxo de erro - CourseClass não encontrado
@@ -193,6 +207,75 @@ describe('CourseClassesController', () => {
       expect(mockCourseClassesService.remove).toHaveBeenCalledWith(
         nonExistentId,
       );
+    });
+  });
+
+  // =================================================================
+  // TESTES PARA AS ROTAS DE GERENCIAMENTO DE PROFESSORES
+  // =================================================================
+  describe('Teacher Management Routes', () => {
+    describe('addTeacher', () => {
+      it('should add a teacher and return the updated CourseClassResponseDto', async () => {
+        // Arrange
+        mockCourseClassesService.addTeacherToClass.mockResolvedValue(
+          mockCourseClassWithTeacher,
+        );
+        const dto = { teacherId: mockTeacher.id };
+
+        // Act
+        const result = await controller.addTeacher(mockCourseClass.id, dto);
+
+        // Assert
+        expect(mockCourseClassesService.addTeacherToClass).toHaveBeenCalledWith(
+          mockCourseClass.id,
+          mockTeacher.id,
+        );
+        expect(result).toBeInstanceOf(CourseClassResponseDto);
+        expect(result.teachers).toHaveLength(1);
+        expect(result.teachers[0].id).toEqual(mockTeacher.id);
+      });
+    });
+
+    describe('getTeachers', () => {
+      it('should return an array of UserResponseDto', async () => {
+        // Arrange
+        mockCourseClassesService.getTeachersFromClass.mockResolvedValue([
+          mockTeacher,
+        ]);
+
+        // Act
+        const result = await controller.getTeachers(mockCourseClass.id);
+
+        // Assert
+        expect(
+          mockCourseClassesService.getTeachersFromClass,
+        ).toHaveBeenCalledWith(mockCourseClass.id);
+        expect(result).toBeInstanceOf(Array);
+        expect(result[0]).toBeInstanceOf(UserResponseDto);
+        expect(result[0].id).toEqual(mockTeacher.id);
+      });
+    });
+
+    describe('removeTeacher', () => {
+      it('should remove a teacher and return the updated CourseClassResponseDto', async () => {
+        // Arrange
+        mockCourseClassesService.removeTeacherFromClass.mockResolvedValue(
+          mockCourseClass,
+        ); // Retorna a turma sem professores
+
+        // Act
+        const result = await controller.removeTeacher(
+          mockCourseClass.id,
+          mockTeacher.id,
+        );
+
+        // Assert
+        expect(
+          mockCourseClassesService.removeTeacherFromClass,
+        ).toHaveBeenCalledWith(mockCourseClass.id, mockTeacher.id);
+        expect(result).toBeInstanceOf(CourseClassResponseDto);
+        expect(result.teachers).toHaveLength(0);
+      });
     });
   });
 });

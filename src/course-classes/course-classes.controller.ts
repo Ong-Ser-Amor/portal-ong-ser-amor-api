@@ -11,8 +11,10 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserResponseDto } from 'src/users/dto/user-response.dto';
 
 import { CourseClassesService } from './course-classes.service';
+import { AddTeacherDto } from './dto/add-teacher.dto';
 import { CourseClassResponseDto } from './dto/course-class-response.dto';
 import { CreateCourseClassDto } from './dto/create-course-class.dto';
 import { UpdateCourseClassDto } from './dto/update-course-class.dto';
@@ -123,5 +125,44 @@ export class CourseClassesController {
   })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.courseClassesService.remove(id);
+  }
+
+  // --- Rotas de Gerenciamento de Professores ---
+
+  @Post(':id/teachers')
+  @ApiOperation({ summary: 'Add a teacher to a course class' })
+  @ApiResponse({ status: 200, type: CourseClassResponseDto })
+  async addTeacher(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() addTeacherDto: AddTeacherDto,
+  ): Promise<CourseClassResponseDto> {
+    const updatedCourseClass =
+      await this.courseClassesService.addTeacherToClass(
+        id,
+        addTeacherDto.teacherId,
+      );
+    return new CourseClassResponseDto(updatedCourseClass);
+  }
+
+  @Get(':id/teachers')
+  @ApiOperation({ summary: 'Get all teachers from a course class' })
+  @ApiResponse({ status: 200, type: [UserResponseDto] })
+  async getTeachers(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<UserResponseDto[]> {
+    const teachers = await this.courseClassesService.getTeachersFromClass(id);
+    return teachers.map((teacher) => new UserResponseDto(teacher));
+  }
+
+  @Delete(':id/teachers/:teacherId')
+  @ApiOperation({ summary: 'Remove a teacher from a course class' })
+  @ApiResponse({ status: 200, type: CourseClassResponseDto })
+  async removeTeacher(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('teacherId', ParseIntPipe) teacherId: number,
+  ): Promise<CourseClassResponseDto> {
+    const updatedCourseClass =
+      await this.courseClassesService.removeTeacherFromClass(id, teacherId);
+    return new CourseClassResponseDto(updatedCourseClass);
   }
 }

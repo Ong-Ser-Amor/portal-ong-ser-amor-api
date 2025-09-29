@@ -14,9 +14,17 @@ export const mockUser: User = {
   name: 'Mock User',
   email: 'mock@example.com',
   passwordHash: 'hashedPassword',
+  courseClasses: [],
   createdAt: new Date('2025-09-17T15:00:00.000Z'),
   updatedAt: new Date('2025-09-17T15:00:00.000Z'),
   deletedAt: null,
+};
+
+export const mockTeacher: User = {
+  ...mockUser,
+  id: 2,
+  name: 'Professor Mock',
+  email: 'teacher@mock.com',
 };
 
 // Uma lista de usuários para testar métodos como `findAll`

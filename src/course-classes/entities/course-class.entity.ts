@@ -1,4 +1,5 @@
 import { Course } from 'src/courses/entities/course.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -6,6 +7,8 @@ import {
   Entity,
   Index,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -38,6 +41,14 @@ export class CourseClass {
   @ManyToOne(() => Course, (course: Course) => course.courseClasses)
   @JoinColumn({ name: 'course_id', referencedColumnName: 'id' })
   course: Course;
+
+  @ManyToMany(() => User, (user: User) => user.courseClasses)
+  @JoinTable({
+    name: 'course_class_teacher',
+    joinColumn: { name: 'course_class_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'teacher_id', referencedColumnName: 'id' },
+  })
+  teachers: User[];
 
   constructor(partial: Partial<CourseClass>) {
     Object.assign(this, partial);

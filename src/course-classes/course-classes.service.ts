@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -6,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CoursesService } from 'src/courses/courses.service';
+import { User } from 'src/users/entities/user.entity';
+import { UsersService } from 'src/users/users.service';
 import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { CreateCourseClassDto } from './dto/create-course-class.dto';
@@ -20,6 +23,7 @@ export class CourseClassesService {
     @InjectRepository(CourseClass)
     private readonly repository: Repository<CourseClass>,
     private readonly coursesService: CoursesService,
+    private readonly usersService: UsersService,
   ) {}
 
   async create(
@@ -112,5 +116,74 @@ export class CourseClassesService {
       this.logger.error(`Error deleting course class: ${errorMessage}`);
       throw new InternalServerErrorException('Error deleting course class');
     }
+  }
+
+  // --- Métodos de Gerenciamento de Professores ---
+
+  async addTeacherToClass(
+    classId: number,
+    teacherId: number,
+  ): Promise<CourseClass> {
+    const courseClass = await this.findOne(classId);
+    const teacher = await this.usersService.findOne(teacherId);
+
+    const isTeacherAlreadyInClass = courseClass.teachers.some(
+      (t) => t.id === teacherId,
+    );
+
+    if (isTeacherAlreadyInClass) {
+      throw new BadRequestException(
+        `Teacher with ID ${teacherId} is already in this class.`,
+      );
+    }
+
+    courseClass.teachers.push(teacher);
+
+    try {
+      return await this.repository.save(courseClass);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(`Error adding teacher to class: ${errorMessage}`);
+      throw new InternalServerErrorException('Error adding teacher to class');
+    }
+  }
+
+  async removeTeacherFromClass(
+    classId: number,
+    teacherId: number,
+  ): Promise<CourseClass> {
+    const courseClass = await this.findOne(classId);
+
+    const initialTeacherCount = courseClass.teachers.length;
+    courseClass.teachers = courseClass.teachers.filter(
+      (teacher) => teacher.id !== teacherId,
+    );
+
+    if (courseClass.teachers.length === initialTeacherCount) {
+      throw new NotFoundException(
+        `Teacher with ID ${teacherId} not found in this class.`,
+      );
+    }
+
+    try {
+      return await this.repository.save(courseClass);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(`Error removing teacher from class: ${errorMessage}`);
+      throw new InternalServerErrorException(
+        'Error removing teacher from class',
+      );
+    }
+  }
+
+  async getTeachersFromClass(classId: number): Promise<User[]> {
+    const courseClass = await this.findOne(classId);
+    return courseClass.teachers;
   }
 }

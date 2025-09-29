@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -6,6 +7,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CoursesService } from 'src/courses/courses.service';
 import { mockCourse } from 'src/courses/mocks/course.mock';
+import { mockTeacher } from 'src/users/mocks/user.mock';
+import { UsersService } from 'src/users/users.service';
 import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { CourseClassesService } from '../course-classes.service';
@@ -14,6 +17,7 @@ import { CourseClass } from '../entities/course-class.entity';
 import {
   mockCourseClass,
   mockCourseClassList,
+  mockCourseClassWithTeacher,
   mockCreateCourseClassDto,
 } from '../mocks/course-class.mock';
 
@@ -45,9 +49,9 @@ describe('CourseClassesService', () => {
     softDelete: jest.fn(),
   };
 
-  const mockCoursesService = {
-    findOne: jest.fn(),
-  };
+  const mockCoursesService = { findOne: jest.fn() };
+
+  const mockUsersService = { findOne: jest.fn() };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -61,6 +65,7 @@ describe('CourseClassesService', () => {
           provide: CoursesService,
           useValue: mockCoursesService,
         },
+        { provide: UsersService, useValue: mockUsersService },
       ],
     })
       .setLogger(mockLogger)
@@ -297,6 +302,98 @@ describe('CourseClassesService', () => {
       await expect(service.remove(mockCourseClass.id)).rejects.toThrow(
         InternalServerErrorException,
       );
+    });
+  });
+
+  // =================================================================
+  // TESTES PARA GERENCIAMENTO DE PROFESSORES
+  // =================================================================
+  describe('Teacher Management', () => {
+    let findOneSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      findOneSpy = jest.spyOn(service, 'findOne');
+    });
+
+    describe('addTeacherToClass', () => {
+      it('should add a teacher to a class', async () => {
+        // Arrange
+        findOneSpy.mockResolvedValue({ ...mockCourseClass, teachers: [] });
+        mockUsersService.findOne.mockResolvedValue(mockTeacher);
+        mockRepository.save.mockResolvedValue(mockCourseClassWithTeacher);
+
+        // Act
+        const result = await service.addTeacherToClass(
+          mockCourseClass.id,
+          mockTeacher.id,
+        );
+
+        // Assert
+        expect(findOneSpy).toHaveBeenCalledWith(mockCourseClass.id);
+        expect(mockUsersService.findOne).toHaveBeenCalledWith(mockTeacher.id);
+        expect(mockRepository.save).toHaveBeenCalledWith(
+          expect.objectContaining({
+            teachers: [mockTeacher],
+          }),
+        );
+        expect(result.teachers).toContain(mockTeacher);
+      });
+
+      it('should throw BadRequestException if teacher is already in class', async () => {
+        // Arrange
+        findOneSpy.mockResolvedValue(mockCourseClassWithTeacher);
+        mockUsersService.findOne.mockResolvedValue(mockTeacher);
+
+        // Act & Assert
+        await expect(
+          service.addTeacherToClass(mockCourseClass.id, mockTeacher.id),
+        ).rejects.toThrow(BadRequestException);
+      });
+    });
+
+    describe('removeTeacherFromClass', () => {
+      it('should remove a teacher from a class', async () => {
+        // Arrange
+        findOneSpy.mockResolvedValue({ ...mockCourseClassWithTeacher });
+        mockRepository.save.mockResolvedValue(mockCourseClass);
+
+        // Act
+        const result = await service.removeTeacherFromClass(
+          mockCourseClass.id,
+          mockTeacher.id,
+        );
+
+        // Assert
+        expect(findOneSpy).toHaveBeenCalledWith(mockCourseClass.id);
+        expect(mockRepository.save).toHaveBeenCalledWith(
+          expect.objectContaining({ teachers: [] }),
+        );
+        expect(result.teachers).toHaveLength(0);
+      });
+
+      it('should throw NotFoundException if teacher to remove is not in class', async () => {
+        // Arrange
+        findOneSpy.mockResolvedValue(mockCourseClass);
+
+        // Act & Assert
+        await expect(
+          service.removeTeacherFromClass(mockCourseClass.id, 99),
+        ).rejects.toThrow(NotFoundException);
+      });
+    });
+
+    describe('getTeachersFromClass', () => {
+      it('should return an array of teachers', async () => {
+        // Arrange
+        findOneSpy.mockResolvedValue(mockCourseClassWithTeacher);
+
+        // Act
+        const result = await service.getTeachersFromClass(mockCourseClass.id);
+
+        // Assert
+        expect(result).toEqual([mockTeacher]);
+        expect(findOneSpy).toHaveBeenCalledWith(mockCourseClass.id);
+      });
     });
   });
 });
