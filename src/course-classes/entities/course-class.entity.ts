@@ -1,4 +1,5 @@
 import { Course } from 'src/courses/entities/course.entity';
+import { Student } from 'src/students/entities/student.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -49,6 +50,14 @@ export class CourseClass {
     inverseJoinColumn: { name: 'teacher_id', referencedColumnName: 'id' },
   })
   teachers: User[];
+
+  @ManyToMany(() => Student, (student: Student) => student.courseClasses)
+  @JoinTable({
+    name: 'course_class_student',
+    joinColumn: { name: 'course_class_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'student_id', referencedColumnName: 'id' },
+  })
+  students: Student[];
 
   constructor(partial: Partial<CourseClass>) {
     Object.assign(this, partial);

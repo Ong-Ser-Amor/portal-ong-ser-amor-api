@@ -11,9 +11,11 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { StudentResponseDto } from 'src/students/dto/student-response.dto';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 
 import { CourseClassesService } from './course-classes.service';
+import { AddStudentDto } from './dto/add-student.dto';
 import { AddTeacherDto } from './dto/add-teacher.dto';
 import { CourseClassResponseDto } from './dto/course-class-response.dto';
 import { CreateCourseClassDto } from './dto/create-course-class.dto';
@@ -131,7 +133,7 @@ export class CourseClassesController {
 
   @Post(':id/teachers')
   @ApiOperation({ summary: 'Add a teacher to a course class' })
-  @ApiResponse({ status: 200, type: CourseClassResponseDto })
+  @ApiResponse({ status: HttpStatus.OK, type: CourseClassResponseDto })
   async addTeacher(
     @Param('id', ParseIntPipe) id: number,
     @Body() addTeacherDto: AddTeacherDto,
@@ -146,7 +148,7 @@ export class CourseClassesController {
 
   @Get(':id/teachers')
   @ApiOperation({ summary: 'Get all teachers from a course class' })
-  @ApiResponse({ status: 200, type: [UserResponseDto] })
+  @ApiResponse({ status: HttpStatus.OK, type: [UserResponseDto] })
   async getTeachers(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<UserResponseDto[]> {
@@ -156,13 +158,52 @@ export class CourseClassesController {
 
   @Delete(':id/teachers/:teacherId')
   @ApiOperation({ summary: 'Remove a teacher from a course class' })
-  @ApiResponse({ status: 200, type: CourseClassResponseDto })
+  @ApiResponse({ status: HttpStatus.OK, type: CourseClassResponseDto })
   async removeTeacher(
     @Param('id', ParseIntPipe) id: number,
     @Param('teacherId', ParseIntPipe) teacherId: number,
   ): Promise<CourseClassResponseDto> {
     const updatedCourseClass =
       await this.courseClassesService.removeTeacherFromClass(id, teacherId);
+    return new CourseClassResponseDto(updatedCourseClass);
+  }
+
+  // --- Rotas de Gerenciamento de Alunos ---
+
+  @Post(':id/students')
+  @ApiOperation({ summary: 'Add a student to a course class' })
+  @ApiResponse({ status: HttpStatus.CREATED, type: CourseClassResponseDto })
+  async addStudent(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() addStudentDto: AddStudentDto,
+  ): Promise<CourseClassResponseDto> {
+    const updatedCourseClass =
+      await this.courseClassesService.addStudentToClass(
+        id,
+        addStudentDto.studentId,
+      );
+    return new CourseClassResponseDto(updatedCourseClass);
+  }
+
+  @Get(':id/students')
+  @ApiOperation({ summary: 'Get all students from a course class' })
+  @ApiResponse({ status: HttpStatus.OK, type: [StudentResponseDto] })
+  async getStudents(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<StudentResponseDto[]> {
+    const students = await this.courseClassesService.getStudentsFromClass(id);
+    return students.map((student) => new StudentResponseDto(student));
+  }
+
+  @Delete(':id/students/:studentId')
+  @ApiOperation({ summary: 'Remove a student from a course class' })
+  @ApiResponse({ status: HttpStatus.OK, type: CourseClassResponseDto })
+  async removeStudent(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('studentId', ParseIntPipe) studentId: number,
+  ): Promise<CourseClassResponseDto> {
+    const updatedCourseClass =
+      await this.courseClassesService.removeStudentFromClass(id, studentId);
     return new CourseClassResponseDto(updatedCourseClass);
   }
 }

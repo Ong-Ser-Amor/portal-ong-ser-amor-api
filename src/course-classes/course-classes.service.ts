@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CoursesService } from 'src/courses/courses.service';
+import { Student } from 'src/students/entities/student.entity';
+import { StudentsService } from 'src/students/students.service';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { EntityNotFoundError, Repository } from 'typeorm';
@@ -24,6 +26,7 @@ export class CourseClassesService {
     private readonly repository: Repository<CourseClass>,
     private readonly coursesService: CoursesService,
     private readonly usersService: UsersService,
+    private readonly studentsService: StudentsService,
   ) {}
 
   async create(
@@ -68,7 +71,7 @@ export class CourseClassesService {
     try {
       return await this.repository.findOneOrFail({
         where: { id },
-        relations: ['course', 'teachers'],
+        relations: ['course', 'teachers', 'students'],
       });
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
@@ -185,5 +188,78 @@ export class CourseClassesService {
   async getTeachersFromClass(classId: number): Promise<User[]> {
     const courseClass = await this.findOne(classId);
     return courseClass.teachers;
+  }
+
+  // --- Métodos de Gerenciamento de Alunos ---
+
+  async addStudentToClass(
+    classId: number,
+    studentId: number,
+  ): Promise<CourseClass> {
+    const courseClass = await this.findOne(classId);
+    const student = await this.studentsService.findOne(studentId);
+
+    if (!courseClass.students) {
+      courseClass.students = [];
+    }
+
+    const isStudentAlreadyInClass = courseClass.students.some(
+      (s) => s.id === studentId,
+    );
+
+    if (isStudentAlreadyInClass) {
+      throw new BadRequestException(
+        `Student with ID ${studentId} is already in this class.`,
+      );
+    }
+
+    courseClass.students.push(student);
+
+    try {
+      return await this.repository.save(courseClass);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(`Error adding student to class: ${errorMessage}`);
+      throw new InternalServerErrorException('Error adding student to class');
+    }
+  }
+
+  async removeStudentFromClass(
+    classId: number,
+    studentId: number,
+  ): Promise<CourseClass> {
+    const courseClass = await this.findOne(classId);
+
+    const initialStudentCount = courseClass.students.length;
+    courseClass.students = courseClass.students.filter(
+      (student) => student.id !== studentId,
+    );
+
+    if (courseClass.students.length === initialStudentCount) {
+      throw new NotFoundException(
+        `Student with ID ${studentId} not found in this class.`,
+      );
+    }
+
+    try {
+      return await this.repository.save(courseClass);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(`Error removing student from class: ${errorMessage}`);
+      throw new InternalServerErrorException(
+        'Error removing student from class',
+      );
+    }
+  }
+
+  async getStudentsFromClass(classId: number): Promise<Student[]> {
+    const courseClass = await this.findOne(classId);
+    return courseClass.students;
   }
 }

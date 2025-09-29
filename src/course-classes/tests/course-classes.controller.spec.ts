@@ -1,5 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { StudentResponseDto } from 'src/students/dto/student-response.dto';
+import { mockStudent } from 'src/students/mocks/student.mock';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 import { mockTeacher } from 'src/users/mocks/user.mock';
 
@@ -26,6 +28,9 @@ describe('CourseClassesController', () => {
     addTeacherToClass: jest.fn(),
     removeTeacherFromClass: jest.fn(),
     getTeachersFromClass: jest.fn(),
+    addStudentToClass: jest.fn(),
+    removeStudentFromClass: jest.fn(),
+    getStudentsFromClass: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -210,9 +215,7 @@ describe('CourseClassesController', () => {
     });
   });
 
-  // =================================================================
   // TESTES PARA AS ROTAS DE GERENCIAMENTO DE PROFESSORES
-  // =================================================================
   describe('Teacher Management Routes', () => {
     describe('addTeacher', () => {
       it('should add a teacher and return the updated CourseClassResponseDto', async () => {
@@ -275,6 +278,50 @@ describe('CourseClassesController', () => {
         ).toHaveBeenCalledWith(mockCourseClass.id, mockTeacher.id);
         expect(result).toBeInstanceOf(CourseClassResponseDto);
         expect(result.teachers).toHaveLength(0);
+      });
+    });
+  });
+
+  // TESTES PARA AS ROTAS DE GERENCIAMENTO DE ALUNOS
+  describe('Student Management Routes', () => {
+    describe('addStudent', () => {
+      it('should add a student and return the updated CourseClassResponseDto', async () => {
+        // Arrange
+        const classWithStudent = {
+          ...mockCourseClass,
+          students: [mockStudent],
+        };
+        mockCourseClassesService.addStudentToClass.mockResolvedValue(
+          classWithStudent,
+        );
+        const dto = { studentId: mockStudent.id };
+
+        // Act
+        const result = await controller.addStudent(mockCourseClass.id, dto);
+
+        // Assert
+        expect(mockCourseClassesService.addStudentToClass).toHaveBeenCalledWith(
+          mockCourseClass.id,
+          mockStudent.id,
+        );
+        expect(result).toBeInstanceOf(CourseClassResponseDto);
+        expect(result.students).toHaveLength(1);
+      });
+    });
+
+    describe('getStudents', () => {
+      it('should return an array of StudentResponseDto', async () => {
+        // Arrange
+        mockCourseClassesService.getStudentsFromClass.mockResolvedValue([
+          mockStudent,
+        ]);
+
+        // Act
+        const result = await controller.getStudents(mockCourseClass.id);
+
+        // Assert
+        expect(result[0]).toBeInstanceOf(StudentResponseDto);
+        expect(result[0].id).toEqual(mockStudent.id);
       });
     });
   });

@@ -7,6 +7,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CoursesService } from 'src/courses/courses.service';
 import { mockCourse } from 'src/courses/mocks/course.mock';
+import { mockStudent } from 'src/students/mocks/student.mock';
+import { StudentsService } from 'src/students/students.service';
 import { mockTeacher } from 'src/users/mocks/user.mock';
 import { UsersService } from 'src/users/users.service';
 import { EntityNotFoundError, Repository } from 'typeorm';
@@ -53,6 +55,8 @@ describe('CourseClassesService', () => {
 
   const mockUsersService = { findOne: jest.fn() };
 
+  const mockStudentsService = { findOne: jest.fn() };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -66,6 +70,7 @@ describe('CourseClassesService', () => {
           useValue: mockCoursesService,
         },
         { provide: UsersService, useValue: mockUsersService },
+        { provide: StudentsService, useValue: mockStudentsService },
       ],
     })
       .setLogger(mockLogger)
@@ -166,21 +171,28 @@ describe('CourseClassesService', () => {
     // Teste o fluxo de sucesso do método findOne
     it('should return a course class by id with its relations', async () => {
       // Arrange
+      const mockCourseClassWithAllRelations = {
+        ...mockCourseClass,
+        teachers: [],
+        students: [],
+      };
       mockRepository.findOneOrFail.mockResolvedValue(
-        mockCourseClassWithTeacher,
+        mockCourseClassWithAllRelations,
       );
 
       // Act
       const result = await service.findOne(mockCourseClass.id);
 
       // Assert
-      expect(result).toEqual(mockCourseClassWithTeacher);
-      expect(result.teachers).toBeDefined();
-      expect(Array.isArray(result.teachers)).toBe(true);
       expect(mockRepository.findOneOrFail).toHaveBeenCalledWith({
         where: { id: mockCourseClass.id },
-        relations: ['course', 'teachers'],
+        relations: ['course', 'teachers', 'students'],
       });
+      expect(result).toEqual(mockCourseClassWithAllRelations);
+      expect(result.teachers).toBeDefined();
+      expect(Array.isArray(result.teachers)).toBe(true);
+      expect(result.students).toBeDefined();
+      expect(Array.isArray(result.students)).toBe(true);
     });
 
     // Teste o fluxo de erro quando a turma do curso não é encontrada
@@ -309,9 +321,7 @@ describe('CourseClassesService', () => {
     });
   });
 
-  // =================================================================
   // TESTES PARA GERENCIAMENTO DE PROFESSORES
-  // =================================================================
   describe('Teacher Management', () => {
     let findOneSpy: jest.SpyInstance;
 
@@ -397,6 +407,59 @@ describe('CourseClassesService', () => {
         // Assert
         expect(result).toEqual([mockTeacher]);
         expect(findOneSpy).toHaveBeenCalledWith(mockCourseClass.id);
+      });
+    });
+  });
+
+  // TESTES PARA GERENCIAMENTO DE ALUNOS
+  describe('Student Management', () => {
+    let findOneSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      findOneSpy = jest.spyOn(service, 'findOne');
+    });
+
+    describe('addStudentToClass', () => {
+      it('should add a student to a class', async () => {
+        // Arrange
+        findOneSpy.mockResolvedValue({ ...mockCourseClass, students: [] });
+        mockStudentsService.findOne.mockResolvedValue(mockStudent);
+        mockRepository.save.mockResolvedValue({
+          ...mockCourseClass,
+          students: [mockStudent],
+        });
+
+        // Act
+        const result = await service.addStudentToClass(
+          mockCourseClass.id,
+          mockStudent.id,
+        );
+
+        // Assert
+        expect(findOneSpy).toHaveBeenCalledWith(mockCourseClass.id);
+        expect(mockStudentsService.findOne).toHaveBeenCalledWith(
+          mockStudent.id,
+        );
+        expect(mockRepository.save).toHaveBeenCalledWith(
+          expect.objectContaining({
+            students: [mockStudent],
+          }),
+        );
+        expect(result.students).toContain(mockStudent);
+      });
+
+      it('should throw BadRequestException if student is already in class', async () => {
+        // Arrange
+        findOneSpy.mockResolvedValue({
+          ...mockCourseClass,
+          students: [mockStudent],
+        });
+        mockStudentsService.findOne.mockResolvedValue(mockStudent);
+
+        // Act & Assert
+        await expect(
+          service.addStudentToClass(mockCourseClass.id, mockStudent.id),
+        ).rejects.toThrow(BadRequestException);
       });
     });
   });
