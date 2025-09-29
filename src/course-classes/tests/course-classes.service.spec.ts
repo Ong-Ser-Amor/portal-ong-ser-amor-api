@@ -164,18 +164,22 @@ describe('CourseClassesService', () => {
 
   describe('findOne', () => {
     // Teste o fluxo de sucesso do método findOne
-    it('should return a course class by id', async () => {
+    it('should return a course class by id with its relations', async () => {
       // Arrange
-      mockRepository.findOneOrFail.mockResolvedValue(mockCourseClass);
+      mockRepository.findOneOrFail.mockResolvedValue(
+        mockCourseClassWithTeacher,
+      );
 
       // Act
       const result = await service.findOne(mockCourseClass.id);
 
       // Assert
-      expect(result).toEqual(mockCourseClass);
+      expect(result).toEqual(mockCourseClassWithTeacher);
+      expect(result.teachers).toBeDefined();
+      expect(Array.isArray(result.teachers)).toBe(true);
       expect(mockRepository.findOneOrFail).toHaveBeenCalledWith({
         where: { id: mockCourseClass.id },
-        relations: ['course'],
+        relations: ['course', 'teachers'],
       });
     });
 

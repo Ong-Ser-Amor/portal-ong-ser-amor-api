@@ -28,7 +28,7 @@ export const mockCourseClassWithTeacher: CourseClass = {
   teachers: [mockTeacher],
 };
 
-export const mockCourseClassList = [
+export const mockCourseClassList: CourseClass[] = [
   mockCourseClass,
   {
     ...mockCourseClass,
