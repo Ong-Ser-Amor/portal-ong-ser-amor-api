@@ -1,10 +1,11 @@
 import { CreateCourseDto } from '../dto/create-course.dto';
+import { Course } from '../entities/course.entity';
 
 export const mockCreateCourseDto: CreateCourseDto = {
   name: 'Mock Course',
 };
 
-export const mockCourse = {
+export const mockCourse: Course = {
   id: 1,
   name: 'Mock Course',
   courseClasses: [],
@@ -13,7 +14,7 @@ export const mockCourse = {
   deletedAt: null,
 };
 
-export const mockCourseList = [
+export const mockCourseList: Course[] = [
   mockCourse,
   { ...mockCourse, id: 2, name: 'Mock Course 2' },
 ];
