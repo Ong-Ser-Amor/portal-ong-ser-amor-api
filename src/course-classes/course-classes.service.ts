@@ -68,7 +68,7 @@ export class CourseClassesService {
     try {
       return await this.repository.findOneOrFail({
         where: { id },
-        relations: ['course'],
+        relations: ['course', 'teachers'],
       });
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
