@@ -1,4 +1,5 @@
 import { Course } from 'src/courses/entities/course.entity';
+import { Lesson } from 'src/lessons/entities/lesson.entity';
 import { Student } from 'src/students/entities/student.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -11,6 +12,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -58,6 +60,9 @@ export class CourseClass {
     inverseJoinColumn: { name: 'student_id', referencedColumnName: 'id' },
   })
   students: Student[];
+
+  @OneToMany(() => Lesson, (lesson) => lesson.courseClass)
+  lessons: Lesson[];
 
   constructor(partial: Partial<CourseClass>) {
     Object.assign(this, partial);
