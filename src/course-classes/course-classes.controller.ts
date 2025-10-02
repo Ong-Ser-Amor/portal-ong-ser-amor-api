@@ -11,6 +11,8 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { LessonResponseDto } from 'src/lessons/dto/lesson-response.dto';
+import { LessonsService } from 'src/lessons/lessons.service';
 import { StudentResponseDto } from 'src/students/dto/student-response.dto';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 
@@ -24,7 +26,10 @@ import { UpdateCourseClassDto } from './dto/update-course-class.dto';
 @Controller('course-classes')
 @ApiTags('Course Classes')
 export class CourseClassesController {
-  constructor(private readonly courseClassesService: CourseClassesService) {}
+  constructor(
+    private readonly courseClassesService: CourseClassesService,
+    private readonly lessonsService: LessonsService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new course class' })
@@ -84,6 +89,28 @@ export class CourseClassesController {
     return new CourseClassResponseDto(
       await this.courseClassesService.findOne(id),
     );
+  }
+
+  @Get(':id/lessons')
+  @ApiOperation({ summary: 'Get all lessons from a course class' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'The lessons have been successfully retrieved.',
+    type: [LessonResponseDto],
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Course class not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async getLessons(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<LessonResponseDto[]> {
+    const lessons = await this.lessonsService.findByCourseClassId(id);
+    return lessons.map((lesson) => new LessonResponseDto(lesson));
   }
 
   @Patch(':id')

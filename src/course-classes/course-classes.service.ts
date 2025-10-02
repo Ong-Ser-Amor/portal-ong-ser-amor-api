@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CoursesService } from 'src/courses/courses.service';
+import { Lesson } from 'src/lessons/entities/lesson.entity';
+import { LessonsService } from 'src/lessons/lessons.service';
 import { Student } from 'src/students/entities/student.entity';
 import { StudentsService } from 'src/students/students.service';
 import { User } from 'src/users/entities/user.entity';

@@ -1,5 +1,8 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { LessonResponseDto } from 'src/lessons/dto/lesson-response.dto';
+import { LessonsService } from 'src/lessons/lessons.service';
+import { mockLesson, mockLessonList } from 'src/lessons/mocks/lesson.mock';
 import { StudentResponseDto } from 'src/students/dto/student-response.dto';
 import { mockStudent } from 'src/students/mocks/student.mock';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
@@ -18,6 +21,7 @@ import {
 describe('CourseClassesController', () => {
   let controller: CourseClassesController;
   let service: CourseClassesService;
+  let lessonsService: LessonsService;
 
   const mockCourseClassesService = {
     create: jest.fn(),
@@ -33,6 +37,10 @@ describe('CourseClassesController', () => {
     getStudentsFromClass: jest.fn(),
   };
 
+  const mockLessonsService = {
+    findByCourseClassId: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CourseClassesController],
@@ -41,11 +49,16 @@ describe('CourseClassesController', () => {
           provide: CourseClassesService,
           useValue: mockCourseClassesService,
         },
+        {
+          provide: LessonsService,
+          useValue: mockLessonsService,
+        },
       ],
     }).compile();
 
     controller = module.get<CourseClassesController>(CourseClassesController);
     service = module.get<CourseClassesService>(CourseClassesService);
+    lessonsService = module.get<LessonsService>(LessonsService);
   });
 
   afterEach(() => {
@@ -55,6 +68,7 @@ describe('CourseClassesController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
     expect(service).toBeDefined();
+    expect(lessonsService).toBeDefined();
   });
 
   describe('create', () => {
@@ -322,6 +336,51 @@ describe('CourseClassesController', () => {
         // Assert
         expect(result[0]).toBeInstanceOf(StudentResponseDto);
         expect(result[0].id).toEqual(mockStudent.id);
+      });
+    });
+  });
+
+  // TESTES PARA AS ROTAS DE GERENCIAMENTO DE AULAS
+  describe('Lesson Management Routes', () => {
+    describe('getLessons', () => {
+      it('should return an array of LessonResponseDto', async () => {
+        // Arrange
+        mockLessonsService.findByCourseClassId.mockResolvedValue(
+          mockLessonList,
+        );
+
+        // Act
+        const result = await controller.getLessons(mockCourseClass.id);
+
+        // Assert
+        expect(result).toBeInstanceOf(Array);
+        expect(result[0]).toBeInstanceOf(LessonResponseDto);
+        expect(mockLessonsService.findByCourseClassId).toHaveBeenCalledWith(
+          mockCourseClass.id,
+        );
+        expect(result).toHaveLength(mockLessonList.length);
+        result.forEach((item) => {
+          expect(item).toBeInstanceOf(LessonResponseDto);
+        });
+        expect(result).toEqual(
+          mockLessonList.map((lesson) => new LessonResponseDto(lesson)),
+        );
+      });
+
+      it('should throw NotFoundException when course class not found', async () => {
+        // Arrange
+        const nonExistentId = 99;
+        mockLessonsService.findByCourseClassId.mockRejectedValue(
+          new NotFoundException('Course class not found'),
+        );
+
+        // Act & Assert
+        await expect(controller.getLessons(nonExistentId)).rejects.toThrow(
+          NotFoundException,
+        );
+        expect(mockLessonsService.findByCourseClassId).toHaveBeenCalledWith(
+          nonExistentId,
+        );
       });
     });
   });
