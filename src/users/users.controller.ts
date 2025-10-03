@@ -108,7 +108,7 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete user by ID' })
   @ApiResponse({
-    status: 204,
+    status: HttpStatus.NO_CONTENT,
     description: 'The user has been successfully deleted',
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
