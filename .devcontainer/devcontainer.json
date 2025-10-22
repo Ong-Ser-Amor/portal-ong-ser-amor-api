@@ -72,8 +72,8 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
       }
     }
-  }
+  },
 
 	// Descomente para conectar-se como um usuário existente diferente do padrão do contêiner. Mais informações: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "devcontainer"
+	"remoteUser": "node"
 }

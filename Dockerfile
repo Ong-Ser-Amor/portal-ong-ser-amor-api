@@ -21,6 +21,9 @@ COPY . .
 # Este passo é necessário para o estágio de produção.
 RUN npm run build
 
+# Muda para o usuário 'node' para a execução em desenvolvimento
+USER node
+
 
 # =================================================================
 # ESTÁGIO 2: "production" - A imagem final, enxuta e otimizada
@@ -39,6 +42,9 @@ RUN npm ci --omit=dev
 
 # Copia o código já compilado do estágio 'builder'
 COPY --from=builder /usr/src/app/dist ./dist
+
+# Garante que o processo rode como 'node' em produção também
+USER node
 
 # Comando padrão para iniciar a aplicação em modo de produção
 CMD ["node", "dist/main.js"]
