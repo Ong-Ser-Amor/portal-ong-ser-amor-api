@@ -19,6 +19,7 @@ export const mockLesson: Lesson = {
   createdAt: new Date('2025-09-17T15:00:00.000Z'),
   updatedAt: new Date('2025-09-17T15:00:00.000Z'),
   deletedAt: null,
+  attendances: [],
 };
 
 export const mockLessonList: Lesson[] = [

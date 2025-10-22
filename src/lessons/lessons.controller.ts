@@ -11,6 +11,8 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AttendancesService } from 'src/attendances/attendances.service';
+import { AttendanceResponseDto } from 'src/attendances/dto/attendance-response.dto';
 
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { LessonResponseDto } from './dto/lesson-response.dto';
@@ -20,7 +22,10 @@ import { LessonsService } from './lessons.service';
 @Controller('lessons')
 @ApiTags('Lessons')
 export class LessonsController {
-  constructor(private readonly lessonsService: LessonsService) {}
+  constructor(
+    private readonly lessonsService: LessonsService,
+    private readonly attendancesService: AttendancesService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new lesson' })
@@ -103,5 +108,23 @@ export class LessonsController {
   })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.lessonsService.remove(id);
+  }
+
+  @Get(':id/attendances')
+  @ApiOperation({ summary: 'Get all attendance records for a specific lesson' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Attendance records retrieved successfully.',
+    type: [AttendanceResponseDto],
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Lesson not found.',
+  })
+  async findAllAttendancesByLesson(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<AttendanceResponseDto[]> {
+    const attendances = await this.attendancesService.findAllByLesson(id);
+    return attendances.map((att) => new AttendanceResponseDto(att));
   }
 }

@@ -1,3 +1,4 @@
+import { Attendance } from 'src/attendances/entities/attendance.entity';
 import { CourseClass } from 'src/course-classes/entities/course-class.entity';
 import {
   Column,
@@ -5,6 +6,7 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -35,6 +37,9 @@ export class Student {
 
   @ManyToMany(() => CourseClass, (courseClass) => courseClass.students)
   courseClasses: CourseClass[];
+
+  @OneToMany(() => Attendance, (attendance) => attendance.student)
+  attendances: Attendance[];
 
   constructor(partial: Partial<Student>) {
     Object.assign(this, partial);

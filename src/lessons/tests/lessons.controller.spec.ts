@@ -1,5 +1,8 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { AttendancesService } from 'src/attendances/attendances.service';
+import { AttendanceResponseDto } from 'src/attendances/dto/attendance-response.dto';
+import { mockAttendanceList } from 'src/attendances/mocks/attendance.mock';
 
 import { LessonResponseDto } from '../dto/lesson-response.dto';
 import { LessonsController } from '../lessons.controller';
@@ -9,6 +12,7 @@ import { mockCreateLessonDto, mockLesson } from '../mocks/lesson.mock';
 describe('LessonsController', () => {
   let controller: LessonsController;
   let service: LessonsService;
+  let attendancesService: AttendancesService;
 
   const mockLessonsService = {
     create: jest.fn(),
@@ -16,6 +20,10 @@ describe('LessonsController', () => {
     update: jest.fn(),
     remove: jest.fn(),
     findByCourseClassId: jest.fn(),
+  };
+
+  const mockAttendancesService = {
+    findAllByLesson: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -26,11 +34,13 @@ describe('LessonsController', () => {
           provide: LessonsService,
           useValue: mockLessonsService,
         },
+        { provide: AttendancesService, useValue: mockAttendancesService },
       ],
     }).compile();
 
     controller = module.get<LessonsController>(LessonsController);
     service = module.get<LessonsService>(LessonsService);
+    attendancesService = module.get<AttendancesService>(AttendancesService);
 
     jest.clearAllMocks();
   });
@@ -38,6 +48,7 @@ describe('LessonsController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
     expect(service).toBeDefined();
+    expect(attendancesService).toBeDefined();
   });
 
   describe('create', () => {
@@ -148,6 +159,43 @@ describe('LessonsController', () => {
         NotFoundException,
       );
       expect(mockLessonsService.remove).toHaveBeenCalledWith(nonExistentId);
+    });
+  });
+
+  // =================================================================
+  // NOVO TESTE PARA A ROTA ANINHADA DE PRESENÇAS
+  // =================================================================
+  describe('findAllAttendancesByLesson', () => {
+    it('should return an array of AttendanceResponseDto for a given lesson id', async () => {
+      // Arrange
+      const lessonId = 1;
+      mockAttendancesService.findAllByLesson.mockResolvedValue(
+        mockAttendanceList,
+      );
+
+      // Act
+      const result = await controller.findAllAttendancesByLesson(lessonId);
+
+      // Assert
+      expect(mockAttendancesService.findAllByLesson).toHaveBeenCalledWith(
+        lessonId,
+      );
+      expect(result).toBeInstanceOf(Array);
+      expect(result.length).toBe(mockAttendanceList.length);
+      expect(result[0]).toBeInstanceOf(AttendanceResponseDto);
+    });
+
+    it('should throw NotFoundException if the lesson does not exist', async () => {
+      // Arrange
+      const nonExistentId = 99;
+      mockAttendancesService.findAllByLesson.mockRejectedValue(
+        new NotFoundException(),
+      );
+
+      // Act & Assert
+      await expect(
+        controller.findAllAttendancesByLesson(nonExistentId),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

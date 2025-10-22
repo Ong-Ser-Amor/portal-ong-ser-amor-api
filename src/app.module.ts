@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module';
 import { CoursesModule } from './courses/courses.module';
 import { CourseClassesModule } from './course-classes/course-classes.module';
 import { LessonsModule } from './lessons/lessons.module';
+import { AttendancesModule } from './attendances/attendances.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { LessonsModule } from './lessons/lessons.module';
     CoursesModule,
     CourseClassesModule,
     LessonsModule,
+    AttendancesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
