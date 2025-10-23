@@ -1,31 +1,50 @@
-# ---- Estágio Base (Compartilhado) ----
-# Usamos um estágio base para não repetir o FROM
-FROM node:22.19.0-trixie-slim AS base
+# =================================================================
+# ESTÁGIO 1: "builder" - Ambiente para Desenvolvimento e Build
+# =================================================================
+# Este estágio contém TODAS as dependências (dev e prod) e o código-fonte.
+# Ele será usado pelo Dev Container e como fonte para o estágio de produção.
+FROM node:22.19.0-trixie-slim AS builder
+
+# Atualiza e instala pacotes úteis que queremos no nosso ambiente de dev
+RUN apt-get update && apt-get install -y git git-flow
+
 WORKDIR /usr/src/app
+
 COPY package*.json ./
 
-# ---- Estágio de Desenvolvimento ----
-# Este estágio terá tudo que o dev precisa
-FROM base AS development
-RUN npm install -g @nestjs/cli
-RUN npm install
-COPY . .
-# Comando para rodar em modo de desenvolvimento com hot-reload
-CMD ["npm", "run", "start:dev"]
+# 'npm ci' ao inves do 'npm i', promove uma instalação rápida e consistente baseada no lockfile
+RUN npm ci
 
-# ---- Estágio de Build (usado pela produção) ----
-# Este estágio é idêntico ao nosso 'builder' anterior
-FROM base AS builder
-RUN npm install
 COPY . .
+
+# Compila o TypeScript para JavaScript, criando a pasta /dist
+# Este passo é necessário para o estágio de produção.
 RUN npm run build
 
-# ---- Estágio de Produção (Final) ----
-# A imagem final e otimizada
+# Muda para o usuário 'node' para a execução em desenvolvimento
+USER node
+
+
+# =================================================================
+# ESTÁGIO 2: "production" - A imagem final, enxuta e otimizada
+# =================================================================
 FROM node:22.19.0-trixie-slim AS production
+
 WORKDIR /usr/src/app
+
+# Define o ambiente para produção, o que otimiza muitas bibliotecas
+ENV NODE_ENV=production
+
 COPY package*.json ./
-RUN npm install --omit=dev
+
+# Instala APENAS as dependências de produção. É mais rápido e seguro.
+RUN npm ci --omit=dev
+
+# Copia o código já compilado do estágio 'builder'
 COPY --from=builder /usr/src/app/dist ./dist
-# Comando para rodar em produção
+
+# Garante que o processo rode como 'node' em produção também
+USER node
+
+# Comando padrão para iniciar a aplicação em modo de produção
 CMD ["node", "dist/main.js"]

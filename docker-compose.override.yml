@@ -1,0 +1,20 @@
+services:
+  db:
+    ports:
+      # Usa porta 5432 como padrão se DATABASE_PORT não estiver definida
+      - "${DATABASE_PORT:-5432}:5432"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    command: sleep infinity
+    ports:
+      # Usa porta 3000 como padrão se API_PORT não estiver definida
+      - "${API_PORT:-3000}:3000"
+    volumes:
+      - .:/usr/src/app # Volume para hot-reload do código
+      - /usr/src/app/node_modules # "Truque" para isolar o node_modules
+    environment:
+      - NODE_ENV=development # Define o ambiente como desenvolvimento
