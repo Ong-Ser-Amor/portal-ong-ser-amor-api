@@ -14,6 +14,9 @@
 	// A pasta que será aberta dentro do contêiner.
 	"workspaceFolder": "/usr/src/app",
 
+  // Comando que roda DEPOIS que o container está pronto, mas ANTES de conectar
+  "postStartCommand": "npm install",
+
   // Ação a ser tomada quando a janela do VS Code for fechada.
 	"shutdownAction": "stopCompose",
 
