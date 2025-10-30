@@ -14,6 +14,17 @@ async function bootstrap() {
   const host =
     configService.get<string>('API_HOST', process.env.HOST) || 'localhost';
 
+  const cors = {
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+    credentials: true,
+    allowedHeaders: ['Accept', 'Content-Type', 'Authorization'],
+  };
+
+  app.enableCors(cors);
+
   const config = new DocumentBuilder()
     .setTitle('Portal ONG Ser Amor API')
     .build();
