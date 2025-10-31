@@ -9,8 +9,10 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 
 import { CoursesService } from './courses.service';
 import { CourseResponseDto } from './dto/course-response.dto';
@@ -52,9 +54,22 @@ export class CoursesController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Internal server error',
   })
-  async findAll(): Promise<CourseResponseDto[]> {
-    const courses = await this.coursesService.findAll();
-    return courses.map((course) => new CourseResponseDto(course));
+  async findAll(
+    @Query('take', ParseIntPipe) take: number = 10,
+    @Query('page', ParseIntPipe) page: number = 1,
+  ): Promise<PaginatedResponseDto<CourseResponseDto>> {
+    const courses = await this.coursesService.findAll(take, page);
+
+    const courseDtos = courses.data.map(
+      (course) => new CourseResponseDto(course),
+    );
+
+    return new PaginatedResponseDto<CourseResponseDto>(
+      courseDtos,
+      courses.meta.totalItems,
+      courses.meta.itemsPerPage,
+      courses.meta.currentPage,
+    );
   }
 
   @Get(':id')
