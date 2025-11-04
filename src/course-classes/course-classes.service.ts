@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CoursesService } from 'src/courses/courses.service';
+import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 import { Lesson } from 'src/lessons/entities/lesson.entity';
 import { LessonsService } from 'src/lessons/lessons.service';
 import { Student } from 'src/students/entities/student.entity';
@@ -54,9 +55,23 @@ export class CourseClassesService {
     }
   }
 
-  async findAll(): Promise<CourseClass[]> {
+  async findAll(
+    take = 10,
+    page = 1,
+  ): Promise<PaginatedResponseDto<CourseClass>> {
     try {
-      return await this.repository.find({ relations: ['course'] });
+      const skip = (page - 1) * take;
+
+      const queryBuilder = this.repository
+        .createQueryBuilder('courseClass')
+        .leftJoinAndSelect('courseClass.course', 'course')
+        .orderBy('courseClass.createdAt', 'DESC')
+        .take(take)
+        .skip(skip);
+
+      const [courseClasses, total] = await queryBuilder.getManyAndCount();
+
+      return new PaginatedResponseDto(courseClasses, total, take, page);
     } catch (error) {
       const errorMessage =
         error instanceof Error
