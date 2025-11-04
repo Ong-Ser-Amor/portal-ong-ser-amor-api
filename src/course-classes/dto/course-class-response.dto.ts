@@ -12,16 +12,18 @@ export class CourseClassResponseDto {
   status: CourseClassStatus;
   startDate: Date;
   endDate: Date;
-  teachers: UserResponseDto[];
-  students: StudentResponseDto[];
+  teachers?: UserResponseDto[];
+  students?: StudentResponseDto[];
+  studentsCount?: number;
 
-  constructor(courseClass: CourseClass) {
+  constructor(courseClass: CourseClass & { studentsCount?: number }) {
     this.id = courseClass.id;
     this.name = courseClass.name;
     this.status = courseClass.status;
     this.course = new CourseResponseDto(courseClass.course);
     this.startDate = courseClass.startDate;
     this.endDate = courseClass.endDate;
+    this.studentsCount = courseClass.studentsCount;
 
     if (courseClass.teachers) {
       this.teachers = courseClass.teachers.map(
