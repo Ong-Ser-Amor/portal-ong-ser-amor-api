@@ -32,7 +32,11 @@ export class CourseClassesController {
   ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new course class' })
+  @ApiOperation({
+    summary: 'Create a new course class',
+    description:
+      'Creates a new course class. Available status: EM_FORMACAO (default, enrollments open), EM_ANDAMENTO (classes started), FINALIZADA (completed), CANCELADA (cancelled)',
+  })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'The course class has been successfully created.',
@@ -114,7 +118,11 @@ export class CourseClassesController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a course class by ID' })
+  @ApiOperation({
+    summary: 'Update a course class by ID',
+    description:
+      'Updates a course class. Available status: EM_FORMACAO (enrollments open), EM_ANDAMENTO (classes started), FINALIZADA (completed), CANCELADA (cancelled)',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'The course class has been successfully updated.',
