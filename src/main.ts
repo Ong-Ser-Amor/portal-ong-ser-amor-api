@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -30,7 +32,10 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, { jsonDocumentUrl: 'api-json' });
+
+  // Salva a documentação da API em um arquivo JSON
+  fs.writeFileSync('./api-docs.json', JSON.stringify(document, null, 2));
 
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
