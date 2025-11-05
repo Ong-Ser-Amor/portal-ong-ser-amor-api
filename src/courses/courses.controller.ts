@@ -12,6 +12,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CourseClassesService } from 'src/course-classes/course-classes.service';
+import { CourseClassResponseDto } from 'src/course-classes/dto/course-class-response.dto';
 import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 
 import { CoursesService } from './courses.service';
@@ -22,7 +24,10 @@ import { UpdateCourseDto } from './dto/update-course.dto';
 @Controller('courses')
 @ApiTags('Courses')
 export class CoursesController {
-  constructor(private readonly coursesService: CoursesService) {}
+  constructor(
+    private readonly coursesService: CoursesService,
+    private readonly courseClassesService: CourseClassesService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new course' })
@@ -134,5 +139,43 @@ export class CoursesController {
   })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.coursesService.remove(id);
+  }
+
+  @Get(':id/classes')
+  @ApiOperation({ summary: 'Get all course classes from a course' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'The course classes have been successfully retrieved',
+    type: [CourseClassResponseDto],
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Course not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async findCourseClasses(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('take', ParseIntPipe) take: number = 10,
+    @Query('page', ParseIntPipe) page: number = 1,
+  ): Promise<PaginatedResponseDto<CourseClassResponseDto>> {
+    const courseClasses = await this.courseClassesService.findAll(
+      take,
+      page,
+      id,
+    );
+
+    const courseClassDtos = courseClasses.data.map(
+      (courseClass) => new CourseClassResponseDto(courseClass),
+    );
+
+    return new PaginatedResponseDto<CourseClassResponseDto>(
+      courseClassDtos,
+      courseClasses.meta.totalItems,
+      courseClasses.meta.itemsPerPage,
+      courseClasses.meta.currentPage,
+    );
   }
 }

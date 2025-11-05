@@ -623,6 +623,62 @@
         ]
       }
     },
+    "/courses/{id}/classes": {
+      "get": {
+        "operationId": "CoursesController_findCourseClasses",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The course classes have been successfully retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CourseClassResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Get all course classes from a course",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
     "/course-classes": {
       "post": {
         "description": "Creates a new course class. Available status: EM_FORMACAO (default, enrollments open), EM_ANDAMENTO (classes started), FINALIZADA (completed), CANCELADA (cancelled)",
@@ -1595,47 +1651,6 @@
           }
         }
       },
-      "CreateCourseClassDto": {
-        "type": "object",
-        "properties": {
-          "courseId": {
-            "type": "number",
-            "minimum": 1,
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "example": "Programming 2"
-          },
-          "startDate": {
-            "format": "date",
-            "type": "string",
-            "example": "2024-01-01"
-          },
-          "endDate": {
-            "format": "date",
-            "type": "string",
-            "example": "2024-12-31"
-          },
-          "status": {
-            "enum": [
-              "EM_FORMACAO",
-              "EM_ANDAMENTO",
-              "FINALIZADA",
-              "CANCELADA"
-            ],
-            "type": "string",
-            "example": "EM_FORMACAO",
-            "default": "EM_FORMACAO"
-          }
-        },
-        "required": [
-          "courseId",
-          "name",
-          "startDate",
-          "endDate"
-        ]
-      },
       "CourseClassResponseDto": {
         "type": "object",
         "properties": {
@@ -1674,6 +1689,47 @@
           "course",
           "name",
           "status",
+          "startDate",
+          "endDate"
+        ]
+      },
+      "CreateCourseClassDto": {
+        "type": "object",
+        "properties": {
+          "courseId": {
+            "type": "number",
+            "minimum": 1,
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Programming 2"
+          },
+          "startDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2024-01-01"
+          },
+          "endDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2024-12-31"
+          },
+          "status": {
+            "enum": [
+              "EM_FORMACAO",
+              "EM_ANDAMENTO",
+              "FINALIZADA",
+              "CANCELADA"
+            ],
+            "type": "string",
+            "example": "EM_FORMACAO",
+            "default": "EM_FORMACAO"
+          }
+        },
+        "required": [
+          "courseId",
+          "name",
           "startDate",
           "endDate"
         ]

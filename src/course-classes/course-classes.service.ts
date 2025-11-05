@@ -56,7 +56,13 @@ export class CourseClassesService {
   async findAll(
     take = 10,
     page = 1,
+    courseId?: number,
   ): Promise<PaginatedResponseDto<CourseClass>> {
+    // Se courseId foi fornecido, valida se o curso existe
+    if (courseId) {
+      await this.coursesService.findOne(courseId);
+    }
+
     try {
       const skip = (page - 1) * take;
 
@@ -70,6 +76,11 @@ export class CourseClassesService {
         .orderBy('courseClass.createdAt', 'DESC')
         .take(take)
         .skip(skip);
+
+      // Filtra por courseId se fornecido
+      if (courseId) {
+        queryBuilder.where('course.id = :courseId', { courseId });
+      }
 
       const [courseClasses, total] = await queryBuilder.getManyAndCount();
 
