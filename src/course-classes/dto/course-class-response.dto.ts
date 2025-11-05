@@ -1,6 +1,4 @@
 import { CourseResponseDto } from 'src/courses/dto/course-response.dto';
-import { StudentResponseDto } from 'src/students/dto/student-response.dto';
-import { UserResponseDto } from 'src/users/dto/user-response.dto';
 
 import { CourseClass } from '../entities/course-class.entity';
 import { CourseClassStatus } from '../enums/course-class-status.enum';
@@ -12,8 +10,6 @@ export class CourseClassResponseDto {
   status: CourseClassStatus;
   startDate: Date;
   endDate: Date;
-  teachers?: UserResponseDto[];
-  students?: StudentResponseDto[];
   studentsCount?: number;
 
   constructor(courseClass: CourseClass & { studentsCount?: number }) {
@@ -24,17 +20,5 @@ export class CourseClassResponseDto {
     this.startDate = courseClass.startDate;
     this.endDate = courseClass.endDate;
     this.studentsCount = courseClass.studentsCount;
-
-    if (courseClass.teachers) {
-      this.teachers = courseClass.teachers.map(
-        (teacher) => new UserResponseDto(teacher),
-      );
-    }
-
-    if (courseClass.students) {
-      this.students = courseClass.students.map(
-        (student) => new StudentResponseDto(student),
-      );
-    }
   }
 }

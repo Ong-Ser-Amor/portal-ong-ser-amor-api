@@ -186,18 +186,20 @@ export class CourseClassesController {
   // --- Rotas de Gerenciamento de Professores ---
 
   @Post(':id/teachers')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Add a teacher to a course class' })
-  @ApiResponse({ status: HttpStatus.OK, type: CourseClassResponseDto })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Teacher successfully added to the course class',
+  })
   async addTeacher(
     @Param('id', ParseIntPipe) id: number,
     @Body() addTeacherDto: AddTeacherDto,
-  ): Promise<CourseClassResponseDto> {
-    const updatedCourseClass =
-      await this.courseClassesService.addTeacherToClass(
-        id,
-        addTeacherDto.teacherId,
-      );
-    return new CourseClassResponseDto(updatedCourseClass);
+  ): Promise<void> {
+    await this.courseClassesService.addTeacherToClass(
+      id,
+      addTeacherDto.teacherId,
+    );
   }
 
   @Get(':id/teachers')
@@ -211,32 +213,36 @@ export class CourseClassesController {
   }
 
   @Delete(':id/teachers/:teacherId')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remove a teacher from a course class' })
-  @ApiResponse({ status: HttpStatus.OK, type: CourseClassResponseDto })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Teacher successfully removed from the course class',
+  })
   async removeTeacher(
     @Param('id', ParseIntPipe) id: number,
     @Param('teacherId', ParseIntPipe) teacherId: number,
-  ): Promise<CourseClassResponseDto> {
-    const updatedCourseClass =
-      await this.courseClassesService.removeTeacherFromClass(id, teacherId);
-    return new CourseClassResponseDto(updatedCourseClass);
+  ): Promise<void> {
+    await this.courseClassesService.removeTeacherFromClass(id, teacherId);
   }
 
   // --- Rotas de Gerenciamento de Alunos ---
 
   @Post(':id/students')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Add a student to a course class' })
-  @ApiResponse({ status: HttpStatus.CREATED, type: CourseClassResponseDto })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Student successfully added to the course class',
+  })
   async addStudent(
     @Param('id', ParseIntPipe) id: number,
     @Body() addStudentDto: AddStudentDto,
-  ): Promise<CourseClassResponseDto> {
-    const updatedCourseClass =
-      await this.courseClassesService.addStudentToClass(
-        id,
-        addStudentDto.studentId,
-      );
-    return new CourseClassResponseDto(updatedCourseClass);
+  ): Promise<void> {
+    await this.courseClassesService.addStudentToClass(
+      id,
+      addStudentDto.studentId,
+    );
   }
 
   @Get(':id/students')
@@ -250,14 +256,16 @@ export class CourseClassesController {
   }
 
   @Delete(':id/students/:studentId')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remove a student from a course class' })
-  @ApiResponse({ status: HttpStatus.OK, type: CourseClassResponseDto })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Student successfully removed from the course class',
+  })
   async removeStudent(
     @Param('id', ParseIntPipe) id: number,
     @Param('studentId', ParseIntPipe) studentId: number,
-  ): Promise<CourseClassResponseDto> {
-    const updatedCourseClass =
-      await this.courseClassesService.removeStudentFromClass(id, studentId);
-    return new CourseClassResponseDto(updatedCourseClass);
+  ): Promise<void> {
+    await this.courseClassesService.removeStudentFromClass(id, studentId);
   }
 }

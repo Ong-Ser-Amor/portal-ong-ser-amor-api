@@ -90,7 +90,7 @@ export class CourseClassesService {
     try {
       return await this.repository.findOneOrFail({
         where: { id },
-        relations: ['course', 'teachers', 'students'],
+        relations: ['course'],
       });
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
@@ -140,13 +140,39 @@ export class CourseClassesService {
     }
   }
 
+  // --- Métodos Privados para Buscar Relações ---
+
+  private async findOneWithTeachers(classId: number): Promise<CourseClass> {
+    const courseClass = await this.repository.findOne({
+      where: { id: classId },
+      relations: ['teachers'],
+    });
+
+    if (!courseClass) {
+      throw new NotFoundException('Course class not found');
+    }
+
+    return courseClass;
+  }
+
+  private async findOneWithStudents(classId: number): Promise<CourseClass> {
+    const courseClass = await this.repository.findOne({
+      where: { id: classId },
+      relations: ['students'],
+    });
+
+    if (!courseClass) {
+      throw new NotFoundException('Course class not found');
+    }
+
+    return courseClass;
+  }
+
   // --- Métodos de Gerenciamento de Professores ---
 
-  async addTeacherToClass(
-    classId: number,
-    teacherId: number,
-  ): Promise<CourseClass> {
-    const courseClass = await this.findOne(classId);
+  async addTeacherToClass(classId: number, teacherId: number): Promise<void> {
+    const courseClass = await this.findOneWithTeachers(classId);
+
     const teacher = await this.usersService.findOne(teacherId);
 
     const isTeacherAlreadyInClass = courseClass.teachers.some(
@@ -162,7 +188,7 @@ export class CourseClassesService {
     courseClass.teachers.push(teacher);
 
     try {
-      return await this.repository.save(courseClass);
+      await this.repository.save(courseClass);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -176,8 +202,8 @@ export class CourseClassesService {
   async removeTeacherFromClass(
     classId: number,
     teacherId: number,
-  ): Promise<CourseClass> {
-    const courseClass = await this.findOne(classId);
+  ): Promise<void> {
+    const courseClass = await this.findOneWithTeachers(classId);
 
     const initialTeacherCount = courseClass.teachers.length;
     courseClass.teachers = courseClass.teachers.filter(
@@ -191,7 +217,7 @@ export class CourseClassesService {
     }
 
     try {
-      return await this.repository.save(courseClass);
+      await this.repository.save(courseClass);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -205,17 +231,15 @@ export class CourseClassesService {
   }
 
   async getTeachersFromClass(classId: number): Promise<User[]> {
-    const courseClass = await this.findOne(classId);
+    const courseClass = await this.findOneWithTeachers(classId);
     return courseClass.teachers;
   }
 
   // --- Métodos de Gerenciamento de Alunos ---
 
-  async addStudentToClass(
-    classId: number,
-    studentId: number,
-  ): Promise<CourseClass> {
-    const courseClass = await this.findOne(classId);
+  async addStudentToClass(classId: number, studentId: number): Promise<void> {
+    const courseClass = await this.findOneWithStudents(classId);
+
     const student = await this.studentsService.findOne(studentId);
 
     if (!courseClass.students) {
@@ -235,7 +259,7 @@ export class CourseClassesService {
     courseClass.students.push(student);
 
     try {
-      return await this.repository.save(courseClass);
+      await this.repository.save(courseClass);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -249,8 +273,8 @@ export class CourseClassesService {
   async removeStudentFromClass(
     classId: number,
     studentId: number,
-  ): Promise<CourseClass> {
-    const courseClass = await this.findOne(classId);
+  ): Promise<void> {
+    const courseClass = await this.findOneWithStudents(classId);
 
     const initialStudentCount = courseClass.students.length;
     courseClass.students = courseClass.students.filter(
@@ -264,7 +288,7 @@ export class CourseClassesService {
     }
 
     try {
-      return await this.repository.save(courseClass);
+      await this.repository.save(courseClass);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -278,7 +302,7 @@ export class CourseClassesService {
   }
 
   async getStudentsFromClass(classId: number): Promise<Student[]> {
-    const courseClass = await this.findOne(classId);
+    const courseClass = await this.findOneWithStudents(classId);
     return courseClass.students;
   }
 }
