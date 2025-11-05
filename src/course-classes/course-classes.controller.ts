@@ -9,8 +9,10 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 import { LessonResponseDto } from 'src/lessons/dto/lesson-response.dto';
 import { LessonsService } from 'src/lessons/lessons.service';
 import { StudentResponseDto } from 'src/students/dto/student-response.dto';
@@ -94,9 +96,25 @@ export class CourseClassesController {
   })
   async getLessons(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<LessonResponseDto[]> {
-    const lessons = await this.lessonsService.findByCourseClassId(id);
-    return lessons.map((lesson) => new LessonResponseDto(lesson));
+    @Query('take', ParseIntPipe) take: number = 10,
+    @Query('page', ParseIntPipe) page: number = 1,
+  ): Promise<PaginatedResponseDto<LessonResponseDto>> {
+    const lessons = await this.lessonsService.findByCourseClassId(
+      id,
+      take,
+      page,
+    );
+
+    const lessonDtos = lessons.data.map(
+      (lesson) => new LessonResponseDto(lesson),
+    );
+
+    return new PaginatedResponseDto<LessonResponseDto>(
+      lessonDtos,
+      lessons.meta.totalItems,
+      lessons.meta.itemsPerPage,
+      lessons.meta.currentPage,
+    );
   }
 
   @Patch(':id')

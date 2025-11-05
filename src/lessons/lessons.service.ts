@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CourseClassesService } from 'src/course-classes/course-classes.service';
+import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { CreateLessonDto } from './dto/create-lesson.dto';
@@ -43,13 +44,25 @@ export class LessonsService {
     }
   }
 
-  async findByCourseClassId(courseClassId: number): Promise<Lesson[]> {
+  async findByCourseClassId(
+    courseClassId: number,
+    take = 10,
+    page = 1,
+  ): Promise<PaginatedResponseDto<Lesson>> {
     await this.courseClassesService.findOne(courseClassId);
 
     try {
-      return await this.repository.find({
+      const skip = (page - 1) * take;
+
+      const [lessons, total] = await this.repository.findAndCount({
         where: { courseClass: { id: courseClassId } },
+        relations: ['courseClass'],
+        order: { createdAt: 'DESC' },
+        take,
+        skip,
       });
+
+      return new PaginatedResponseDto(lessons, total, take, page);
     } catch (error) {
       const errorMessage =
         error instanceof Error
