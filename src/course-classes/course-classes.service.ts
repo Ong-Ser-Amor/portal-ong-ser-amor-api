@@ -67,6 +67,7 @@ export class CourseClassesService {
       const queryBuilder = this.repository
         .createQueryBuilder('courseClass')
         .leftJoinAndSelect('courseClass.course', 'course')
+        .leftJoinAndSelect('courseClass.teachers', 'teachers')
         .loadRelationCountAndMap(
           'courseClass.studentsCount',
           'courseClass.students',

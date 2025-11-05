@@ -1639,6 +1639,12 @@
           },
           "studentsCount": {
             "type": "number"
+          },
+          "teachers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserResponseDto"
+            }
           }
         },
         "required": [
