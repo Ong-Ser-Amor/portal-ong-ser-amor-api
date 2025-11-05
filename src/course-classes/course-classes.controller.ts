@@ -9,10 +9,8 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
-  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 import { LessonResponseDto } from 'src/lessons/dto/lesson-response.dto';
 import { LessonsService } from 'src/lessons/lessons.service';
 import { StudentResponseDto } from 'src/students/dto/student-response.dto';
@@ -53,41 +51,6 @@ export class CourseClassesController {
   ): Promise<CourseClassResponseDto> {
     return new CourseClassResponseDto(
       await this.courseClassesService.create(createCourseClassDto),
-    );
-  }
-
-  @Get()
-  @ApiOperation({ summary: 'Get all course classes' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The course classes have been successfully retrieved.',
-    type: [CourseClassResponseDto],
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
-  })
-  async findAll(
-    @Query('take') take: string = '10',
-    @Query('page') page: string = '1',
-  ): Promise<PaginatedResponseDto<CourseClassResponseDto>> {
-    const takeNumber = parseInt(take);
-    const pageNumber = parseInt(page);
-
-    const courseClasses = await this.courseClassesService.findAll(
-      takeNumber,
-      pageNumber,
-    );
-
-    const courseClassDtos = courseClasses.data.map(
-      (courseClass) => new CourseClassResponseDto(courseClass),
-    );
-
-    return new PaginatedResponseDto<CourseClassResponseDto>(
-      courseClassDtos,
-      courseClasses.meta.totalItems,
-      courseClasses.meta.itemsPerPage,
-      courseClasses.meta.currentPage,
     );
   }
 

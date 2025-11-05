@@ -713,49 +713,6 @@
         "tags": [
           "Course Classes"
         ]
-      },
-      "get": {
-        "operationId": "CourseClassesController_findAll",
-        "parameters": [
-          {
-            "name": "take",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The course classes have been successfully retrieved.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CourseClassResponseDto"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Get all course classes",
-        "tags": [
-          "Course Classes"
-        ]
       }
     },
     "/course-classes/{id}": {

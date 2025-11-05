@@ -161,10 +161,10 @@ export class CoursesController {
     @Query('take', ParseIntPipe) take: number = 10,
     @Query('page', ParseIntPipe) page: number = 1,
   ): Promise<PaginatedResponseDto<CourseClassResponseDto>> {
-    const courseClasses = await this.courseClassesService.findAll(
+    const courseClasses = await this.courseClassesService.findAllByCourseId(
+      id,
       take,
       page,
-      id,
     );
 
     const courseClassDtos = courseClasses.data.map(
