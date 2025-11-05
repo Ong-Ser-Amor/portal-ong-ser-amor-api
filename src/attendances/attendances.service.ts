@@ -1,17 +1,16 @@
 import {
-  ConflictException,
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CourseClassesService } from 'src/course-classes/course-classes.service';
 import { LessonsService } from 'src/lessons/lessons.service';
 import { StudentsService } from 'src/students/students.service';
-import { EntityNotFoundError, QueryFailedError, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
-import { CreateAttendanceDto } from './dto/create-attendance.dto';
-import { UpdateAttendanceDto } from './dto/update-attendance.dto';
+import { AttendanceItemDto } from './dto/bulk-attendance.dto';
 import { Attendance } from './entities/attendance.entity';
 
 @Injectable()
@@ -23,47 +22,8 @@ export class AttendancesService {
     private readonly repository: Repository<Attendance>,
     private readonly studentsService: StudentsService,
     private readonly lessonsService: LessonsService,
+    private readonly courseClassesService: CourseClassesService,
   ) {}
-
-  async create(createAttendanceDto: CreateAttendanceDto): Promise<Attendance> {
-    const student = await this.studentsService.findOne(
-      createAttendanceDto.studentId,
-    );
-    const lesson = await this.lessonsService.findOne(
-      createAttendanceDto.lessonId,
-    );
-
-    try {
-      const attendance = this.repository.create({
-        ...createAttendanceDto,
-        student,
-        lesson,
-      });
-      return await this.repository.save(attendance);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : `An unexpected error occurred: ${String(error)}`;
-
-      // Tratar erro de violação de constraint UNIQUE (código 23505 no PostgreSQL)
-      if (
-        error instanceof QueryFailedError &&
-        'code' in error &&
-        error.code === '23505'
-      ) {
-        this.logger.warn(
-          `Attempted to create duplicate attendance record for student ${createAttendanceDto.studentId} in lesson ${createAttendanceDto.lessonId}`,
-        );
-        throw new ConflictException(
-          'Attendance record for this student in this lesson already exists.',
-        );
-      }
-
-      this.logger.error(`Error creating attendance: ${errorMessage}`);
-      throw new InternalServerErrorException('Error creating attendance');
-    }
-  }
 
   async findAllByLesson(lessonId: number): Promise<Attendance[]> {
     await this.lessonsService.findOne(lessonId);
@@ -87,63 +47,112 @@ export class AttendancesService {
     }
   }
 
-  async findOne(id: number): Promise<Attendance> {
+  async removeAllByLesson(lessonId: number): Promise<void> {
+    await this.lessonsService.findOne(lessonId);
+
     try {
-      return await this.repository.findOneOrFail({
-        where: { id },
-        relations: ['student', 'lesson'],
-      });
+      await this.repository.softDelete({ lesson: { id: lessonId } });
     } catch (error) {
-      if (error instanceof EntityNotFoundError) {
-        throw new NotFoundException(
-          `Attendance record with ID ${id} not found.`,
-        );
-      }
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       this.logger.error(
-        `Error finding attendance record with ID ${id}: ${errorMessage}`,
+        `Error removing all attendance records for lesson ${lessonId}: ${errorMessage}`,
       );
       throw new InternalServerErrorException(
-        'Error retrieving attendance record.',
+        'Error removing attendance records.',
       );
     }
   }
 
-  async update(
-    id: number,
-    updateAttendanceDto: UpdateAttendanceDto,
-  ): Promise<Attendance> {
-    const attendance = await this.findOne(id);
+  async bulkUpsert(
+    lessonId: number,
+    attendanceItems: AttendanceItemDto[],
+  ): Promise<Attendance[]> {
+    const lesson = await this.lessonsService.findOne(lessonId);
+
+    const courseClassStudents =
+      await this.courseClassesService.getStudentsFromClass(
+        lesson.courseClassId,
+      );
+
+    const courseClassStudentIds = courseClassStudents.map(
+      (student) => student.id,
+    );
+
+    const receivedStudentIds = attendanceItems.map((item) => item.studentId);
+
+    // Valida que todos os alunos da turma foram incluídos
+    const missingStudentIds = courseClassStudentIds.filter(
+      (id) => !receivedStudentIds.includes(id),
+    );
+    if (missingStudentIds.length > 0) {
+      throw new BadRequestException(
+        `Missing attendance records for students with IDs: ${missingStudentIds.join(', ')}`,
+      );
+    }
+
+    // Valida que todos os alunos recebidos pertencem à turma
+    const invalidStudentIds = receivedStudentIds.filter(
+      (id) => !courseClassStudentIds.includes(id),
+    );
+    if (invalidStudentIds.length > 0) {
+      throw new BadRequestException(
+        `Students with IDs ${invalidStudentIds.join(', ')} do not belong to this course class`,
+      );
+    }
 
     try {
-      this.repository.merge(attendance, updateAttendanceDto);
-      return await this.repository.save(attendance);
+      return await this.repository.manager.transaction(async (manager) => {
+        // Busca todas as presenças existentes desta aula em uma única query
+        const existingAttendances = await manager.find(Attendance, {
+          where: {
+            lesson: { id: lessonId },
+            student: { id: In(receivedStudentIds) },
+          },
+          relations: ['student', 'lesson'],
+        });
+
+        // Cria maps para lookup O(1) de performance
+        const existingAttendancesMap = new Map(
+          existingAttendances.map((att) => [att.student.id, att]),
+        );
+
+        const studentsMap = new Map(
+          courseClassStudents.map((student) => [student.id, student]),
+        );
+
+        const attendancesToSave: Attendance[] = [];
+
+        for (const item of attendanceItems) {
+          const existingAttendance = existingAttendancesMap.get(item.studentId);
+
+          if (existingAttendance) {
+            existingAttendance.present = item.present;
+            existingAttendance.notes = item.notes;
+            attendancesToSave.push(existingAttendance);
+          } else {
+            const student = studentsMap.get(item.studentId);
+            const newAttendance = manager.create(Attendance, {
+              present: item.present,
+              notes: item.notes,
+              student,
+              lesson,
+            });
+            attendancesToSave.push(newAttendance);
+          }
+        }
+
+        // Salva todas as presenças em uma única query (bulk save)
+        return await manager.save(Attendance, attendancesToSave);
+      });
     } catch (error) {
       const errorMessage =
         error instanceof Error
           ? error.message
           : `An unexpected error occurred: ${String(error)}`;
-      this.logger.error(`Error updating attendance by id: ${errorMessage}`);
+      this.logger.error(`Error bulk upserting attendances: ${errorMessage}`);
       throw new InternalServerErrorException(
-        'Error updating attendance record.',
-      );
-    }
-  }
-
-  async remove(id: number): Promise<void> {
-    await this.findOne(id);
-
-    try {
-      await this.repository.softDelete(id);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      this.logger.error(
-        `Error removing attendance record with ID ${id}: ${errorMessage}`,
-      );
-      throw new InternalServerErrorException(
-        'Error removing attendance record.',
+        'Error creating/updating attendance records',
       );
     }
   }

@@ -1224,6 +1224,58 @@
       }
     },
     "/lessons/{id}/attendances": {
+      "post": {
+        "description": "Creates or updates attendance records for all students in a course class. All students must be included in the request.",
+        "operationId": "LessonsController_bulkUpsertAttendances",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkAttendanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Attendance records have been successfully created/updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AttendanceResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing students or invalid student IDs for this course class."
+          },
+          "404": {
+            "description": "Lesson not found."
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Create or update attendance records for a lesson",
+        "tags": [
+          "Lessons"
+        ]
+      },
       "get": {
         "operationId": "LessonsController_findAllAttendancesByLesson",
         "parameters": [
@@ -1258,132 +1310,10 @@
         "tags": [
           "Lessons"
         ]
-      }
-    },
-    "/attendances": {
-      "post": {
-        "operationId": "AttendancesController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateAttendanceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The attendance record has been successfully created.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AttendanceResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Student or Lesson not found."
-          },
-          "409": {
-            "description": "Attendance record for this student/lesson already exists."
-          },
-          "500": {
-            "description": "Internal server error."
-          }
-        },
-        "summary": "Create a new attendance record",
-        "tags": [
-          "Attendances"
-        ]
-      }
-    },
-    "/attendances/{id}": {
-      "get": {
-        "operationId": "AttendancesController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Attendance record retrieved successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AttendanceResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Attendance record not found."
-          },
-          "500": {
-            "description": "Internal server error."
-          }
-        },
-        "summary": "Get a single attendance record by ID",
-        "tags": [
-          "Attendances"
-        ]
-      },
-      "patch": {
-        "operationId": "AttendancesController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateAttendanceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Attendance record updated successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AttendanceResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Attendance record not found."
-          },
-          "500": {
-            "description": "Internal server error."
-          }
-        },
-        "summary": "Update an attendance record",
-        "tags": [
-          "Attendances"
-        ]
       },
       "delete": {
-        "operationId": "AttendancesController_remove",
+        "description": "Removes all attendance records for a specific lesson. Useful for clearing attendance data entered by mistake.",
+        "operationId": "LessonsController_removeAllAttendances",
         "parameters": [
           {
             "name": "id",
@@ -1396,18 +1326,18 @@
         ],
         "responses": {
           "204": {
-            "description": "Attendance record deleted successfully."
+            "description": "All attendance records have been successfully deleted."
           },
           "404": {
-            "description": "Attendance record not found."
+            "description": "Lesson not found."
           },
           "500": {
-            "description": "Internal server error."
+            "description": "Internal server error"
           }
         },
-        "summary": "Delete an attendance record",
+        "summary": "Delete all attendance records for a lesson",
         "tags": [
-          "Attendances"
+          "Lessons"
         ]
       }
     }
@@ -1833,6 +1763,46 @@
           }
         }
       },
+      "AttendanceItemDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "number",
+            "description": "Student ID",
+            "example": 1
+          },
+          "present": {
+            "type": "boolean",
+            "description": "Indicates whether the student was present",
+            "example": true
+          },
+          "notes": {
+            "type": "string",
+            "description": "Notes about the attendance or absence",
+            "example": "Arrived late"
+          }
+        },
+        "required": [
+          "studentId",
+          "present"
+        ]
+      },
+      "BulkAttendanceDto": {
+        "type": "object",
+        "properties": {
+          "attendances": {
+            "minItems": 1,
+            "description": "List of attendance records to be created/updated",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttendanceItemDto"
+            }
+          }
+        },
+        "required": [
+          "attendances"
+        ]
+      },
       "AttendanceResponseDto": {
         "type": "object",
         "properties": {
@@ -1850,73 +1820,14 @@
           },
           "lesson": {
             "$ref": "#/components/schemas/LessonResponseDto"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
           }
         },
         "required": [
           "id",
           "present",
           "student",
-          "lesson",
-          "createdAt",
-          "updatedAt"
+          "lesson"
         ]
-      },
-      "CreateAttendanceDto": {
-        "type": "object",
-        "properties": {
-          "lessonId": {
-            "type": "number",
-            "minimum": 1,
-            "description": "ID of the lesson",
-            "example": 1
-          },
-          "studentId": {
-            "type": "number",
-            "minimum": 1,
-            "description": "ID of the student",
-            "example": 1
-          },
-          "present": {
-            "type": "boolean",
-            "description": "Attendance status",
-            "example": true
-          },
-          "notes": {
-            "type": "string",
-            "maxLength": 500,
-            "description": "Notes about the attendance",
-            "example": "Student was late"
-          }
-        },
-        "required": [
-          "lessonId",
-          "studentId",
-          "present"
-        ]
-      },
-      "UpdateAttendanceDto": {
-        "type": "object",
-        "properties": {
-          "present": {
-            "type": "boolean",
-            "description": "Attendance status",
-            "example": true
-          },
-          "notes": {
-            "type": "string",
-            "maxLength": 500,
-            "description": "Notes about the attendance",
-            "example": "Student was late"
-          }
-        }
       }
     }
   }

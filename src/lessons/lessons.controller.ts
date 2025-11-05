@@ -13,6 +13,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AttendancesService } from 'src/attendances/attendances.service';
 import { AttendanceResponseDto } from 'src/attendances/dto/attendance-response.dto';
+import { BulkAttendanceDto } from 'src/attendances/dto/bulk-attendance.dto';
 
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { LessonResponseDto } from './dto/lesson-response.dto';
@@ -110,6 +111,41 @@ export class LessonsController {
     await this.lessonsService.remove(id);
   }
 
+  @Post(':id/attendances')
+  @ApiOperation({
+    summary: 'Create or update attendance records for a lesson',
+    description:
+      'Creates or updates attendance records for all students in a course class. All students must be included in the request.',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Attendance records have been successfully created/updated.',
+    type: [AttendanceResponseDto],
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      'Missing students or invalid student IDs for this course class.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Lesson not found.',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async bulkUpsertAttendances(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() bulkAttendanceDto: BulkAttendanceDto,
+  ): Promise<AttendanceResponseDto[]> {
+    const attendances = await this.attendancesService.bulkUpsert(
+      id,
+      bulkAttendanceDto.attendances,
+    );
+    return attendances.map((att) => new AttendanceResponseDto(att));
+  }
+
   @Get(':id/attendances')
   @ApiOperation({ summary: 'Get all attendance records for a specific lesson' })
   @ApiResponse({
@@ -126,5 +162,30 @@ export class LessonsController {
   ): Promise<AttendanceResponseDto[]> {
     const attendances = await this.attendancesService.findAllByLesson(id);
     return attendances.map((att) => new AttendanceResponseDto(att));
+  }
+
+  @Delete(':id/attendances')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Delete all attendance records for a lesson',
+    description:
+      'Removes all attendance records for a specific lesson. Useful for clearing attendance data entered by mistake.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'All attendance records have been successfully deleted.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Lesson not found.',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async removeAllAttendances(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void> {
+    await this.attendancesService.removeAllByLesson(id);
   }
 }
