@@ -25,6 +25,50 @@ export class AttendancesService {
     private readonly courseClassesService: CourseClassesService,
   ) {}
 
+  // --- Métodos Auxiliares Privados ---
+
+  private async getLessonWithCourseClassStudents(lessonId: number) {
+    const lesson = await this.lessonsService.findOne(lessonId);
+
+    const courseClassStudents =
+      await this.courseClassesService.getStudentsFromClass(
+        lesson.courseClassId,
+      );
+
+    const courseClassStudentIds = courseClassStudents.map(
+      (student) => student.id,
+    );
+
+    return {
+      lesson,
+      courseClassStudents,
+      courseClassStudentIds,
+    };
+  }
+
+  private validateStudentsBelongToCourseClass(
+    receivedStudentIds: number[],
+    courseClassStudentIds: number[],
+  ): void {
+    const invalidStudentIds = receivedStudentIds.filter(
+      (id) => !courseClassStudentIds.includes(id),
+    );
+
+    if (invalidStudentIds.length > 0) {
+      throw new BadRequestException(
+        `Students with IDs ${invalidStudentIds.join(', ')} do not belong to this course class`,
+      );
+    }
+  }
+
+  private createStudentsMap<T extends { id: number }>(
+    students: T[],
+  ): Map<number, T> {
+    return new Map(students.map((student) => [student.id, student]));
+  }
+
+  // --- Métodos Públicos ---
+
   async findAllByLesson(lessonId: number): Promise<Attendance[]> {
     await this.lessonsService.findOne(lessonId);
 
@@ -68,9 +112,7 @@ export class AttendancesService {
     lessonId: number,
     attendanceItems: AttendanceItemDto[],
   ): Promise<Attendance[]> {
-    const lesson = await this.lessonsService.findOne(lessonId);
-
-    // Verifica se já existe alguma chamada para esta aula
+    // POST deve falhar se já existe chamada - força uso do PATCH para edição
     const existingCount = await this.repository.count({
       where: { lesson: { id: lessonId } },
     });
@@ -81,18 +123,12 @@ export class AttendancesService {
       );
     }
 
-    const courseClassStudents =
-      await this.courseClassesService.getStudentsFromClass(
-        lesson.courseClassId,
-      );
-
-    const courseClassStudentIds = courseClassStudents.map(
-      (student) => student.id,
-    );
+    const { lesson, courseClassStudents, courseClassStudentIds } =
+      await this.getLessonWithCourseClassStudents(lessonId);
 
     const receivedStudentIds = attendanceItems.map((item) => item.studentId);
 
-    // Valida que todos os alunos da turma foram incluídos
+    // Criar chamada exige TODOS os alunos para garantir consistência inicial
     const missingStudentIds = courseClassStudentIds.filter(
       (id) => !receivedStudentIds.includes(id),
     );
@@ -102,21 +138,14 @@ export class AttendancesService {
       );
     }
 
-    // Valida que todos os alunos recebidos pertencem à turma
-    const invalidStudentIds = receivedStudentIds.filter(
-      (id) => !courseClassStudentIds.includes(id),
+    this.validateStudentsBelongToCourseClass(
+      receivedStudentIds,
+      courseClassStudentIds,
     );
-    if (invalidStudentIds.length > 0) {
-      throw new BadRequestException(
-        `Students with IDs ${invalidStudentIds.join(', ')} do not belong to this course class`,
-      );
-    }
 
     try {
       return await this.repository.manager.transaction(async (manager) => {
-        const studentsMap = new Map(
-          courseClassStudents.map((student) => [student.id, student]),
-        );
+        const studentsMap = this.createStudentsMap(courseClassStudents);
 
         const attendancesToCreate: Attendance[] = attendanceItems.map(
           (item) => {
@@ -149,28 +178,16 @@ export class AttendancesService {
     lessonId: number,
     attendanceItems: AttendanceItemDto[],
   ): Promise<Attendance[]> {
-    const lesson = await this.lessonsService.findOne(lessonId);
-
-    const courseClassStudents =
-      await this.courseClassesService.getStudentsFromClass(
-        lesson.courseClassId,
-      );
-
-    const courseClassStudentIds = courseClassStudents.map(
-      (student) => student.id,
-    );
+    const { lesson, courseClassStudents, courseClassStudentIds } =
+      await this.getLessonWithCourseClassStudents(lessonId);
 
     const receivedStudentIds = attendanceItems.map((item) => item.studentId);
 
     // Valida que todos os alunos recebidos pertencem à turma
-    const invalidStudentIds = receivedStudentIds.filter(
-      (id) => !courseClassStudentIds.includes(id),
+    this.validateStudentsBelongToCourseClass(
+      receivedStudentIds,
+      courseClassStudentIds,
     );
-    if (invalidStudentIds.length > 0) {
-      throw new BadRequestException(
-        `Students with IDs ${invalidStudentIds.join(', ')} do not belong to this course class`,
-      );
-    }
 
     try {
       return await this.repository.manager.transaction(async (manager) => {
@@ -188,9 +205,7 @@ export class AttendancesService {
           existingAttendances.map((att) => [att.student.id, att]),
         );
 
-        const studentsMap = new Map(
-          courseClassStudents.map((student) => [student.id, student]),
-        );
+        const studentsMap = this.createStudentsMap(courseClassStudents);
 
         const attendancesToSave: Attendance[] = [];
 
@@ -198,12 +213,11 @@ export class AttendancesService {
           const existingAttendance = existingAttendancesMap.get(item.studentId);
 
           if (existingAttendance) {
-            // Atualiza registro existente
             existingAttendance.present = item.present;
             existingAttendance.notes = item.notes;
             attendancesToSave.push(existingAttendance);
           } else {
-            // Cria novo registro (caso o aluno não tenha presença cadastrada ainda)
+            // Permite criar registro de alunos adicionados à turma após a chamada inicial
             const student = studentsMap.get(item.studentId);
             const newAttendance = manager.create(Attendance, {
               present: item.present,
