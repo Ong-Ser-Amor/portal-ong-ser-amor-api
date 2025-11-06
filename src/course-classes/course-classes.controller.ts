@@ -181,13 +181,30 @@ export class CourseClassesController {
   }
 
   @Get(':id/teachers')
-  @ApiOperation({ summary: 'Get all teachers from a course class' })
-  @ApiResponse({ status: HttpStatus.OK, type: [UserResponseDto] })
+  @ApiOperation({ summary: 'Get paginated teachers from a course class' })
+  @ApiPaginatedResponse(UserResponseDto)
   async getTeachers(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<UserResponseDto[]> {
-    const teachers = await this.courseClassesService.getTeachersFromClass(id);
-    return teachers.map((teacher) => new UserResponseDto(teacher));
+    @Query('take', ParseIntPipe) take: number,
+    @Query('page', ParseIntPipe) page: number,
+  ): Promise<PaginatedResponseDto<UserResponseDto>> {
+    const result =
+      await this.courseClassesService.getTeachersFromClassPaginated(
+        id,
+        take,
+        page,
+      );
+
+    const teacherDtos = result.data.map(
+      (teacher) => new UserResponseDto(teacher),
+    );
+
+    return new PaginatedResponseDto<UserResponseDto>(
+      teacherDtos,
+      result.meta.totalItems,
+      result.meta.itemsPerPage,
+      result.meta.currentPage,
+    );
   }
 
   @Delete(':id/teachers/:teacherId')

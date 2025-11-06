@@ -238,9 +238,40 @@ export class CourseClassesService {
     }
   }
 
-  async getTeachersFromClass(classId: number): Promise<User[]> {
-    const courseClass = await this.findOneWithTeachers(classId);
-    return courseClass.teachers;
+  async getTeachersFromClassPaginated(
+    classId: number,
+    take: number,
+    page: number,
+  ): Promise<PaginatedResponseDto<User>> {
+    await this.findOne(classId);
+
+    try {
+      const skip = (page - 1) * take;
+
+      const [courseClasses, total] = await this.repository
+        .createQueryBuilder('courseClass')
+        .leftJoinAndSelect('courseClass.teachers', 'teacher')
+        .where('courseClass.id = :classId', { classId })
+        .skip(skip)
+        .take(take)
+        .getManyAndCount();
+
+      const allTeachers =
+        courseClasses.length > 0 ? courseClasses[0].teachers : [];
+
+      return new PaginatedResponseDto<User>(allTeachers, total, take, page);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(
+        `Error fetching paginated teachers from class: ${errorMessage}`,
+      );
+      throw new InternalServerErrorException(
+        'Error fetching teachers from class',
+      );
+    }
   }
 
   // --- Métodos de Gerenciamento de Alunos ---
