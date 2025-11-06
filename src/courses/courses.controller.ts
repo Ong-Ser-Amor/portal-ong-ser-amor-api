@@ -14,6 +14,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CourseClassesService } from 'src/course-classes/course-classes.service';
 import { CourseClassResponseDto } from 'src/course-classes/dto/course-class-response.dto';
+import { ApiPaginatedResponse } from 'src/dtos/api-paginated-response.decorator';
 import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 
 import { CoursesService } from './courses.service';
@@ -50,11 +51,7 @@ export class CoursesController {
 
   @Get()
   @ApiOperation({ summary: 'Get all courses' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The courses have been successfully retrieved',
-    type: [CourseResponseDto],
-  })
+  @ApiPaginatedResponse(CourseResponseDto)
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Internal server error',
@@ -143,11 +140,7 @@ export class CoursesController {
 
   @Get(':id/classes')
   @ApiOperation({ summary: 'Get all course classes from a course' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The course classes have been successfully retrieved',
-    type: [CourseClassResponseDto],
-  })
+  @ApiPaginatedResponse(CourseClassResponseDto)
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Course not found',

@@ -502,14 +502,25 @@
         ],
         "responses": {
           "200": {
-            "description": "The courses have been successfully retrieved",
+            "description": "Successfully received paginated response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CourseResponseDto"
-                  }
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/CourseResponseDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
@@ -665,14 +676,25 @@
         ],
         "responses": {
           "200": {
-            "description": "The course classes have been successfully retrieved",
+            "description": "Successfully received paginated response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CourseClassResponseDto"
-                  }
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/CourseClassResponseDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
