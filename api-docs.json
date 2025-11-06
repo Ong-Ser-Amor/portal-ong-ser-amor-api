@@ -1544,14 +1544,20 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "number"
+            "type": "number",
+            "example": 1,
+            "description": "Student ID"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "example": "João Silva",
+            "description": "Student name"
           },
           "birthDate": {
-            "format": "date-time",
-            "type": "string"
+            "type": "string",
+            "example": "2010-05-15",
+            "description": "Student birth date (date only, no time)",
+            "format": "date"
           }
         },
         "required": [
