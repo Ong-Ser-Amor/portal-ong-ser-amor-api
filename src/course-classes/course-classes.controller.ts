@@ -82,11 +82,7 @@ export class CourseClassesController {
 
   @Get(':id/lessons')
   @ApiOperation({ summary: 'Get all lessons from a course class' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The lessons have been successfully retrieved.',
-    type: [LessonResponseDto],
-  })
+  @ApiPaginatedResponse(LessonResponseDto)
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Course class not found',
