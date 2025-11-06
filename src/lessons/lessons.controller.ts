@@ -113,19 +113,19 @@ export class LessonsController {
 
   @Post(':id/attendances')
   @ApiOperation({
-    summary: 'Create or update attendance records for a lesson',
+    summary: 'Create attendance records for a lesson',
     description:
-      'Creates or updates attendance records for all students in a course class. All students must be included in the request.',
+      'Creates attendance records for all students in a course class. All students must be included. Returns error if attendance already exists for this lesson.',
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: 'Attendance records have been successfully created/updated.',
+    description: 'Attendance records have been successfully created.',
     type: [AttendanceResponseDto],
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description:
-      'Missing students or invalid student IDs for this course class.',
+      'Attendance already exists, missing students, or invalid student IDs.',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
@@ -135,11 +135,45 @@ export class LessonsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Internal server error',
   })
-  async bulkUpsertAttendances(
+  async createAttendances(
     @Param('id', ParseIntPipe) id: number,
     @Body() bulkAttendanceDto: BulkAttendanceDto,
   ): Promise<AttendanceResponseDto[]> {
-    const attendances = await this.attendancesService.bulkUpsert(
+    const attendances = await this.attendancesService.bulkCreate(
+      id,
+      bulkAttendanceDto.attendances,
+    );
+    return attendances.map((att) => new AttendanceResponseDto(att));
+  }
+
+  @Patch(':id/attendances')
+  @ApiOperation({
+    summary: 'Update attendance records for a lesson',
+    description:
+      'Updates attendance records partially. Only the students included in the request will be updated. Students must belong to the course class.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Attendance records have been successfully updated.',
+    type: [AttendanceResponseDto],
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid student IDs for this course class.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Lesson not found.',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async updateAttendances(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() bulkAttendanceDto: BulkAttendanceDto,
+  ): Promise<AttendanceResponseDto[]> {
+    const attendances = await this.attendancesService.bulkUpdate(
       id,
       bulkAttendanceDto.attendances,
     );

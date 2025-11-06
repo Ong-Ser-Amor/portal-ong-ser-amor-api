@@ -1359,8 +1359,8 @@
     },
     "/lessons/{id}/attendances": {
       "post": {
-        "description": "Creates or updates attendance records for all students in a course class. All students must be included in the request.",
-        "operationId": "LessonsController_bulkUpsertAttendances",
+        "description": "Creates attendance records for all students in a course class. All students must be included. Returns error if attendance already exists for this lesson.",
+        "operationId": "LessonsController_createAttendances",
         "parameters": [
           {
             "name": "id",
@@ -1383,7 +1383,7 @@
         },
         "responses": {
           "201": {
-            "description": "Attendance records have been successfully created/updated.",
+            "description": "Attendance records have been successfully created.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1396,7 +1396,7 @@
             }
           },
           "400": {
-            "description": "Missing students or invalid student IDs for this course class."
+            "description": "Attendance already exists, missing students, or invalid student IDs."
           },
           "404": {
             "description": "Lesson not found."
@@ -1405,7 +1405,59 @@
             "description": "Internal server error"
           }
         },
-        "summary": "Create or update attendance records for a lesson",
+        "summary": "Create attendance records for a lesson",
+        "tags": [
+          "Lessons"
+        ]
+      },
+      "patch": {
+        "description": "Updates attendance records partially. Only the students included in the request will be updated. Students must belong to the course class.",
+        "operationId": "LessonsController_updateAttendances",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkAttendanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Attendance records have been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AttendanceResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid student IDs for this course class."
+          },
+          "404": {
+            "description": "Lesson not found."
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Update attendance records for a lesson",
         "tags": [
           "Lessons"
         ]

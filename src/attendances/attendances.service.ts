@@ -64,11 +64,22 @@ export class AttendancesService {
     }
   }
 
-  async bulkUpsert(
+  async bulkCreate(
     lessonId: number,
     attendanceItems: AttendanceItemDto[],
   ): Promise<Attendance[]> {
     const lesson = await this.lessonsService.findOne(lessonId);
+
+    // Verifica se já existe alguma chamada para esta aula
+    const existingCount = await this.repository.count({
+      where: { lesson: { id: lessonId } },
+    });
+
+    if (existingCount > 0) {
+      throw new BadRequestException(
+        'Attendance records already exist for this lesson. Use PATCH to update.',
+      );
+    }
 
     const courseClassStudents =
       await this.courseClassesService.getStudentsFromClass(
@@ -103,7 +114,67 @@ export class AttendancesService {
 
     try {
       return await this.repository.manager.transaction(async (manager) => {
-        // Busca todas as presenças existentes desta aula em uma única query
+        const studentsMap = new Map(
+          courseClassStudents.map((student) => [student.id, student]),
+        );
+
+        const attendancesToCreate: Attendance[] = attendanceItems.map(
+          (item) => {
+            const student = studentsMap.get(item.studentId);
+            return manager.create(Attendance, {
+              present: item.present,
+              notes: item.notes,
+              student,
+              lesson,
+            });
+          },
+        );
+
+        // Salva todas as presenças em uma única query (bulk save)
+        return await manager.save(Attendance, attendancesToCreate);
+      });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(`Error bulk creating attendances: ${errorMessage}`);
+      throw new InternalServerErrorException(
+        'Error creating attendance records',
+      );
+    }
+  }
+
+  async bulkUpdate(
+    lessonId: number,
+    attendanceItems: AttendanceItemDto[],
+  ): Promise<Attendance[]> {
+    const lesson = await this.lessonsService.findOne(lessonId);
+
+    const courseClassStudents =
+      await this.courseClassesService.getStudentsFromClass(
+        lesson.courseClassId,
+      );
+
+    const courseClassStudentIds = courseClassStudents.map(
+      (student) => student.id,
+    );
+
+    const receivedStudentIds = attendanceItems.map((item) => item.studentId);
+
+    // Valida que todos os alunos recebidos pertencem à turma
+    const invalidStudentIds = receivedStudentIds.filter(
+      (id) => !courseClassStudentIds.includes(id),
+    );
+    if (invalidStudentIds.length > 0) {
+      throw new BadRequestException(
+        `Students with IDs ${invalidStudentIds.join(', ')} do not belong to this course class`,
+      );
+    }
+
+    try {
+      return await this.repository.manager.transaction(async (manager) => {
+        // Busca apenas as presenças dos alunos que foram enviados
         const existingAttendances = await manager.find(Attendance, {
           where: {
             lesson: { id: lessonId },
@@ -127,10 +198,12 @@ export class AttendancesService {
           const existingAttendance = existingAttendancesMap.get(item.studentId);
 
           if (existingAttendance) {
+            // Atualiza registro existente
             existingAttendance.present = item.present;
             existingAttendance.notes = item.notes;
             attendancesToSave.push(existingAttendance);
           } else {
+            // Cria novo registro (caso o aluno não tenha presença cadastrada ainda)
             const student = studentsMap.get(item.studentId);
             const newAttendance = manager.create(Attendance, {
               present: item.present,
@@ -150,9 +223,9 @@ export class AttendancesService {
         error instanceof Error
           ? error.message
           : `An unexpected error occurred: ${String(error)}`;
-      this.logger.error(`Error bulk upserting attendances: ${errorMessage}`);
+      this.logger.error(`Error bulk updating attendances: ${errorMessage}`);
       throw new InternalServerErrorException(
-        'Error creating/updating attendance records',
+        'Error updating attendance records',
       );
     }
   }
