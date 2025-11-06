@@ -12,6 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiPaginatedResponse } from 'src/dtos/api-paginated-response.decorator';
 import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 import { LessonResponseDto } from 'src/lessons/dto/lesson-response.dto';
 import { LessonsService } from 'src/lessons/lessons.service';
@@ -227,13 +228,46 @@ export class CourseClassesController {
   }
 
   @Get(':id/students')
-  @ApiOperation({ summary: 'Get all students from a course class' })
+  @ApiOperation({
+    summary: 'Get all students from a course class',
+    description: 'Returns all students without pagination (for attendance)',
+  })
   @ApiResponse({ status: HttpStatus.OK, type: [StudentResponseDto] })
-  async getStudents(
+  async getAllStudents(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<StudentResponseDto[]> {
     const students = await this.courseClassesService.getStudentsFromClass(id);
     return students.map((student) => new StudentResponseDto(student));
+  }
+
+  @Get(':id/students/paginated')
+  @ApiOperation({
+    summary: 'Get paginated students from a course class',
+    description: 'Returns students with pagination (for listing)',
+  })
+  @ApiPaginatedResponse(StudentResponseDto)
+  async getStudents(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('take', ParseIntPipe) take: number,
+    @Query('page', ParseIntPipe) page: number,
+  ): Promise<PaginatedResponseDto<StudentResponseDto>> {
+    const result =
+      await this.courseClassesService.getStudentsFromClassPaginated(
+        id,
+        take,
+        page,
+      );
+
+    const studentDtos = result.data.map(
+      (student) => new StudentResponseDto(student),
+    );
+
+    return new PaginatedResponseDto<StudentResponseDto>(
+      studentDtos,
+      result.meta.totalItems,
+      result.meta.itemsPerPage,
+      result.meta.currentPage,
+    );
   }
 
   @Delete(':id/students/:studentId')

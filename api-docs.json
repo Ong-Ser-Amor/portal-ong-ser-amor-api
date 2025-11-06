@@ -1014,7 +1014,8 @@
         ]
       },
       "get": {
-        "operationId": "CourseClassesController_getStudents",
+        "description": "Returns all students without pagination (for attendance)",
+        "operationId": "CourseClassesController_getAllStudents",
         "parameters": [
           {
             "name": "id",
@@ -1041,6 +1042,68 @@
           }
         },
         "summary": "Get all students from a course class",
+        "tags": [
+          "Course Classes"
+        ]
+      }
+    },
+    "/course-classes/{id}/students/paginated": {
+      "get": {
+        "description": "Returns students with pagination (for listing)",
+        "operationId": "CourseClassesController_getStudents",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully received paginated response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/StudentResponseDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get paginated students from a course class",
         "tags": [
           "Course Classes"
         ]
@@ -1722,6 +1785,61 @@
         },
         "required": [
           "studentId"
+        ]
+      },
+      "PaginationMetaDto": {
+        "type": "object",
+        "properties": {
+          "itemsPerPage": {
+            "type": "number",
+            "description": "Number of items per page",
+            "example": 10
+          },
+          "totalItems": {
+            "type": "number",
+            "description": "Total items",
+            "example": 100
+          },
+          "currentPage": {
+            "type": "number",
+            "description": "Current page",
+            "example": 1
+          },
+          "totalPages": {
+            "type": "number",
+            "description": "Total pages",
+            "example": 10
+          }
+        },
+        "required": [
+          "itemsPerPage",
+          "totalItems",
+          "currentPage",
+          "totalPages"
+        ]
+      },
+      "PaginatedResponseDto": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "description": "Metadata da paginação",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaginationMetaDto"
+              }
+            ]
+          },
+          "data": {
+            "description": "Dados paginados",
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "data"
         ]
       },
       "CreateLessonDto": {

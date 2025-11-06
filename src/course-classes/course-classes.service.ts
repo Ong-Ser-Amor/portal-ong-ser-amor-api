@@ -313,4 +313,39 @@ export class CourseClassesService {
     const courseClass = await this.findOneWithStudents(classId);
     return courseClass.students;
   }
+
+  async getStudentsFromClassPaginated(
+    classId: number,
+    take: number,
+    page: number,
+  ): Promise<PaginatedResponseDto<Student>> {
+    await this.findOne(classId);
+
+    try {
+      const skip = (page - 1) * take;
+
+      const [students, total] = await this.repository
+        .createQueryBuilder('courseClass')
+        .leftJoinAndSelect('courseClass.students', 'student')
+        .where('courseClass.id = :classId', { classId })
+        .skip(skip)
+        .take(take)
+        .getManyAndCount();
+
+      const allStudents = students.flatMap((cc) => cc.students);
+
+      return new PaginatedResponseDto<Student>(allStudents, total, take, page);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(
+        `Error fetching paginated students from class: ${errorMessage}`,
+      );
+      throw new InternalServerErrorException(
+        'Error fetching students from class',
+      );
+    }
+  }
 }
