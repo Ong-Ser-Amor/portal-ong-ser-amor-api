@@ -12,6 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiPaginatedResponse } from 'src/dtos/api-paginated-response.decorator';
 import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -45,11 +46,7 @@ export class StudentsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all students' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'The students have been successfully retrieved',
-    type: [StudentResponseDto],
-  })
+  @ApiPaginatedResponse(StudentResponseDto)
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Internal server error',

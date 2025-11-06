@@ -303,14 +303,25 @@
         ],
         "responses": {
           "200": {
-            "description": "The students have been successfully retrieved",
+            "description": "Successfully received paginated response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/StudentResponseDto"
-                  }
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/StudentResponseDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
@@ -1604,6 +1615,61 @@
           "birthDate"
         ]
       },
+      "PaginationMetaDto": {
+        "type": "object",
+        "properties": {
+          "itemsPerPage": {
+            "type": "number",
+            "description": "Number of items per page",
+            "example": 10
+          },
+          "totalItems": {
+            "type": "number",
+            "description": "Total items",
+            "example": 100
+          },
+          "currentPage": {
+            "type": "number",
+            "description": "Current page",
+            "example": 1
+          },
+          "totalPages": {
+            "type": "number",
+            "description": "Total pages",
+            "example": 10
+          }
+        },
+        "required": [
+          "itemsPerPage",
+          "totalItems",
+          "currentPage",
+          "totalPages"
+        ]
+      },
+      "PaginatedResponseDto": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "description": "Metadata da paginação",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaginationMetaDto"
+              }
+            ]
+          },
+          "data": {
+            "description": "Dados paginados",
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "data"
+        ]
+      },
       "UpdateStudentDto": {
         "type": "object",
         "properties": {
@@ -1748,61 +1814,6 @@
           "name",
           "startDate",
           "endDate"
-        ]
-      },
-      "PaginationMetaDto": {
-        "type": "object",
-        "properties": {
-          "itemsPerPage": {
-            "type": "number",
-            "description": "Number of items per page",
-            "example": 10
-          },
-          "totalItems": {
-            "type": "number",
-            "description": "Total items",
-            "example": 100
-          },
-          "currentPage": {
-            "type": "number",
-            "description": "Current page",
-            "example": 1
-          },
-          "totalPages": {
-            "type": "number",
-            "description": "Total pages",
-            "example": 10
-          }
-        },
-        "required": [
-          "itemsPerPage",
-          "totalItems",
-          "currentPage",
-          "totalPages"
-        ]
-      },
-      "PaginatedResponseDto": {
-        "type": "object",
-        "properties": {
-          "meta": {
-            "description": "Metadata da paginação",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PaginationMetaDto"
-              }
-            ]
-          },
-          "data": {
-            "description": "Dados paginados",
-            "type": "array",
-            "items": {
-              "type": "array"
-            }
-          }
-        },
-        "required": [
-          "meta",
-          "data"
         ]
       },
       "LessonResponseDto": {
