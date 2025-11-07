@@ -12,7 +12,7 @@ import { CourseClass } from './entities/course-class.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([CourseClass]),
-    CoursesModule,
+    forwardRef(() => CoursesModule),
     UsersModule,
     StudentsModule,
     forwardRef(() => LessonsModule),

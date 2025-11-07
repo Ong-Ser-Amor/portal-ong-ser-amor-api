@@ -5,6 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CourseClassStatus } from 'src/course-classes/enums/course-class-status.enum';
+import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -34,9 +36,31 @@ export class CoursesService {
     }
   }
 
-  async findAll(): Promise<Course[]> {
+  async findAll(take = 10, page = 1): Promise<PaginatedResponseDto<Course>> {
     try {
-      return await this.repository.find();
+      const skip = (page - 1) * take;
+
+      const queryBuilder = this.repository
+        .createQueryBuilder('course')
+        .loadRelationCountAndMap(
+          'course.activeClassesCount',
+          'course.courseClasses',
+          'activeCourseClass',
+          (qb) =>
+            qb.where('activeCourseClass.status IN (:...statuses)', {
+              statuses: [
+                CourseClassStatus.EM_FORMACAO,
+                CourseClassStatus.EM_ANDAMENTO,
+              ],
+            }),
+        )
+        .orderBy('course.name', 'ASC')
+        .take(take)
+        .skip(skip);
+
+      const [courses, total] = await queryBuilder.getManyAndCount();
+
+      return new PaginatedResponseDto(courses, total, take, page);
     } catch (error) {
       const errorMessage =
         error instanceof Error

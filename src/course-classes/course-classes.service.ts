@@ -7,8 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CoursesService } from 'src/courses/courses.service';
-import { Lesson } from 'src/lessons/entities/lesson.entity';
-import { LessonsService } from 'src/lessons/lessons.service';
+import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 import { Student } from 'src/students/entities/student.entity';
 import { StudentsService } from 'src/students/students.service';
 import { User } from 'src/users/entities/user.entity';
@@ -54,17 +53,43 @@ export class CourseClassesService {
     }
   }
 
-  async findAll(): Promise<CourseClass[]> {
+  async findAllByCourseId(
+    courseId: number,
+    take = 10,
+    page = 1,
+  ): Promise<PaginatedResponseDto<CourseClass>> {
+    // Valida se o curso existe
+    await this.coursesService.findOne(courseId);
+
     try {
-      return await this.repository.find({ relations: ['course'] });
+      const skip = (page - 1) * take;
+
+      const queryBuilder = this.repository
+        .createQueryBuilder('courseClass')
+        .leftJoinAndSelect('courseClass.course', 'course')
+        .leftJoinAndSelect('courseClass.teachers', 'teachers')
+        .loadRelationCountAndMap(
+          'courseClass.studentsCount',
+          'courseClass.students',
+        )
+        .where('course.id = :courseId', { courseId })
+        .orderBy('courseClass.createdAt', 'DESC')
+        .take(take)
+        .skip(skip);
+
+      const [courseClasses, total] = await queryBuilder.getManyAndCount();
+
+      return new PaginatedResponseDto(courseClasses, total, take, page);
     } catch (error) {
       const errorMessage =
         error instanceof Error
           ? error.message
           : `An unexpected error occurred: ${String(error)}`;
-      this.logger.error(`Error finding all course classes: ${errorMessage}`);
+      this.logger.error(
+        `Error finding course classes by course id: ${errorMessage}`,
+      );
       throw new InternalServerErrorException(
-        'Error finding all course classes',
+        'Error finding course classes by course id',
       );
     }
   }
@@ -73,7 +98,7 @@ export class CourseClassesService {
     try {
       return await this.repository.findOneOrFail({
         where: { id },
-        relations: ['course', 'teachers', 'students'],
+        relations: ['course'],
       });
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
@@ -123,13 +148,39 @@ export class CourseClassesService {
     }
   }
 
+  // --- Métodos Privados para Buscar Relações ---
+
+  private async findOneWithTeachers(classId: number): Promise<CourseClass> {
+    const courseClass = await this.repository.findOne({
+      where: { id: classId },
+      relations: ['teachers'],
+    });
+
+    if (!courseClass) {
+      throw new NotFoundException('Course class not found');
+    }
+
+    return courseClass;
+  }
+
+  private async findOneWithStudents(classId: number): Promise<CourseClass> {
+    const courseClass = await this.repository.findOne({
+      where: { id: classId },
+      relations: ['students'],
+    });
+
+    if (!courseClass) {
+      throw new NotFoundException('Course class not found');
+    }
+
+    return courseClass;
+  }
+
   // --- Métodos de Gerenciamento de Professores ---
 
-  async addTeacherToClass(
-    classId: number,
-    teacherId: number,
-  ): Promise<CourseClass> {
-    const courseClass = await this.findOne(classId);
+  async addTeacherToClass(classId: number, teacherId: number): Promise<void> {
+    const courseClass = await this.findOneWithTeachers(classId);
+
     const teacher = await this.usersService.findOne(teacherId);
 
     const isTeacherAlreadyInClass = courseClass.teachers.some(
@@ -145,7 +196,7 @@ export class CourseClassesService {
     courseClass.teachers.push(teacher);
 
     try {
-      return await this.repository.save(courseClass);
+      await this.repository.save(courseClass);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -159,8 +210,8 @@ export class CourseClassesService {
   async removeTeacherFromClass(
     classId: number,
     teacherId: number,
-  ): Promise<CourseClass> {
-    const courseClass = await this.findOne(classId);
+  ): Promise<void> {
+    const courseClass = await this.findOneWithTeachers(classId);
 
     const initialTeacherCount = courseClass.teachers.length;
     courseClass.teachers = courseClass.teachers.filter(
@@ -174,7 +225,7 @@ export class CourseClassesService {
     }
 
     try {
-      return await this.repository.save(courseClass);
+      await this.repository.save(courseClass);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -187,18 +238,47 @@ export class CourseClassesService {
     }
   }
 
-  async getTeachersFromClass(classId: number): Promise<User[]> {
-    const courseClass = await this.findOne(classId);
-    return courseClass.teachers;
+  async getTeachersFromClassPaginated(
+    classId: number,
+    take: number,
+    page: number,
+  ): Promise<PaginatedResponseDto<User>> {
+    await this.findOne(classId);
+
+    try {
+      const skip = (page - 1) * take;
+
+      const [courseClasses, total] = await this.repository
+        .createQueryBuilder('courseClass')
+        .leftJoinAndSelect('courseClass.teachers', 'teacher')
+        .where('courseClass.id = :classId', { classId })
+        .skip(skip)
+        .take(take)
+        .getManyAndCount();
+
+      const allTeachers =
+        courseClasses.length > 0 ? courseClasses[0].teachers : [];
+
+      return new PaginatedResponseDto<User>(allTeachers, total, take, page);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(
+        `Error fetching paginated teachers from class: ${errorMessage}`,
+      );
+      throw new InternalServerErrorException(
+        'Error fetching teachers from class',
+      );
+    }
   }
 
   // --- Métodos de Gerenciamento de Alunos ---
 
-  async addStudentToClass(
-    classId: number,
-    studentId: number,
-  ): Promise<CourseClass> {
-    const courseClass = await this.findOne(classId);
+  async addStudentToClass(classId: number, studentId: number): Promise<void> {
+    const courseClass = await this.findOneWithStudents(classId);
+
     const student = await this.studentsService.findOne(studentId);
 
     if (!courseClass.students) {
@@ -218,7 +298,7 @@ export class CourseClassesService {
     courseClass.students.push(student);
 
     try {
-      return await this.repository.save(courseClass);
+      await this.repository.save(courseClass);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -232,8 +312,8 @@ export class CourseClassesService {
   async removeStudentFromClass(
     classId: number,
     studentId: number,
-  ): Promise<CourseClass> {
-    const courseClass = await this.findOne(classId);
+  ): Promise<void> {
+    const courseClass = await this.findOneWithStudents(classId);
 
     const initialStudentCount = courseClass.students.length;
     courseClass.students = courseClass.students.filter(
@@ -247,7 +327,7 @@ export class CourseClassesService {
     }
 
     try {
-      return await this.repository.save(courseClass);
+      await this.repository.save(courseClass);
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -261,7 +341,42 @@ export class CourseClassesService {
   }
 
   async getStudentsFromClass(classId: number): Promise<Student[]> {
-    const courseClass = await this.findOne(classId);
+    const courseClass = await this.findOneWithStudents(classId);
     return courseClass.students;
+  }
+
+  async getStudentsFromClassPaginated(
+    classId: number,
+    take: number,
+    page: number,
+  ): Promise<PaginatedResponseDto<Student>> {
+    await this.findOne(classId);
+
+    try {
+      const skip = (page - 1) * take;
+
+      const [students, total] = await this.repository
+        .createQueryBuilder('courseClass')
+        .leftJoinAndSelect('courseClass.students', 'student')
+        .where('courseClass.id = :classId', { classId })
+        .skip(skip)
+        .take(take)
+        .getManyAndCount();
+
+      const allStudents = students.flatMap((cc) => cc.students);
+
+      return new PaginatedResponseDto<Student>(allStudents, total, take, page);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(
+        `Error fetching paginated students from class: ${errorMessage}`,
+      );
+      throw new InternalServerErrorException(
+        'Error fetching students from class',
+      );
+    }
   }
 }

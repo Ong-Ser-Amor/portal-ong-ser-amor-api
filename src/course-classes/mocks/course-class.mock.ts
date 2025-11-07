@@ -3,6 +3,7 @@ import { mockTeacher } from 'src/users/mocks/user.mock';
 
 import { CreateCourseClassDto } from '../dto/create-course-class.dto';
 import { CourseClass } from '../entities/course-class.entity';
+import { CourseClassStatus } from '../enums/course-class-status.enum';
 
 export const mockCreateCourseClassDto: CreateCourseClassDto = {
   courseId: 1,
@@ -14,6 +15,7 @@ export const mockCreateCourseClassDto: CreateCourseClassDto = {
 export const mockCourseClass: CourseClass = {
   id: 1,
   name: 'Mock Course Class',
+  status: CourseClassStatus.EM_ANDAMENTO,
   startDate: new Date('2025-10-01'),
   endDate: new Date('2025-12-31'),
   course: mockCourse,

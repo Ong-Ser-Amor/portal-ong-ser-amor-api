@@ -17,6 +17,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { CourseClassStatus } from '../enums/course-class-status.enum';
+
 @Entity({ name: 'course_class' })
 export class CourseClass {
   @PrimaryGeneratedColumn('increment')
@@ -24,6 +26,15 @@ export class CourseClass {
 
   @Column({ name: 'name', type: 'varchar', length: 100, nullable: false })
   name: string;
+
+  @Column({
+    name: 'status',
+    type: 'enum',
+    enum: CourseClassStatus,
+    default: CourseClassStatus.EM_FORMACAO,
+    nullable: false,
+  })
+  status: CourseClassStatus;
 
   @Column({ name: 'start_date', type: 'date', nullable: false })
   startDate: Date;

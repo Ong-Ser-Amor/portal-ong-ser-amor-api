@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -34,9 +35,17 @@ export class StudentsService {
     }
   }
 
-  async findAll(): Promise<Student[]> {
+  async findAll(take = 10, page = 1): Promise<PaginatedResponseDto<Student>> {
     try {
-      return await this.repository.find();
+      const skip = (page - 1) * take;
+
+      const [students, total] = await this.repository.findAndCount({
+        take,
+        skip,
+        order: { name: 'ASC' },
+      });
+
+      return new PaginatedResponseDto(students, total, take, page);
     } catch (error) {
       const errorMessage =
         error instanceof Error
