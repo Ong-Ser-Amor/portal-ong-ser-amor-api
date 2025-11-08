@@ -21,26 +21,11 @@ import { UsersModule } from './users/users.module';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        host: configService.get<string>(
-          'DATABASE_HOST',
-          process.env.DATABASE_HOST,
-        ),
-        port: parseInt(
-          configService.get<string>('DATABASE_PORT', process.env.DATABASE_PORT),
-          10,
-        ),
-        username: configService.get<string>(
-          'DATABASE_USER',
-          process.env.DATABASE_USER,
-        ),
-        password: configService.get<string>(
-          'DATABASE_PASSWORD',
-          process.env.DATABASE_PASSWORD,
-        ),
-        database: configService.get<string>(
-          'DATABASE_NAME',
-          process.env.DATABASE_NAME,
-        ),
+        host: configService.get<string>('DATABASE_HOST'),
+        port: configService.get<number>('DATABASE_PORT'),
+        username: configService.get<string>('DATABASE_USER'),
+        password: configService.get<string>('DATABASE_PASSWORD'),
+        database: configService.get<string>('DATABASE_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         autoLoadEntities: true,
         synchronize: false,
