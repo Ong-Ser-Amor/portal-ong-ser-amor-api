@@ -31,9 +31,10 @@ import { UsersModule } from './users/users.module';
         synchronize: false,
         migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
         migrationsRun: true,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        ssl:
+          configService.get<string>('NODE_ENV') === 'production'
+            ? true
+            : undefined,
       }),
       inject: [ConfigService],
     }),
