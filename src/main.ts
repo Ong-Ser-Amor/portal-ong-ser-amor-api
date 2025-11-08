@@ -35,7 +35,15 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document, { jsonDocumentUrl: 'api-json' });
 
   // Salva a documentação da API em um arquivo JSON
-  fs.writeFileSync('./api-docs.json', JSON.stringify(document, null, 2));
+  // APENAS SE NÃO ESTIVER EM PRODUÇÃO
+  const nodeEnv =
+    configService.get<string>('NODE_ENV', process.env.NODE_ENV) ||
+    'development';
+
+  if (nodeEnv !== 'production') {
+    fs.writeFileSync('./api-docs.json', JSON.stringify(document, null, 2));
+    Logger.log('📄 Documentação da API salva em ./api-docs.json', 'Bootstrap');
+  }
 
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
