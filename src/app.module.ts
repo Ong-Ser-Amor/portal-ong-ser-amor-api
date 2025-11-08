@@ -33,8 +33,8 @@ import { UsersModule } from './users/users.module';
         migrationsRun: true,
         ssl:
           configService.get<string>('NODE_ENV') === 'production'
-            ? true
-            : undefined,
+            ? { rejectUnauthorized: false }
+            : false,
       }),
       inject: [ConfigService],
     }),
