@@ -17,7 +17,11 @@ async function bootstrap() {
     configService.get<string>('API_HOST', process.env.HOST) || 'localhost';
 
   const cors = {
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://portal-ong-ser-amor-next-app.vercel.app',
+    ],
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
     preflightContinue: false,
     optionsSuccessStatus: 204,
