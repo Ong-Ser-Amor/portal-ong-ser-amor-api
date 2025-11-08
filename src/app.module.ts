@@ -4,13 +4,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AttendancesModule } from './attendances/attendances.module';
 import { AuthModule } from './auth/auth.module';
+import { CourseClassesModule } from './course-classes/course-classes.module';
+import { CoursesModule } from './courses/courses.module';
+import { LessonsModule } from './lessons/lessons.module';
 import { StudentsModule } from './students/students.module';
 import { UsersModule } from './users/users.module';
-import { CoursesModule } from './courses/courses.module';
-import { CourseClassesModule } from './course-classes/course-classes.module';
-import { LessonsModule } from './lessons/lessons.module';
-import { AttendancesModule } from './attendances/attendances.module';
 
 @Module({
   imports: [
@@ -46,6 +46,9 @@ import { AttendancesModule } from './attendances/attendances.module';
         synchronize: false,
         migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
         migrationsRun: true,
+        ssl: {
+          rejectUnauthorized: false,
+        },
       }),
       inject: [ConfigService],
     }),
