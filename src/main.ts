@@ -21,6 +21,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'http://localhost:3001',
       'https://portal-ong-ser-amor-next-app.vercel.app',
+      'https://portal-ong-ser-amor-next-app-dev.vercel.app',
     ],
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
     preflightContinue: false,
