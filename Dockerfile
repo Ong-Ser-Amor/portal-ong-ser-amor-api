@@ -15,6 +15,9 @@ COPY package*.json ./
 # 'npm ci' ao inves do 'npm i', promove uma instalação rápida e consistente baseada no lockfile
 RUN npm ci
 
+# Instala o Nest CLI globalmente
+RUN npm install -g @nestjs/cli
+
 COPY . .
 
 # Compila o TypeScript para JavaScript, criando a pasta /dist
