@@ -12,6 +12,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AreasService } from 'src/areas/areas.service';
+import { AreaResponseDto } from 'src/areas/dto/area-response.dto';
 import { ApiPaginatedResponse } from 'src/dtos/api-paginated-response.decorator';
 import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 
@@ -23,7 +25,10 @@ import { LocationsService } from './locations.service';
 @Controller('locations')
 @ApiTags('Locations')
 export class LocationsController {
-  constructor(private readonly locationsService: LocationsService) {}
+  constructor(
+    private readonly locationsService: LocationsService,
+    private readonly areasService: AreasService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new location' })
@@ -131,5 +136,33 @@ export class LocationsController {
   })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.locationsService.remove(id);
+  }
+
+  @Get(':id/areas')
+  @ApiOperation({ summary: 'Get all areas from a location' })
+  @ApiPaginatedResponse(AreaResponseDto)
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Location not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async findCourseClasses(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('take', ParseIntPipe) take: number = 10,
+    @Query('page', ParseIntPipe) page: number = 1,
+  ): Promise<PaginatedResponseDto<AreaResponseDto>> {
+    const areas = await this.areasService.findAllByLocationId(id, take, page);
+
+    const areaDtos = areas.data.map((area) => new AreaResponseDto(area));
+
+    return new PaginatedResponseDto<AreaResponseDto>(
+      areaDtos,
+      areas.meta.totalItems,
+      areas.meta.itemsPerPage,
+      areas.meta.currentPage,
+    );
   }
 }

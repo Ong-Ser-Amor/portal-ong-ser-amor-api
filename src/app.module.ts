@@ -12,6 +12,7 @@ import { LessonsModule } from './lessons/lessons.module';
 import { StudentsModule } from './students/students.module';
 import { UsersModule } from './users/users.module';
 import { LocationsModule } from './locations/locations.module';
+import { AreasModule } from './areas/areas.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { LocationsModule } from './locations/locations.module';
     LessonsModule,
     AttendancesModule,
     LocationsModule,
+    AreasModule,
   ],
   controllers: [AppController],
   providers: [AppService],
