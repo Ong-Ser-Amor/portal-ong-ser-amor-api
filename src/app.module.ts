@@ -13,6 +13,7 @@ import { StudentsModule } from './students/students.module';
 import { UsersModule } from './users/users.module';
 import { LocationsModule } from './locations/locations.module';
 import { AreasModule } from './areas/areas.module';
+import { AssetCategoriesModule } from './asset-categories/asset-categories.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { AreasModule } from './areas/areas.module';
     AttendancesModule,
     LocationsModule,
     AreasModule,
+    AssetCategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
