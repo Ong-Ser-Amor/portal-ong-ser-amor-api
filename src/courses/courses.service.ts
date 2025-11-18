@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -23,6 +24,12 @@ export class CoursesService {
   ) {}
 
   async create(createCourseDto: CreateCourseDto): Promise<Course> {
+    const existingCourse = await this.findOneByName(createCourseDto.name);
+
+    if (existingCourse) {
+      throw new ConflictException('Course already exists');
+    }
+
     try {
       const course = this.repository.create(createCourseDto);
       return await this.repository.save(course);
@@ -88,7 +95,26 @@ export class CoursesService {
     }
   }
 
+  async findOneByName(name: string): Promise<Course | null> {
+    try {
+      return await this.repository.findOneBy({ name });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(`Error finding course by name: ${errorMessage}`);
+      throw new InternalServerErrorException('Error finding course by name');
+    }
+  }
+
   async update(id: number, updateCourseDto: UpdateCourseDto) {
+    const existingCourse = await this.findOneByName(updateCourseDto.name);
+
+    if (existingCourse && existingCourse.id !== id) {
+      throw new ConflictException('Course name already in use');
+    }
+
     const course = await this.findOne(id);
 
     try {
