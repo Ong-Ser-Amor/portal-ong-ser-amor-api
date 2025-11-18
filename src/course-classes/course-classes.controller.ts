@@ -46,6 +46,10 @@ export class CourseClassesController {
     type: CourseClassResponseDto,
   })
   @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Start date must be earlier than end date.',
+  })
+  @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Internal server error',
   })
@@ -124,6 +128,10 @@ export class CourseClassesController {
     status: HttpStatus.OK,
     description: 'The course class has been successfully updated.',
     type: CourseClassResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Start date must be earlier than end date.',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,

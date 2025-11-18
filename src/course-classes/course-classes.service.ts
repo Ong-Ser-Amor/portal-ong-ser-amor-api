@@ -37,6 +37,17 @@ export class CourseClassesService {
       createCourseClassDto.courseId,
     );
 
+    if (
+      !this.validateStartAndEndDates(
+        createCourseClassDto.startDate,
+        createCourseClassDto.endDate,
+      )
+    ) {
+      throw new BadRequestException(
+        'Start date must be earlier than end date.',
+      );
+    }
+
     try {
       const courseClass = this.repository.create({
         ...createCourseClassDto,
@@ -119,6 +130,19 @@ export class CourseClassesService {
     updateCourseClassDto: UpdateCourseClassDto,
   ): Promise<CourseClass> {
     const courseClass = await this.findOne(id);
+
+    if (
+      updateCourseClassDto.startDate &&
+      updateCourseClassDto.endDate &&
+      !this.validateStartAndEndDates(
+        updateCourseClassDto.startDate,
+        updateCourseClassDto.endDate,
+      )
+    ) {
+      throw new BadRequestException(
+        'Start date must be earlier than end date.',
+      );
+    }
 
     try {
       this.repository.merge(courseClass, updateCourseClassDto);
@@ -378,5 +402,13 @@ export class CourseClassesService {
         'Error fetching students from class',
       );
     }
+  }
+
+  // valida se a data de início é anterior à data de término
+  private validateStartAndEndDates(startDate: Date, endDate: Date): boolean {
+    if (startDate > endDate) {
+      return false;
+    }
+    return true;
   }
 }

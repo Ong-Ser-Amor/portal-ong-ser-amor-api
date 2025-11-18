@@ -738,6 +738,9 @@
               }
             }
           },
+          "400": {
+            "description": "Start date must be earlier than end date."
+          },
           "500": {
             "description": "Internal server error"
           }
@@ -817,6 +820,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Start date must be earlier than end date."
           },
           "404": {
             "description": "Course class not found"
