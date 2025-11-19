@@ -18,7 +18,6 @@ export class Course {
     name: 'name',
     type: 'varchar',
     length: 100,
-    unique: true,
     nullable: false,
   })
   name: string;

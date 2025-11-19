@@ -24,11 +24,7 @@ export class CoursesService {
   ) {}
 
   async create(createCourseDto: CreateCourseDto): Promise<Course> {
-    const existingCourse = await this.findOneByName(createCourseDto.name);
-
-    if (existingCourse) {
-      throw new ConflictException('Course already exists');
-    }
+    await this.validateCourseNameUniqueness(createCourseDto.name);
 
     try {
       const course = this.repository.create(createCourseDto);
@@ -95,27 +91,12 @@ export class CoursesService {
     }
   }
 
-  async findOneByName(name: string): Promise<Course | null> {
-    try {
-      return await this.repository.findOneBy({ name });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : `An unexpected error occurred: ${String(error)}`;
-      this.logger.error(`Error finding course by name: ${errorMessage}`);
-      throw new InternalServerErrorException('Error finding course by name');
-    }
-  }
-
   async update(id: number, updateCourseDto: UpdateCourseDto) {
-    const existingCourse = await this.findOneByName(updateCourseDto.name);
-
-    if (existingCourse && existingCourse.id !== id) {
-      throw new ConflictException('Course name already in use');
-    }
-
     const course = await this.findOne(id);
+
+    if (updateCourseDto.name) {
+      await this.validateCourseNameUniqueness(updateCourseDto.name, id);
+    }
 
     try {
       this.repository.merge(course, updateCourseDto);
@@ -142,6 +123,44 @@ export class CoursesService {
           : `An unexpected error occurred: ${String(error)}`;
       this.logger.error(`Error deleting course: ${errorMessage}`);
       throw new InternalServerErrorException('Error deleting course');
+    }
+  }
+
+  private async validateCourseNameUniqueness(
+    name: string,
+    excludeId?: number,
+  ): Promise<void> {
+    try {
+      const queryBuilder = this.repository
+        .createQueryBuilder('course')
+        // Usa LOWER() para fazer a busca case-insensitive
+        .where('LOWER(course.name) = LOWER(:name)', { name });
+
+      // Exclui o próprio curso da busca, se for um update
+      if (excludeId) {
+        queryBuilder.andWhere('course.id != :id', { id: excludeId });
+      }
+
+      const existingCourse = await queryBuilder.getOne();
+
+      if (existingCourse) {
+        throw new ConflictException('Course name already in use');
+      }
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(
+        `Error during course name uniqueness validation: ${errorMessage}`,
+      );
+      throw new InternalServerErrorException(
+        'Error during course name uniqueness validation',
+      );
     }
   }
 }
