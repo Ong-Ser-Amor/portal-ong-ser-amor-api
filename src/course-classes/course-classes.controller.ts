@@ -50,6 +50,10 @@ export class CourseClassesController {
     description: 'Start date must be earlier than end date.',
   })
   @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Course class name already in use for this course',
+  })
+  @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Internal server error',
   })
@@ -132,6 +136,10 @@ export class CourseClassesController {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Start date must be earlier than end date.',
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Course class name already in use for this course',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,

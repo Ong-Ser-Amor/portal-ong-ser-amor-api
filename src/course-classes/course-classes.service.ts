@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -34,6 +35,11 @@ export class CourseClassesService {
     createCourseClassDto: CreateCourseClassDto,
   ): Promise<CourseClass> {
     const course = await this.coursesService.findOne(
+      createCourseClassDto.courseId,
+    );
+
+    await this.validateCourseClassNameUniqueness(
+      createCourseClassDto.name,
       createCourseClassDto.courseId,
     );
 
@@ -130,6 +136,14 @@ export class CourseClassesService {
     updateCourseClassDto: UpdateCourseClassDto,
   ): Promise<CourseClass> {
     const courseClass = await this.findOne(id);
+
+    if (updateCourseClassDto.name) {
+      await this.validateCourseClassNameUniqueness(
+        updateCourseClassDto.name,
+        courseClass.course.id,
+        id,
+      );
+    }
 
     if (
       updateCourseClassDto.startDate &&
@@ -410,5 +424,46 @@ export class CourseClassesService {
       return false;
     }
     return true;
+  }
+
+  // Valida se o nome da turma é único dentro do curso
+  private async validateCourseClassNameUniqueness(
+    name: string,
+    courseId: number,
+    excludeId?: number,
+  ): Promise<void> {
+    try {
+      const queryBuilder = this.repository
+        .createQueryBuilder('courseClass')
+        .where('LOWER(courseClass.name) = LOWER(:name)', { name })
+        .andWhere('courseClass.course_id = :courseId', { courseId });
+
+      if (excludeId) {
+        queryBuilder.andWhere('courseClass.id != :id', { id: excludeId });
+      }
+
+      const existingCourseClass = await queryBuilder.getOne();
+
+      if (existingCourseClass) {
+        throw new ConflictException(
+          'Course class name already in use for this course',
+        );
+      }
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(
+        `Error during course class name uniqueness validation: ${errorMessage}`,
+      );
+      throw new InternalServerErrorException(
+        'Error during course class name uniqueness validation',
+      );
+    }
   }
 }
