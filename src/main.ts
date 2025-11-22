@@ -20,6 +20,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       'http://localhost:3001',
+      'http://localhost:4200',
       'https://portal-ong-ser-amor-next-app.vercel.app',
       'https://portal-ong-ser-amor-next-app-dev.vercel.app',
     ],
