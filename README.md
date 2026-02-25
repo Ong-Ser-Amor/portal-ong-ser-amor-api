@@ -6,6 +6,23 @@ Construída com [NestJS](https://nestjs.com/) e [TypeORM](https://typeorm.io/), 
 
 ---
 
+## Sumário
+
+- [Formas de executar o projeto](#formas-de-executar-o-projeto)
+- [Módulos](#módulos)
+- [Variáveis de ambiente](#variáveis-de-ambiente)
+- [Executando o projeto](#executando-o-projeto)
+  - [1. Dev Container em Named Volume ★ (recomendado)](#1-com-docker--dev-container-em-named-volume--recomendado)
+  - [2. Dev Container com código local](#2-com-docker--dev-container-com-código-local)
+  - [3. Manual via terminal](#3-com-docker--manual-via-terminal)
+  - [4. Sem Docker — Setup local](#4-sem-docker--setup-local)
+- [Migrations](#migrations)
+- [Documentação da API (Swagger)](#documentação-da-api-swagger)
+- [Testes](#testes)
+- [Scripts disponíveis](#scripts-disponíveis)
+
+---
+
 ## Formas de executar o projeto
 
 Existem dois caminhos principais para rodar o projeto: **com Docker** ou **sem Docker**. A forma recomendada é com Docker, pois elimina a necessidade de configurar a máquina manualmente.
@@ -64,6 +81,19 @@ cp .env.example .env
 ---
 
 ## Executando o projeto
+
+> **Usuários Windows — Docker via WSL2**
+>
+> Se ao criar ou iniciar containers você encontrar erros de recursos insuficientes, crie o arquivo `.wslconfig` na pasta do seu usuário (`C:\Users\nome_do_usuario`) com o seguinte conteúdo:
+>
+> ```ini
+> [wsl2]
+> memory=8GB
+> processors=4
+> swap=2GB
+> ```
+>
+> Os valores acima são uma referência — ajuste `memory`, `processors` e `swap` de acordo com os recursos disponíveis na sua máquina. Isso aumenta os recursos disponíveis para o WSL2 (e consequentemente para o Docker Desktop). Após criar o arquivo, reinicie o WSL com `wsl --shutdown` no PowerShell e abra o Docker Desktop novamente.
 
 ### 1. Com Docker — Dev Container em Named Volume ★ (recomendado)
 
