@@ -1,98 +1,229 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Portal ONG Ser Amor — API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST do portal de gestão da ONG Ser Amor, responsável pelo controle de alunos, cursos, aulas, presenças e demais recursos administrativos da organização.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Construída com [NestJS](https://nestjs.com/) e [TypeORM](https://typeorm.io/), usando PostgreSQL como banco de dados.
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Formas de executar o projeto
 
-## Project setup
+Existem dois caminhos principais para rodar o projeto: **com Docker** ou **sem Docker**. A forma recomendada é com Docker, pois elimina a necessidade de configurar a máquina manualmente.
 
-```bash
-$ npm install
+```
+├── Com Docker
+│   ├── Manual (docker compose no terminal)
+│   └── Dev Container
+│       ├── Código espelhado localmente (clone + Reopen in Container)
+│       └── ★ Código no container via Named Volume (recomendado)
+└── Sem Docker (setup manual completo na máquina)
 ```
 
-## Compile and run the project
+---
+
+## Módulos
+
+| Módulo             | Responsabilidade                  |
+| ------------------ | --------------------------------- |
+| `auth`             | Autenticação via JWT              |
+| `users`            | Gestão de usuários                |
+| `students`         | Gestão de alunos                  |
+| `courses`          | Gestão de cursos                  |
+| `course-classes`   | Turmas vinculadas aos cursos      |
+| `lessons`          | Aulas de cada turma               |
+| `attendances`      | Registro de presenças             |
+| `locations`        | Locais onde as atividades ocorrem |
+| `areas`            | Áreas de atuação da ONG           |
+| `asset-categories` | Categorias de patrimônio          |
+
+---
+
+## Variáveis de ambiente
+
+Copie o arquivo de exemplo e ajuste os valores conforme o seu ambiente:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cp .env.example .env
 ```
 
-## Run tests
+| Variável            | Descrição                                | Padrão                        |
+| ------------------- | ---------------------------------------- | ----------------------------- |
+| `API_PORT`          | Porta em que a API será exposta          | `3000`                        |
+| `API_HOST`          | Host da API (usado nos logs)             | `localhost`                   |
+| `NODE_ENV`          | Ambiente de execução                     | `development`                 |
+| `JWT_SECRET_KEY`    | Chave secreta para assinatura dos tokens | —                             |
+| `JWT_EXPIRES_IN`    | Tempo de expiração do token JWT          | `1d`                          |
+| `DATABASE_HOST`     | Host do banco de dados                   | `db` (nome do serviço Docker) |
+| `DATABASE_PORT`     | Porta do PostgreSQL                      | `5432`                        |
+| `DATABASE_USER`     | Usuário do banco de dados                | `admin`                       |
+| `DATABASE_PASSWORD` | Senha do banco de dados                  | `admin123`                    |
+| `DATABASE_NAME`     | Nome do banco de dados                   | `portal_ong_ser_amor`         |
+
+> **Atenção:** em produção, substitua todos os valores padrão por valores seguros, especialmente `JWT_SECRET_KEY` e as credenciais do banco.
+
+---
+
+## Executando o projeto
+
+### 1. Com Docker — Dev Container em Named Volume ★ (recomendado)
+
+Esta é a forma mais prática. Todo o código fica **dentro do container** — nada é instalado ou clonado na sua máquina além das ferramentas essenciais.
+
+**O que você precisa ter instalado na máquina:**
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (em execução)
+- [VS Code](https://code.visualstudio.com/)
+- Extensão [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) para o VS Code
+- Cliente de API REST: [Insomnia](https://insomnia.rest/) ou [Postman](https://www.postman.com/)
+- Cliente de banco de dados: [DBeaver](https://dbeaver.io/) ou [pgAdmin](https://www.pgadmin.org/)
+
+**Passo a passo:**
+
+1. Certifique-se de que o **Docker Desktop está em execução**.
+2. Abra uma **nova janela** do VS Code.
+3. Abra a paleta de comandos (`Ctrl+Shift+P` ou `Cmd+Shift+P`) e pesquise por:
+   ```
+   Dev Containers: Clone Repository in Named Container Volume
+   ```
+4. Cole a URL do repositório e siga as instruções.
+5. O VS Code vai criar o container, instalar todas as dependências e abrir o projeto pronto para uso.
+
+> Todo o ambiente de desenvolvimento (Node.js, dependências, banco de dados) é provisionado automaticamente pelo Dev Container. Não é necessário instalar a stack na máquina.
+
+---
+
+### 2. Com Docker — Dev Container com código local
+
+Nesta variante, o repositório é clonado localmente e o container espelha a pasta do projeto. Qualquer alteração feita no container é refletida no sistema de arquivos local e vice-versa.
+
+**O que você precisa ter instalado na máquina:**
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (em execução)
+- [VS Code](https://code.visualstudio.com/) com a extensão [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+- [Git](https://git-scm.com/)
+
+**Passo a passo:**
+
+1. Clone o repositório:
+   ```bash
+   git clone <url-do-repositorio>
+   cd portal-ong-ser-amor-api
+   ```
+2. Abra a pasta no VS Code.
+3. Certifique-se de que o **Docker Desktop está em execução**.
+4. Quando solicitado, clique em **Reopen in Container** (ou use a paleta de comandos: `Dev Containers: Reopen in Container`).
+5. O VS Code vai construir o container e reabrir o projeto dentro dele.
+
+---
+
+### 3. Com Docker — Manual (via terminal)
+
+Para quem prefere controle direto sobre os containers sem usar o Dev Container.
+
+**Pré-requisitos:** Docker Desktop instalado e em execução.
 
 ```bash
-# unit tests
-$ npm run test
+# Desenvolvimento
+docker compose up
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Produção
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
-## Deployment
+A API ficará disponível em `http://localhost:3000`.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+> Em produção, a porta da API não é exposta diretamente. O serviço deve ficar atrás de um proxy reverso (ex.: Nginx).
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+---
+
+### 4. Sem Docker — Setup local
+
+Para rodar sem Docker é necessário instalar e configurar tudo na máquina.
+
+**O que você precisa ter instalado:**
+
+- [Node.js](https://nodejs.org/) v22+
+- [PostgreSQL](https://www.postgresql.org/) v17+
+
+**Passo a passo:**
+
+1. Instale as dependências:
+   ```bash
+   npm install
+   ```
+2. Configure o arquivo `.env` com as credenciais do seu banco local:
+   ```bash
+   cp .env.example .env
+   ```
+3. Inicie a aplicação:
+
+   ```bash
+   # Desenvolvimento com hot-reload
+   npm run dev
+
+   # Produção
+   npm run build
+   npm run start:prod
+   ```
+
+---
+
+## Migrations
+
+As migrations são executadas **automaticamente** ao iniciar a aplicação.
+
+Para executar manualmente via CLI:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Executar migrations pendentes
+npm run typeorm migration:run -- -d <caminho-do-data-source>
+
+# Reverter a última migration
+npm run typeorm migration:revert -- -d <caminho-do-data-source>
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## Documentação da API (Swagger)
 
-Check out a few resources that may come in handy when working with NestJS:
+Com a aplicação rodando, acesse:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| Formato | URL                              |
+| ------- | -------------------------------- |
+| UI      | `http://localhost:3000/api`      |
+| JSON    | `http://localhost:3000/api-json` |
 
-## Support
+Em ambiente de desenvolvimento, o arquivo `api-docs.json` também é gerado automaticamente na raiz do projeto a cada inicialização.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+## Testes
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+# Testes unitários
+npm run test
 
-## License
+# Testes unitários em modo watch
+npm run test:watch
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+# Cobertura de testes
+npm run test:cov
+
+# Testes e2e
+npm run test:e2e
+```
+
+---
+
+## Scripts disponíveis
+
+| Script               | Descrição                                     |
+| -------------------- | --------------------------------------------- |
+| `npm run dev`        | Inicia em modo desenvolvimento com hot-reload |
+| `npm run build`      | Compila o TypeScript para JavaScript          |
+| `npm run start:prod` | Inicia a aplicação compilada em modo produção |
+| `npm run lint`       | Executa o ESLint com correção automática      |
+| `npm run format`     | Formata o código com Prettier                 |
+| `npm run test`       | Executa os testes unitários                   |
+| `npm run test:cov`   | Executa os testes com relatório de cobertura  |
+| `npm run test:e2e`   | Executa os testes end-to-end                  |
