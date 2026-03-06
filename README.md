@@ -16,6 +16,7 @@ Construída com [NestJS](https://nestjs.com/) e [TypeORM](https://typeorm.io/), 
   - [2. Dev Container com código local](#2-com-docker--dev-container-com-código-local)
   - [3. Manual via terminal](#3-com-docker--manual-via-terminal)
   - [4. Sem Docker — Setup local](#4-sem-docker--setup-local)
+- [Criando o primeiro usuário (seed)](#criando-o-primeiro-usuário-seed)
 - [Migrations](#migrations)
 - [Documentação da API (Swagger)](#documentação-da-api-swagger)
 - [Testes](#testes)
@@ -76,7 +77,11 @@ cp .env.example .env
 | `DATABASE_PASSWORD` | Senha do banco de dados                  | `admin123`                    |
 | `DATABASE_NAME`     | Nome do banco de dados                   | `portal_ong_ser_amor`         |
 
-> **Atenção:** em produção, substitua todos os valores padrão por valores seguros, especialmente `JWT_SECRET_KEY` e as credenciais do banco.
+| `SEED_ADMIN_NAME`   | Nome do usuário admin criado pelo seed          | —                             |
+| `SEED_ADMIN_EMAIL`  | E-mail do usuário admin criado pelo seed        | —                             |
+| `SEED_ADMIN_PASSWORD` | Senha do usuário admin criado pelo seed       | —                             |
+
+> **Atenção:** em produção, substitua todos os valores padrão por valores seguros, especialmente `JWT_SECRET_KEY` e as credenciais do banco. **Não defina as variáveis `SEED_ADMIN_*` em produção.**
 
 ---
 
@@ -198,6 +203,30 @@ Para rodar sem Docker é necessário instalar e configurar tudo na máquina.
 
 ---
 
+## Criando o primeiro usuário (seed)
+
+Como todos os endpoints são protegidos por autenticação JWT, é necessário criar um usuário admin antes de usar a API pela primeira vez.
+
+1. Certifique-se de que as variáveis de seed estão definidas no seu `.env`:
+
+   ```bash
+   SEED_ADMIN_NAME="Admin"
+   SEED_ADMIN_EMAIL="admin@example.com"
+   SEED_ADMIN_PASSWORD="SenhaForte123!"
+   ```
+
+2. Com a aplicação **em execução**, rode o script em outro terminal:
+
+   ```bash
+   npm run seed:dev
+   ```
+
+O script verifica se o usuário já existe antes de criá-lo — é seguro executar mais de uma vez. Ele também recusa execução em `NODE_ENV=production`.
+
+> **Atenção:** este script é exclusivo para desenvolvimento local. Nunca o execute em produção.
+
+---
+
 ## Migrations
 
 As migrations são executadas **automaticamente** ao iniciar a aplicação.
@@ -257,3 +286,4 @@ npm run test:e2e
 | `npm run test`       | Executa os testes unitários                   |
 | `npm run test:cov`   | Executa os testes com relatório de cobertura  |
 | `npm run test:e2e`   | Executa os testes end-to-end                  |
+| `npm run seed:dev`   | Cria o usuário admin inicial (apenas em dev)  |
