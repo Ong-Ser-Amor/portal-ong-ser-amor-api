@@ -15,6 +15,7 @@ import { LocationsModule } from './locations/locations.module';
 import { AreasModule } from './areas/areas.module';
 import { AssetCategoriesModule } from './asset-categories/asset-categories.module';
 import { PeopleModule } from './people/people.module';
+import { VolunteersModule } from './volunteers/volunteers.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { PeopleModule } from './people/people.module';
     AreasModule,
     AssetCategoriesModule,
     PeopleModule,
+    VolunteersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

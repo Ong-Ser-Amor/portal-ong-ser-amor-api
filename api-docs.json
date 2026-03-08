@@ -2300,6 +2300,152 @@
           "People"
         ]
       }
+    },
+    "/volunteers": {
+      "post": {
+        "operationId": "VolunteersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVolunteerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Volunteers"
+        ]
+      },
+      "get": {
+        "operationId": "VolunteersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Volunteers"
+        ]
+      }
+    },
+    "/volunteers/{id}": {
+      "get": {
+        "operationId": "VolunteersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Volunteers"
+        ]
+      },
+      "patch": {
+        "operationId": "VolunteersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVolunteerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Volunteers"
+        ]
+      },
+      "delete": {
+        "operationId": "VolunteersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Volunteers"
+        ]
+      }
     }
   },
   "info": {
@@ -3025,6 +3171,14 @@
         "properties": {}
       },
       "UpdatePersonDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateVolunteerDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateVolunteerDto": {
         "type": "object",
         "properties": {}
       }
