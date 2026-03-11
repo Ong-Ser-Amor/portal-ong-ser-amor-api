@@ -3,9 +3,11 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Person } from 'src/people/entities/person.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityNotFoundError, Repository } from 'typeorm';
 
 import { CreateVolunteerDto } from './dto/create-volunteer.dto';
 import { UpdateVolunteerDto } from './dto/update-volunteer.dto';
@@ -15,7 +17,11 @@ import { Volunteer } from './entities/volunteer.entity';
 export class VolunteersService {
   private readonly logger = new Logger(VolunteersService.name);
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @InjectRepository(Volunteer)
+    private readonly repository: Repository<Volunteer>,
+  ) {}
 
   async create(createVolunteerDto: CreateVolunteerDto): Promise<Volunteer> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -73,8 +79,24 @@ export class VolunteersService {
     return `This action returns all volunteers`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} volunteer`;
+  async findOne(id: string): Promise<Volunteer> {
+    try {
+      return await this.repository.findOneOrFail({
+        where: { id },
+        relations: ['person'],
+      });
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException('Volunteer not found');
+      }
+
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(`Error finding volunteer: ${errorMessage}`);
+      throw new InternalServerErrorException('Error finding volunteer');
+    }
   }
 
   update(id: number, _updateVolunteerDto: UpdateVolunteerDto) {

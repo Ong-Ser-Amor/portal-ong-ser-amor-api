@@ -2367,22 +2367,22 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string"
+              "type": "number"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": "The volunteer has been successfully retrieved."
+          },
+          "404": {
+            "description": "Volunteer not found"
+          },
+          "500": {
+            "description": "Internal server error"
           }
         },
+        "summary": "Get volunteer by ID",
         "tags": [
           "Volunteers"
         ]

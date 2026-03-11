@@ -6,11 +6,14 @@ import {
   Param,
   Patch,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -53,8 +56,21 @@ export class VolunteersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.volunteersService.findOne(+id);
+  @ApiOperation({ summary: 'Get volunteer by ID' })
+  @ApiOkResponse({
+    description: 'The volunteer has been successfully retrieved.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Volunteer not found',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+  })
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<VolunteerResponseDto> {
+    const volunteer = await this.volunteersService.findOne(String(id));
+    return new VolunteerResponseDto(volunteer);
   }
 
   @Patch(':id')
