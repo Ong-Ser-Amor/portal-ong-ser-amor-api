@@ -72,6 +72,8 @@ export class VolunteersService {
 
       // Erro genérico para o frontend não ver detalhes sensíveis do banco
       throw new InternalServerErrorException('Error creating volunteer');
+    } finally {
+      await queryRunner.release();
     }
   }
 
