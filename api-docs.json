@@ -2438,17 +2438,17 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+          "204": {
+            "description": "The volunteer has been successfully deleted."
+          },
+          "404": {
+            "description": "Volunteer not found"
+          },
+          "500": {
+            "description": "Internal server error"
           }
         },
+        "summary": "Delete volunteer by ID",
         "tags": [
           "Volunteers"
         ]

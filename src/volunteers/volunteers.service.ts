@@ -105,7 +105,18 @@ export class VolunteersService {
     return `This action updates a #${id} volunteer`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} volunteer`;
+  async remove(id: string): Promise<void> {
+    await this.findOne(id);
+
+    try {
+      await this.repository.softDelete(id);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(`Error removing volunteer: ${errorMessage}`);
+      throw new InternalServerErrorException('Error removing volunteer');
+    }
   }
 }

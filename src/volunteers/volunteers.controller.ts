@@ -6,11 +6,14 @@ import {
   Param,
   Patch,
   Delete,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -79,7 +82,18 @@ export class VolunteersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.volunteersService.remove(+id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete volunteer by ID' })
+  @ApiNoContentResponse({
+    description: 'The volunteer has been successfully deleted.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Volunteer not found',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+  })
+  async remove(@Param('id') id: string): Promise<void> {
+    await this.volunteersService.remove(id);
   }
 }
