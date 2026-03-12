@@ -87,7 +87,7 @@ export class VolunteersService {
       });
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
-        throw new NotFoundException('Volunteer not found');
+        throw new NotFoundException(`Volunteer with ID ${id} not found`);
       }
 
       const errorMessage =

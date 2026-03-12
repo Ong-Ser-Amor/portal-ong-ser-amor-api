@@ -66,10 +66,8 @@ export class VolunteersController {
   @ApiInternalServerErrorResponse({
     description: 'Internal server error',
   })
-  async findOne(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<VolunteerResponseDto> {
-    const volunteer = await this.volunteersService.findOne(String(id));
+  async findOne(@Param('id') id: string): Promise<VolunteerResponseDto> {
+    const volunteer = await this.volunteersService.findOne(id);
     return new VolunteerResponseDto(volunteer);
   }
 
