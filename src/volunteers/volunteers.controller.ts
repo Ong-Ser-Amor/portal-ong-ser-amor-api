@@ -82,6 +82,9 @@ export class VolunteersController {
   @ApiNotFoundResponse({
     description: 'Volunteer not found',
   })
+  @ApiConflictResponse({
+    description: 'A volunteer with the same CPF already exists.',
+  })
   @ApiInternalServerErrorResponse({
     description: 'Internal server error',
   })

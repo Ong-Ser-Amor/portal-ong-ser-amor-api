@@ -2423,6 +2423,9 @@
           "404": {
             "description": "Volunteer not found"
           },
+          "409": {
+            "description": "A volunteer with the same CPF already exists."
+          },
           "500": {
             "description": "Internal server error"
           }
