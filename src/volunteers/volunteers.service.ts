@@ -101,8 +101,80 @@ export class VolunteersService {
     }
   }
 
-  update(id: number, _updateVolunteerDto: UpdateVolunteerDto) {
-    return `This action updates a #${id} volunteer`;
+  async update(
+    id: string,
+    updateVolunteerDto: UpdateVolunteerDto,
+  ): Promise<Volunteer> {
+    const volunteer = await this.findOne(id);
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // 3. Extraímos os dados que pertencem à Pessoa
+      const { name, cpf, birthDate, ...volunteerUpdates } = updateVolunteerDto;
+
+      let personUpdated = false;
+
+      if (name !== undefined) {
+        volunteer.person.name = name;
+        personUpdated = true;
+      }
+      if (cpf !== undefined) {
+        volunteer.person.cpf = cpf;
+        personUpdated = true;
+      }
+      if (birthDate !== undefined) {
+        volunteer.person.birthDate = birthDate;
+        personUpdated = true;
+      }
+
+      if (personUpdated) {
+        await queryRunner.manager.save(volunteer.person);
+      }
+
+      let volunteerUpdated: Volunteer | null = null;
+
+      if (volunteerUpdates.academicBackground !== undefined) {
+        volunteer.academicBackground = volunteerUpdates.academicBackground;
+      }
+      if (volunteerUpdates.educationStatus !== undefined) {
+        volunteer.educationStatus = volunteerUpdates.educationStatus;
+      }
+      if (volunteerUpdates.volunteerType !== undefined) {
+        volunteer.volunteerType = volunteerUpdates.volunteerType;
+      }
+
+      volunteerUpdated = await queryRunner.manager.save(volunteer);
+
+      await queryRunner.commitTransaction();
+
+      return volunteerUpdated;
+    } catch (error: unknown) {
+      await queryRunner.rollbackTransaction();
+
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${JSON.stringify(error)}`;
+
+      this.logger.error(`Error updating volunteer: ${errorMessage}`);
+
+      // Se tentarem atualizar para um CPF que já existe em outra pessoa:
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as Record<string, unknown>).code === '23505'
+      ) {
+        throw new ConflictException('Person with this CPF already exists');
+      }
+
+      throw new InternalServerErrorException('Error updating volunteer');
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async remove(id: string): Promise<void> {

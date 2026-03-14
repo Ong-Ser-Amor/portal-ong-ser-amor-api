@@ -74,11 +74,26 @@ export class VolunteersController {
   }
 
   @Patch(':id')
-  update(
+  @ApiOperation({ summary: 'Update volunteer by ID' })
+  @ApiOkResponse({
+    description: 'The volunteer has been successfully updated.',
+    type: VolunteerResponseDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'Volunteer not found',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+  })
+  async update(
     @Param('id') id: string,
     @Body() updateVolunteerDto: UpdateVolunteerDto,
-  ) {
-    return this.volunteersService.update(+id, updateVolunteerDto);
+  ): Promise<VolunteerResponseDto> {
+    const updatedVolunteer = await this.volunteersService.update(
+      id,
+      updateVolunteerDto,
+    );
+    return new VolunteerResponseDto(updatedVolunteer);
   }
 
   @Delete(':id')

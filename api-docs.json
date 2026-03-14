@@ -2411,16 +2411,23 @@
         },
         "responses": {
           "200": {
-            "description": "",
+            "description": "The volunteer has been successfully updated.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/VolunteerResponseDto"
                 }
               }
             }
+          },
+          "404": {
+            "description": "Volunteer not found"
+          },
+          "500": {
+            "description": "Internal server error"
           }
         },
+        "summary": "Update volunteer by ID",
         "tags": [
           "Volunteers"
         ]
