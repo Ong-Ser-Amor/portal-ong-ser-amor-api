@@ -2343,16 +2343,34 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Successfully received paginated response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/VolunteerResponseDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
+          },
+          "500": {
+            "description": "An unexpected error occurred while retrieving volunteers."
           }
         },
+        "summary": "Get a paginated list of volunteers",
         "tags": [
           "Volunteers"
         ]

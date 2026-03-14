@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 import { Person } from 'src/people/entities/person.entity';
 import { DataSource, EntityNotFoundError, Repository } from 'typeorm';
 
@@ -77,8 +78,26 @@ export class VolunteersService {
     }
   }
 
-  findAll() {
-    return `This action returns all volunteers`;
+  async findAll(take = 10, skip = 0): Promise<PaginatedResponseDto<Volunteer>> {
+    try {
+      const [volunteers, total] = await Promise.all([
+        this.repository.find({
+          relations: ['person'],
+          take,
+          skip,
+        }),
+        this.repository.count(),
+      ]);
+
+      return new PaginatedResponseDto<Volunteer>(volunteers, total, take, skip);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : `An unexpected error occurred: ${String(error)}`;
+      this.logger.error(`Error finding volunteers: ${errorMessage}`);
+      throw new InternalServerErrorException('Error finding volunteers');
+    }
   }
 
   async findOne(id: string): Promise<Volunteer> {

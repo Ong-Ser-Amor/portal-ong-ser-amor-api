@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import {
   ApiConflictResponse,
@@ -20,6 +21,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from 'src/decorators/is-public.decorator';
+import { ApiPaginatedResponse } from 'src/dtos/api-paginated-response.decorator';
+import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 
 import { CreateVolunteerDto } from './dto/create-volunteer.dto';
 import { UpdateVolunteerDto } from './dto/update-volunteer.dto';
@@ -53,8 +56,28 @@ export class VolunteersController {
   }
 
   @Get()
-  findAll() {
-    return this.volunteersService.findAll();
+  @ApiOperation({ summary: 'Get a paginated list of volunteers' })
+  @ApiPaginatedResponse(VolunteerResponseDto)
+  @ApiInternalServerErrorResponse({
+    description: 'An unexpected error occurred while retrieving volunteers.',
+  })
+  async findAll(
+    @Query('take') take = 10,
+    @Query('skip') skip = 0,
+  ): Promise<PaginatedResponseDto<VolunteerResponseDto>> {
+    const paginatedVolunteers = await this.volunteersService.findAll(
+      take,
+      skip,
+    );
+    const volunteerDtos = paginatedVolunteers.data.map(
+      (volunteer) => new VolunteerResponseDto(volunteer),
+    );
+    return new PaginatedResponseDto(
+      volunteerDtos,
+      paginatedVolunteers.meta.totalItems,
+      paginatedVolunteers.meta.itemsPerPage,
+      paginatedVolunteers.meta.currentPage,
+    );
   }
 
   @Get(':id')
