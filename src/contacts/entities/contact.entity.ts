@@ -1,3 +1,4 @@
+import { PersonContact } from 'src/people/entities/person-contact.entity';
 import {
   Column,
   CreateDateColumn,
@@ -8,29 +9,20 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { PersonContact } from './person-contact.entity';
+import { ContactType } from '../enums/contact-type.enum';
 
-@Entity('people')
-export class Person {
+@Entity('contacts')
+export class Contact {
   @PrimaryGeneratedColumn('identity', { type: 'bigint' })
   id: string;
 
-  @Column({ name: 'name', type: 'varchar', length: 100, nullable: false })
-  name: string;
+  @Column({ name: 'contact_type', type: 'varchar', length: 50 })
+  contactType: ContactType;
 
-  @Column({
-    name: 'cpf',
-    type: 'varchar',
-    length: 11,
-    nullable: false,
-    unique: true,
-  })
-  cpf: string;
+  @Column({ type: 'varchar', length: 100 })
+  value: string;
 
-  @Column({ name: 'birth_date', type: 'date', nullable: false })
-  birthDate: Date;
-
-  @OneToMany(() => PersonContact, (personContact) => personContact.person)
+  @OneToMany(() => PersonContact, (personContact) => personContact.contact)
   personContacts: PersonContact[];
 
   @CreateDateColumn({ name: 'created_at', nullable: false })
@@ -42,7 +34,7 @@ export class Person {
   @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt: Date | null;
 
-  constructor(partial: Partial<Person>) {
+  constructor(partial: Partial<Contact>) {
     Object.assign(this, partial);
   }
 }
