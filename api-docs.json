@@ -3490,11 +3490,43 @@
       },
       "CreateContactDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "contactType": {
+            "enum": [
+              "MOBILE",
+              "EMAIL"
+            ],
+            "type": "string",
+            "example": "MOBILE"
+          },
+          "value": {
+            "type": "string",
+            "maxLength": 100,
+            "example": "1234567890"
+          }
+        },
+        "required": [
+          "contactType",
+          "value"
+        ]
       },
       "UpdateContactDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "contactType": {
+            "enum": [
+              "MOBILE",
+              "EMAIL"
+            ],
+            "type": "string",
+            "example": "MOBILE"
+          },
+          "value": {
+            "type": "string",
+            "maxLength": 100,
+            "example": "1234567890"
+          }
+        }
       }
     }
   }
