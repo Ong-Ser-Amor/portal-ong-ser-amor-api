@@ -3494,6 +3494,7 @@
           "contactType": {
             "enum": [
               "MOBILE",
+              "LANDLINE",
               "EMAIL"
             ],
             "type": "string",
@@ -3501,8 +3502,8 @@
           },
           "value": {
             "type": "string",
-            "maxLength": 100,
-            "example": "1234567890"
+            "format": "email",
+            "pattern": "/^[0-9]{11}$/"
           }
         },
         "required": [
@@ -3516,6 +3517,7 @@
           "contactType": {
             "enum": [
               "MOBILE",
+              "LANDLINE",
               "EMAIL"
             ],
             "type": "string",
@@ -3523,8 +3525,8 @@
           },
           "value": {
             "type": "string",
-            "maxLength": 100,
-            "example": "1234567890"
+            "format": "email",
+            "pattern": "/^[0-9]{11}$/"
           }
         }
       }
