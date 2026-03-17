@@ -2482,16 +2482,16 @@
         ]
       }
     },
-    "/contacts": {
+    "/addresses": {
       "post": {
-        "operationId": "ContactsController_create",
+        "operationId": "AddressesController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateContactDto"
+                "$ref": "#/components/schemas/CreateAddressDto"
               }
             }
           }
@@ -2509,11 +2509,11 @@
           }
         },
         "tags": [
-          "Contacts"
+          "Addresses"
         ]
       },
       "get": {
-        "operationId": "ContactsController_findAll",
+        "operationId": "AddressesController_findAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -2528,13 +2528,13 @@
           }
         },
         "tags": [
-          "Contacts"
+          "Addresses"
         ]
       }
     },
-    "/contacts/{id}": {
+    "/addresses/{id}": {
       "get": {
-        "operationId": "ContactsController_findOne",
+        "operationId": "AddressesController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -2558,11 +2558,11 @@
           }
         },
         "tags": [
-          "Contacts"
+          "Addresses"
         ]
       },
       "patch": {
-        "operationId": "ContactsController_update",
+        "operationId": "AddressesController_update",
         "parameters": [
           {
             "name": "id",
@@ -2578,7 +2578,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateContactDto"
+                "$ref": "#/components/schemas/UpdateAddressDto"
               }
             }
           }
@@ -2596,11 +2596,11 @@
           }
         },
         "tags": [
-          "Contacts"
+          "Addresses"
         ]
       },
       "delete": {
-        "operationId": "ContactsController_remove",
+        "operationId": "AddressesController_remove",
         "parameters": [
           {
             "name": "id",
@@ -2624,7 +2624,7 @@
           }
         },
         "tags": [
-          "Contacts"
+          "Addresses"
         ]
       }
     }
@@ -3488,47 +3488,13 @@
           }
         }
       },
-      "CreateContactDto": {
+      "CreateAddressDto": {
         "type": "object",
-        "properties": {
-          "contactType": {
-            "enum": [
-              "MOBILE",
-              "LANDLINE",
-              "EMAIL"
-            ],
-            "type": "string",
-            "example": "MOBILE"
-          },
-          "value": {
-            "type": "string",
-            "format": "email",
-            "pattern": "/^[0-9]{11}$/"
-          }
-        },
-        "required": [
-          "contactType",
-          "value"
-        ]
+        "properties": {}
       },
-      "UpdateContactDto": {
+      "UpdateAddressDto": {
         "type": "object",
-        "properties": {
-          "contactType": {
-            "enum": [
-              "MOBILE",
-              "LANDLINE",
-              "EMAIL"
-            ],
-            "type": "string",
-            "example": "MOBILE"
-          },
-          "value": {
-            "type": "string",
-            "format": "email",
-            "pattern": "/^[0-9]{11}$/"
-          }
-        }
+        "properties": {}
       }
     }
   }
