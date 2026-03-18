@@ -18,6 +18,7 @@ import { PeopleModule } from './people/people.module';
 import { VolunteersModule } from './volunteers/volunteers.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { AddressesModule } from './addresses/addresses.module';
+import { FamiliesModule } from './families/families.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { AddressesModule } from './addresses/addresses.module';
     VolunteersModule,
     ContactsModule,
     AddressesModule,
+    FamiliesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
