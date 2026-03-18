@@ -7,6 +7,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { State } from '../enums/state.enum';
+
 @Entity('addresses')
 export class Address {
   @PrimaryGeneratedColumn('identity', { type: 'bigint' })
@@ -31,7 +33,7 @@ export class Address {
   city: string;
 
   @Column({ type: 'varchar', length: 2 })
-  state: string;
+  state: State;
 
   @CreateDateColumn({ name: 'created_at', nullable: false })
   createdAt: Date;

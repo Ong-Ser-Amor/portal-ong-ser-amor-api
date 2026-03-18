@@ -3490,11 +3490,149 @@
       },
       "CreateAddressDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "street": {
+            "type": "string",
+            "maxLength": 100,
+            "example": "Rua das Flores"
+          },
+          "number": {
+            "type": "string",
+            "maxLength": 20,
+            "example": "123"
+          },
+          "complement": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "example": "Apto 45"
+          },
+          "neighborhood": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "Centro"
+          },
+          "zipCode": {
+            "type": "string",
+            "pattern": "/^\\d{8}$/",
+            "example": "12345678"
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "São Paulo"
+          },
+          "state": {
+            "enum": [
+              "AC",
+              "AL",
+              "AP",
+              "AM",
+              "BA",
+              "CE",
+              "DF",
+              "ES",
+              "GO",
+              "MA",
+              "MT",
+              "MS",
+              "MG",
+              "PA",
+              "PB",
+              "PR",
+              "PE",
+              "PI",
+              "RJ",
+              "RN",
+              "RS",
+              "RO",
+              "RR",
+              "SC",
+              "SP",
+              "SE",
+              "TO"
+            ],
+            "type": "string",
+            "example": "SP"
+          }
+        },
+        "required": [
+          "street",
+          "number",
+          "neighborhood",
+          "zipCode",
+          "city",
+          "state"
+        ]
       },
       "UpdateAddressDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "street": {
+            "type": "string",
+            "maxLength": 100,
+            "example": "Rua das Flores"
+          },
+          "number": {
+            "type": "string",
+            "maxLength": 20,
+            "example": "123"
+          },
+          "complement": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "example": "Apto 45"
+          },
+          "neighborhood": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "Centro"
+          },
+          "zipCode": {
+            "type": "string",
+            "pattern": "/^\\d{8}$/",
+            "example": "12345678"
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 50,
+            "example": "São Paulo"
+          },
+          "state": {
+            "enum": [
+              "AC",
+              "AL",
+              "AP",
+              "AM",
+              "BA",
+              "CE",
+              "DF",
+              "ES",
+              "GO",
+              "MA",
+              "MT",
+              "MS",
+              "MG",
+              "PA",
+              "PB",
+              "PR",
+              "PE",
+              "PI",
+              "RJ",
+              "RN",
+              "RS",
+              "RO",
+              "RR",
+              "SC",
+              "SP",
+              "SE",
+              "TO"
+            ],
+            "type": "string",
+            "example": "SP"
+          }
+        }
       }
     }
   }
