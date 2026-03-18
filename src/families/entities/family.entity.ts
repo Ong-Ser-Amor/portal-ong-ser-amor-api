@@ -10,19 +10,22 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { HousingType } from '../enums/housing-type.enum';
+import { IncomeRange } from '../enums/income-range.enum';
+
 @Entity('families')
 export class Family {
   @PrimaryGeneratedColumn('identity', { type: 'bigint' })
   id: string;
 
   @Column({ name: 'income_range', type: 'varchar', length: 50 })
-  incomeRange: string;
+  incomeRange: IncomeRange;
 
   @Column({ name: 'receives_income_transfer', type: 'boolean' })
   receivesIncomeTransfer: boolean;
 
   @Column({ name: 'housing_type', type: 'varchar', length: 50 })
-  housingType: string;
+  housingType: HousingType;
 
   @Column({ name: 'address_id', type: 'bigint' })
   addressId: string;
