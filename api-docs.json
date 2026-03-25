@@ -3782,11 +3782,81 @@
       },
       "CreateFamilyDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "incomeRange": {
+            "enum": [
+              "UP_TO_1_MINIMUM_WAGE",
+              "FROM_1_TO_3_MINIMUM_WAGES",
+              "OVER_3_MINIMUM_WAGES"
+            ],
+            "type": "string",
+            "description": "The income range of the family",
+            "example": "FROM_1_TO_3_MINIMUM_WAGES"
+          },
+          "receivesIncomeTransfer": {
+            "type": "boolean",
+            "description": "Indicates whether the family receives income transfer",
+            "example": true
+          },
+          "housingType": {
+            "enum": [
+              "OWNED",
+              "RENTED",
+              "CEDED",
+              "OCCUPATION"
+            ],
+            "type": "string",
+            "description": "The type of housing the family has",
+            "example": "RENTED"
+          },
+          "addressId": {
+            "type": "string",
+            "description": "The ID of the address associated with the family",
+            "example": "1"
+          }
+        },
+        "required": [
+          "incomeRange",
+          "receivesIncomeTransfer",
+          "housingType",
+          "addressId"
+        ]
       },
       "UpdateFamilyDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "incomeRange": {
+            "enum": [
+              "UP_TO_1_MINIMUM_WAGE",
+              "FROM_1_TO_3_MINIMUM_WAGES",
+              "OVER_3_MINIMUM_WAGES"
+            ],
+            "type": "string",
+            "description": "The income range of the family",
+            "example": "FROM_1_TO_3_MINIMUM_WAGES"
+          },
+          "receivesIncomeTransfer": {
+            "type": "boolean",
+            "description": "Indicates whether the family receives income transfer",
+            "example": true
+          },
+          "housingType": {
+            "enum": [
+              "OWNED",
+              "RENTED",
+              "CEDED",
+              "OCCUPATION"
+            ],
+            "type": "string",
+            "description": "The type of housing the family has",
+            "example": "RENTED"
+          },
+          "addressId": {
+            "type": "string",
+            "description": "The ID of the address associated with the family",
+            "example": "1"
+          }
+        }
       }
     }
   }
