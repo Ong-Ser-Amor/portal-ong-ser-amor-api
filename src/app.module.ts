@@ -2,23 +2,23 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { AddressesModule } from './addresses/addresses.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AttendancesModule } from './attendances/attendances.module';
-import { AuthModule } from './auth/auth.module';
-import { CourseClassesModule } from './course-classes/course-classes.module';
-import { CoursesModule } from './courses/courses.module';
-import { LessonsModule } from './lessons/lessons.module';
-import { StudentsModule } from './students/students.module';
-import { UsersModule } from './users/users.module';
-import { LocationsModule } from './locations/locations.module';
 import { AreasModule } from './areas/areas.module';
 import { AssetCategoriesModule } from './asset-categories/asset-categories.module';
-import { PeopleModule } from './people/people.module';
-import { VolunteersModule } from './volunteers/volunteers.module';
+import { AttendancesModule } from './attendances/attendances.module';
+import { AuthModule } from './auth/auth.module';
 import { ContactsModule } from './contacts/contacts.module';
-import { AddressesModule } from './addresses/addresses.module';
+import { CourseClassesModule } from './course-classes/course-classes.module';
+import { CoursesModule } from './courses/courses.module';
 import { FamiliesModule } from './families/families.module';
+import { LessonsModule } from './lessons/lessons.module';
+import { LocationsModule } from './locations/locations.module';
+import { PeopleModule } from './people/people.module';
+import { StudentsModule } from './students/students.module';
+import { UsersModule } from './users/users.module';
+import { VolunteersModule } from './volunteers/volunteers.module';
 
 @Module({
   imports: [
@@ -37,7 +37,7 @@ import { FamiliesModule } from './families/families.module';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         autoLoadEntities: true,
         synchronize: false,
-        migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
+        migrations: [__dirname + '/migracoes/**/*{.ts,.js}'],
         migrationsRun: true,
         ssl:
           configService.get<string>('NODE_ENV') === 'production'
