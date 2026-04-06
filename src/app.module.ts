@@ -21,6 +21,7 @@ import { UsersModule } from './users/users.module';
 import { VolunteersModule } from './volunteers/volunteers.module';
 import { PessoasModule } from './pessoas/pessoas.module';
 import { EnderecosModule } from './enderecos/enderecos.module';
+import { UsuariosModule } from './usuarios/usuarios.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { EnderecosModule } from './enderecos/enderecos.module';
     FamiliesModule,
     PessoasModule,
     EnderecosModule,
+    UsuariosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
