@@ -6,7 +6,7 @@ import {
   Matches,
   ValidateIf,
 } from 'class-validator';
-import { TipoContato } from 'src/contacts/enums/tipo-contato.enum';
+import { TipoContato } from 'src/contatos/enums/tipo-contato.enum';
 
 export class CriarContatoDto {
   @ApiProperty({ enum: TipoContato, example: TipoContato.EMAIL })

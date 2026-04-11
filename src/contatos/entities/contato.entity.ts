@@ -1,4 +1,4 @@
-import { TipoContato } from 'src/contacts/enums/tipo-contato.enum';
+import { TipoContato } from 'src/contatos/enums/tipo-contato.enum';
 import {
   UpdateDateColumn,
   Column,
