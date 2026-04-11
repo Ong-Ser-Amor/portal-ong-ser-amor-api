@@ -9,7 +9,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-// Verifique se os caminhos de importação batem com a sua estrutura atual de pastas
 import { Pessoa } from './pessoa.entity';
 import { Contato } from '../../contatos/entities/contato.entity';
 
@@ -27,7 +26,6 @@ export class PessoaContato {
   @Column({ name: 'eh_principal', type: 'boolean', default: false })
   ehPrincipal: boolean;
 
-  // Mapeamento da Chave Estrangeira para a tabela de Pessoas
   @ManyToOne(() => Pessoa, (pessoa) => pessoa.contatos, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -35,7 +33,6 @@ export class PessoaContato {
   @JoinColumn({ name: 'pessoa_id' })
   pessoa: Pessoa;
 
-  // Mapeamento da Chave Estrangeira para a tabela de Contatos
   @ManyToOne(() => Contato, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -49,7 +46,6 @@ export class PessoaContato {
   @UpdateDateColumn({ name: 'atualizado_em' })
   atualizadoEm: Date;
 
-  // Adicionado o nullable: true e o tipo union Date | null, que é a boa prática para Soft Deletes
   @DeleteDateColumn({ name: 'deletado_em', type: 'timestamp', nullable: true })
   deletadoEm: Date | null;
 
