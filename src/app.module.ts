@@ -23,6 +23,7 @@ import { PessoasModule } from './pessoas/pessoas.module';
 import { EnderecosModule } from './enderecos/enderecos.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { ContatosModule } from './contatos/contatos.module';
+import { VoluntariosModule } from './voluntarios/voluntarios.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { ContatosModule } from './contatos/contatos.module';
     EnderecosModule,
     UsuariosModule,
     ContatosModule,
+    VoluntariosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
