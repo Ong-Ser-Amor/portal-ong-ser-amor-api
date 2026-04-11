@@ -1,0 +1,6 @@
+export enum TipoMoradia {
+  PROPRIA = 'PROPRIA',
+  ALUGADA = 'ALUGADA',
+  CEDIDA = 'CEDIDA',
+  OCUPACAO_IRREGULAR = 'OCUPACAO_IRREGULAR',
+}

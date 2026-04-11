@@ -24,6 +24,7 @@ import { EnderecosModule } from './enderecos/enderecos.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { ContatosModule } from './contatos/contatos.module';
 import { VoluntariosModule } from './voluntarios/voluntarios.module';
+import { FamiliasModule } from './familias/familias.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
     UsuariosModule,
     ContatosModule,
     VoluntariosModule,
+    FamiliasModule,
   ],
   controllers: [AppController],
   providers: [AppService],
