@@ -10,6 +10,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { PessoaContato } from './pessoa-contato.entity';
+
 @Entity('pessoas')
 export class Pessoa {
   @PrimaryGeneratedColumn('identity', { type: 'bigint' })
@@ -47,8 +49,8 @@ export class Pessoa {
   @OneToMany(() => Pessoa, (pessoa) => pessoa.responsavel)
   dependentes: Pessoa[];
 
-  // @OneToMany(() => Contato, (contato) => contato.pessoa)
-  // contatos: Contato[];
+  @OneToMany(() => PessoaContato, (pessoaContato) => pessoaContato.pessoa)
+  contatos: PessoaContato[];
 
   @CreateDateColumn({ name: 'criado_em', nullable: false })
   criadoEm: Date;
