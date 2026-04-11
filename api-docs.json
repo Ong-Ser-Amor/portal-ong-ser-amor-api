@@ -2967,6 +2967,194 @@
           "Usuarios"
         ]
       }
+    },
+    "/voluntarios": {
+      "post": {
+        "operationId": "VoluntariosController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriarVoluntarioDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "O voluntário foi criado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoluntarioRespostaDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Já existe um voluntário com o mesmo CPF."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao criar o voluntário."
+          }
+        },
+        "summary": "Criar um novo voluntário",
+        "tags": [
+          "Voluntarios"
+        ]
+      },
+      "get": {
+        "operationId": "VoluntariosController_buscarTodos",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Resposta paginada recebida com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginacaoRespostaDto"
+                    },
+                    {
+                      "properties": {
+                        "dados": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/VoluntarioRespostaDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar os voluntários."
+          }
+        },
+        "summary": "Buscar uma lista paginada de voluntários",
+        "tags": [
+          "Voluntarios"
+        ]
+      }
+    },
+    "/voluntarios/{id}": {
+      "get": {
+        "operationId": "VoluntariosController_buscarPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O voluntário foi encontrado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoluntarioRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Voluntário não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar o voluntário."
+          }
+        },
+        "summary": "Buscar voluntário pelo ID",
+        "tags": [
+          "Voluntarios"
+        ]
+      },
+      "patch": {
+        "operationId": "VoluntariosController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarVoluntarioDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O voluntário foi atualizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoluntarioRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Voluntário não encontrado."
+          },
+          "409": {
+            "description": "Já existe um voluntário com o mesmo CPF."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar o voluntário."
+          }
+        },
+        "summary": "Atualizar voluntário pelo ID",
+        "tags": [
+          "Voluntarios"
+        ]
+      },
+      "delete": {
+        "operationId": "VoluntariosController_remover",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "O voluntário foi deletado com sucesso."
+          },
+          "404": {
+            "description": "Voluntário não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao deletar o voluntário."
+          }
+        },
+        "summary": "Deletar voluntário pelo ID",
+        "tags": [
+          "Voluntarios"
+        ]
+      }
     }
   },
   "info": {
@@ -4115,6 +4303,204 @@
           "senhaAtual",
           "novaSenha"
         ]
+      },
+      "CriarVoluntarioDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "Carlos Santos"
+          },
+          "cpf": {
+            "type": "string",
+            "minLength": 11,
+            "maxLength": 11,
+            "example": "12345678900"
+          },
+          "dataNascimento": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2000-01-01"
+          },
+          "formacaoAcademica": {
+            "type": "string",
+            "nullable": true,
+            "example": "Pedagogia"
+          },
+          "statusFormacao": {
+            "nullable": true,
+            "enum": [
+              "COMPLETO",
+              "CURSANDO",
+              "INCOMPLETO"
+            ],
+            "type": "string",
+            "example": "COMPLETO"
+          },
+          "tipoVoluntario": {
+            "enum": [
+              "COORDENADOR",
+              "PROFESSOR",
+              "GERAL"
+            ],
+            "type": "string",
+            "example": "PROFESSOR"
+          }
+        },
+        "required": [
+          "nome",
+          "cpf",
+          "dataNascimento",
+          "formacaoAcademica",
+          "tipoVoluntario"
+        ]
+      },
+      "VoluntarioRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "cpf": {
+            "type": "string"
+          },
+          "dataNascimento": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "formacaoAcademica": {
+            "type": "string",
+            "nullable": true
+          },
+          "statusFormacao": {
+            "nullable": true,
+            "enum": [
+              "COMPLETO",
+              "CURSANDO",
+              "INCOMPLETO"
+            ],
+            "type": "string"
+          },
+          "tipoVoluntario": {
+            "enum": [
+              "COORDENADOR",
+              "PROFESSOR",
+              "GERAL"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome",
+          "cpf",
+          "dataNascimento",
+          "formacaoAcademica",
+          "statusFormacao",
+          "tipoVoluntario"
+        ]
+      },
+      "PaginacaoMetaDto": {
+        "type": "object",
+        "properties": {
+          "itensPorPagina": {
+            "type": "number",
+            "description": "Número de itens por página",
+            "example": 10
+          },
+          "totalItens": {
+            "type": "number",
+            "description": "Total de itens",
+            "example": 100
+          },
+          "paginaAtual": {
+            "type": "number",
+            "description": "Página atual",
+            "example": 1
+          },
+          "totalPaginas": {
+            "type": "number",
+            "description": "Total de páginas",
+            "example": 10
+          }
+        },
+        "required": [
+          "itensPorPagina",
+          "totalItens",
+          "paginaAtual",
+          "totalPaginas"
+        ]
+      },
+      "PaginacaoRespostaDto": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "description": "Metadados da paginação",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaginacaoMetaDto"
+              }
+            ]
+          },
+          "dados": {
+            "description": "Dados paginados",
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "dados"
+        ]
+      },
+      "AtualizarVoluntarioDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "Carlos Santos"
+          },
+          "cpf": {
+            "type": "string",
+            "minLength": 11,
+            "maxLength": 11,
+            "example": "12345678900"
+          },
+          "dataNascimento": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2000-01-01"
+          },
+          "formacaoAcademica": {
+            "type": "string",
+            "nullable": true,
+            "example": "Pedagogia"
+          },
+          "statusFormacao": {
+            "nullable": true,
+            "enum": [
+              "COMPLETO",
+              "CURSANDO",
+              "INCOMPLETO"
+            ],
+            "type": "string",
+            "example": "COMPLETO"
+          },
+          "tipoVoluntario": {
+            "enum": [
+              "COORDENADOR",
+              "PROFESSOR",
+              "GERAL"
+            ],
+            "type": "string",
+            "example": "PROFESSOR"
+          }
+        }
       }
     }
   }
