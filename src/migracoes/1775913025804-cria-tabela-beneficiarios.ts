@@ -24,6 +24,7 @@ export class CriaTabelaBeneficiarios1775913025804
             name: 'pessoa_id',
             type: 'bigint',
             isNullable: false,
+            isUnique: true,
           },
           {
             name: 'familia_id',

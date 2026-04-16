@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AddressesModule } from './addresses/addresses.module';
@@ -9,22 +10,24 @@ import { AreasModule } from './areas/areas.module';
 import { AssetCategoriesModule } from './asset-categories/asset-categories.module';
 import { AttendancesModule } from './attendances/attendances.module';
 import { AuthModule } from './auth/auth.module';
+import { BeneficiariosModule } from './beneficiarios/beneficiarios.module';
 import { ContactsModule } from './contacts/contacts.module';
+import { ContatosModule } from './contatos/contatos.module';
 import { CourseClassesModule } from './course-classes/course-classes.module';
 import { CoursesModule } from './courses/courses.module';
+import { EnderecosModule } from './enderecos/enderecos.module';
+import { FamiliasModule } from './familias/familias.module';
 import { FamiliesModule } from './families/families.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { LocationsModule } from './locations/locations.module';
 import { PeopleModule } from './people/people.module';
-import { StudentsModule } from './students/students.module';
-import { UsersModule } from './users/users.module';
-import { VolunteersModule } from './volunteers/volunteers.module';
 import { PessoasModule } from './pessoas/pessoas.module';
-import { EnderecosModule } from './enderecos/enderecos.module';
+import { StudentsModule } from './students/students.module';
+import { TasksModule } from './tasks/tasks.module';
+import { UsersModule } from './users/users.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
-import { ContatosModule } from './contatos/contatos.module';
 import { VoluntariosModule } from './voluntarios/voluntarios.module';
-import { FamiliasModule } from './familias/familias.module';
+import { VolunteersModule } from './volunteers/volunteers.module';
 
 @Module({
   imports: [
@@ -52,27 +55,30 @@ import { FamiliasModule } from './familias/familias.module';
       }),
       inject: [ConfigService],
     }),
-    UsersModule,
-    AuthModule,
-    StudentsModule,
-    CoursesModule,
-    CourseClassesModule,
-    LessonsModule,
-    AttendancesModule,
-    LocationsModule,
+    ScheduleModule.forRoot(),
+    AddressesModule,
     AreasModule,
     AssetCategoriesModule,
-    PeopleModule,
-    VolunteersModule,
+    AttendancesModule,
+    AuthModule,
+    BeneficiariosModule,
     ContactsModule,
-    AddressesModule,
-    FamiliesModule,
-    PessoasModule,
-    EnderecosModule,
-    UsuariosModule,
     ContatosModule,
-    VoluntariosModule,
+    CoursesModule,
+    CourseClassesModule,
+    EnderecosModule,
     FamiliasModule,
+    FamiliesModule,
+    LessonsModule,
+    LocationsModule,
+    PeopleModule,
+    PessoasModule,
+    StudentsModule,
+    TasksModule,
+    UsersModule,
+    UsuariosModule,
+    VoluntariosModule,
+    VolunteersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
