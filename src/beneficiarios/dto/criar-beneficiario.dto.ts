@@ -1,4 +1,3 @@
-import { Optional } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
@@ -9,6 +8,8 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Length,
+  Matches,
   Min,
   ValidateIf,
 } from 'class-validator';
@@ -23,7 +24,6 @@ export class CriarBeneficiarioDto {
   // --- Dados referentes à entidade Pessoa ---
 
   @ApiProperty({
-    description: 'Nome do beneficiário',
     example: 'João da Silva',
   })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
@@ -38,6 +38,12 @@ export class CriarBeneficiarioDto {
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
   @IsString({ message: 'O campo cpf deve ser uma string' })
   @IsNotEmpty({ message: 'O campo cpf não pode ser vazio' })
+  @Length(11, 11, {
+    message: 'O campo cpf deve ter exatamente 11 caracteres.',
+  })
+  @Matches(/^\d+$/, {
+    message: 'O campo cpf deve conter apenas números.',
+  })
   cpf?: string;
 
   @ApiProperty({ type: Date, example: '1990-01-01' })
@@ -94,7 +100,7 @@ export class CriarBeneficiarioDto {
   @IsEnum(EstadoCivil, {
     message: 'O campo estadoCivil deve ser um valor válido',
   })
-  @Optional()
+  @IsOptional()
   estadoCivil?: EstadoCivil;
 
   @ApiProperty({
@@ -105,7 +111,6 @@ export class CriarBeneficiarioDto {
   @IsEnum(VinculoEmpregaticio, {
     message: 'O campo vinculoEmpregaticio deve ser um valor válido',
   })
-  @Optional()
   vinculoEmpregaticio?: VinculoEmpregaticio;
 
   @ApiProperty({ type: Number, example: 2 })

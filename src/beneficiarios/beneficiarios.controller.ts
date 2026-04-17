@@ -125,7 +125,7 @@ export class BeneficiariosController {
     description: 'Beneficiário não encontrado.',
   })
   @ApiConflictResponse({
-    description: 'Já existe um beneficiário com o mesmo CPF.',
+    description: 'Já existe uma pessoa cadastrada com este CPF.',
   })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao atualizar o beneficiário.',

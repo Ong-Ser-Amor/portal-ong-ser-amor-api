@@ -7,7 +7,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
-import { Pessoa } from 'src/pessoas/entities/pessoa.entity';
+import { CriarPessoaDados } from 'src/pessoas/interfaces/criar-pessoa-dados.interface';
+import { PessoasService } from 'src/pessoas/pessoas.service';
 import { DataSource, EntityNotFoundError, Repository } from 'typeorm';
 
 import { AtualizarVoluntarioDto } from './dto/atualizar-voluntario.dto';
@@ -19,9 +20,10 @@ export class VoluntariosService {
   private readonly logger = new Logger(VoluntariosService.name);
 
   constructor(
-    private readonly dataSource: DataSource,
     @InjectRepository(Voluntario)
     private readonly repository: Repository<Voluntario>,
+    private readonly pessoasService: PessoasService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async criar(criarVoluntarioDto: CriarVoluntarioDto): Promise<Voluntario> {
@@ -30,16 +32,44 @@ export class VoluntariosService {
     await queryRunner.startTransaction();
 
     try {
-      const pessoa = new Pessoa({
-        nome: criarVoluntarioDto.nome,
-        cpf: criarVoluntarioDto.cpf,
-        dataNascimento: criarVoluntarioDto.dataNascimento,
-      });
+      let pessoaId = criarVoluntarioDto.pessoaId;
 
-      const pessoaSalva = await queryRunner.manager.save(pessoa);
+      if (!pessoaId) {
+        // Cenario A: Id da pessoa não fornecido (pessoa não existe).
+
+        const dadosPessoa: CriarPessoaDados = {
+          nome: criarVoluntarioDto.nome,
+          cpf: criarVoluntarioDto.cpf,
+          dataNascimento: criarVoluntarioDto.dataNascimento,
+        };
+
+        // Passa o queryRunner.manager para garantir que a pessoa será criada na mesma transação
+        const novaPessoa = await this.pessoasService.criar(
+          dadosPessoa,
+          queryRunner.manager,
+        );
+        pessoaId = novaPessoa.id;
+      } else {
+        // Cenario B: Id da pessoa fornecido (pessoa já existe).
+
+        await this.pessoasService.buscarPorId(pessoaId, queryRunner.manager);
+      }
+
+      const voluntarioExistente = await queryRunner.manager.findOne(
+        Voluntario,
+        {
+          where: { pessoaId },
+        },
+      );
+
+      if (voluntarioExistente) {
+        throw new ConflictException(
+          'Esta pessoa já possui um cadastro de voluntário ativo.',
+        );
+      }
 
       const voluntario = new Voluntario({
-        pessoa: pessoaSalva,
+        pessoaId,
         formacaoAcademica: criarVoluntarioDto.formacaoAcademica,
         statusFormacao: criarVoluntarioDto.statusFormacao,
         tipoVoluntario: criarVoluntarioDto.tipoVoluntario,
@@ -53,7 +83,6 @@ export class VoluntariosService {
     } catch (erro: unknown) {
       await queryRunner.rollbackTransaction();
 
-      // Log detalhado do erro para diagnóstico, sem expor detalhes sensíveis ao frontend
       const mensagemErro =
         erro instanceof Error
           ? erro.message
@@ -61,19 +90,13 @@ export class VoluntariosService {
 
       this.logger.error(`Erro ao criar voluntário: ${mensagemErro}`);
 
-      // Verifica se o erro é uma violação de chave única (código 23505 no PostgreSQL)
       if (
-        typeof erro === 'object' &&
-        erro !== null &&
-        'code' in erro &&
-        (erro as Record<string, unknown>).code === '23505'
+        erro instanceof ConflictException ||
+        erro instanceof NotFoundException
       ) {
-        throw new ConflictException(
-          'Já existe uma pessoa cadastrada com este CPF.',
-        );
+        throw erro;
       }
 
-      // Erro genérico para o frontend não ver detalhes sensíveis do banco
       throw new InternalServerErrorException('Erro ao criar voluntário.');
     } finally {
       await queryRunner.release();
@@ -85,14 +108,12 @@ export class VoluntariosService {
     skip = 0,
   ): Promise<PaginacaoRespostaDto<Voluntario>> {
     try {
-      const [voluntarios, total] = await Promise.all([
-        this.repository.find({
-          relations: ['pessoa'],
-          take,
-          skip,
-        }),
-        this.repository.count(),
-      ]);
+      const [voluntarios, total] = await this.repository.findAndCount({
+        relations: ['pessoa'],
+        take,
+        skip,
+        order: { pessoa: { nome: 'ASC' } },
+      });
 
       return new PaginacaoRespostaDto<Voluntario>(
         voluntarios,
@@ -125,6 +146,7 @@ export class VoluntariosService {
         erro instanceof Error
           ? erro.message
           : `Ocorreu um erro inesperado: ${String(erro)}`;
+
       this.logger.error(`Erro ao buscar voluntário: ${mensagemErro}`);
       throw new InternalServerErrorException('Erro ao buscar voluntário.');
     }
@@ -141,22 +163,30 @@ export class VoluntariosService {
     await queryRunner.startTransaction();
 
     try {
-      // 3. Extraímos os dados que pertencem à Pessoa
-      const { nome, cpf, dataNascimento, ...atualizacoesVoluntario } =
-        atualizarVoluntarioDto;
+      const dadosPessoa = {
+        nome: atualizarVoluntarioDto.nome,
+        cpf: atualizarVoluntarioDto.cpf,
+        dataNascimento: atualizarVoluntarioDto.dataNascimento,
+      };
+
+      const dadosVoluntario = {
+        formacaoAcademica: atualizarVoluntarioDto.formacaoAcademica,
+        statusFormacao: atualizarVoluntarioDto.statusFormacao,
+        tipoVoluntario: atualizarVoluntarioDto.tipoVoluntario,
+      };
 
       let pessoaAtualizada = false;
 
-      if (nome !== undefined) {
-        voluntario.pessoa.nome = nome;
+      if (dadosPessoa.nome !== undefined) {
+        voluntario.pessoa.nome = dadosPessoa.nome;
         pessoaAtualizada = true;
       }
-      if (cpf !== undefined) {
-        voluntario.pessoa.cpf = cpf;
+      if (dadosPessoa.cpf !== undefined) {
+        voluntario.pessoa.cpf = dadosPessoa.cpf;
         pessoaAtualizada = true;
       }
-      if (dataNascimento !== undefined) {
-        voluntario.pessoa.dataNascimento = dataNascimento;
+      if (dadosPessoa.dataNascimento !== undefined) {
+        voluntario.pessoa.dataNascimento = dadosPessoa.dataNascimento;
         pessoaAtualizada = true;
       }
 
@@ -164,19 +194,17 @@ export class VoluntariosService {
         await queryRunner.manager.save(voluntario.pessoa);
       }
 
-      let voluntarioAtualizado: Voluntario | null = null;
-
-      if (atualizacoesVoluntario.formacaoAcademica !== undefined) {
-        voluntario.formacaoAcademica = atualizacoesVoluntario.formacaoAcademica;
+      if (dadosVoluntario.formacaoAcademica !== undefined) {
+        voluntario.formacaoAcademica = dadosVoluntario.formacaoAcademica;
       }
-      if (atualizacoesVoluntario.statusFormacao !== undefined) {
-        voluntario.statusFormacao = atualizacoesVoluntario.statusFormacao;
+      if (dadosVoluntario.statusFormacao !== undefined) {
+        voluntario.statusFormacao = dadosVoluntario.statusFormacao;
       }
-      if (atualizacoesVoluntario.tipoVoluntario !== undefined) {
-        voluntario.tipoVoluntario = atualizacoesVoluntario.tipoVoluntario;
+      if (dadosVoluntario.tipoVoluntario !== undefined) {
+        voluntario.tipoVoluntario = dadosVoluntario.tipoVoluntario;
       }
 
-      voluntarioAtualizado = await queryRunner.manager.save(voluntario);
+      const voluntarioAtualizado = await queryRunner.manager.save(voluntario);
 
       await queryRunner.commitTransaction();
 
@@ -191,7 +219,7 @@ export class VoluntariosService {
 
       this.logger.error(`Erro ao atualizar voluntário: ${mensagemErro}`);
 
-      // Se tentarem atualizar para um CPF que já existe em outra pessoa:
+      // Tratamento para CPF duplicado durante a edição
       if (
         typeof erro === 'object' &&
         erro !== null &&
@@ -201,6 +229,10 @@ export class VoluntariosService {
         throw new ConflictException(
           'Já existe uma pessoa cadastrada com este CPF.',
         );
+      }
+
+      if (erro instanceof NotFoundException) {
+        throw erro;
       }
 
       throw new InternalServerErrorException('Erro ao atualizar voluntário.');
@@ -213,12 +245,16 @@ export class VoluntariosService {
     await this.buscarPorId(id);
 
     try {
+      // Realiza o Soft Delete apenas na tabela de voluntários
+      // A tabela 'pessoas' permanece intacta neste momento.
+      // A limpeza de pessoas órfãs (sem papéis) é feita por uma Cron Job
       await this.repository.softDelete(id);
     } catch (erro) {
       const mensagemErro =
         erro instanceof Error
           ? erro.message
           : `Ocorreu um erro inesperado: ${String(erro)}`;
+
       this.logger.error(`Erro ao remover voluntário: ${mensagemErro}`);
       throw new InternalServerErrorException('Erro ao remover voluntário.');
     }

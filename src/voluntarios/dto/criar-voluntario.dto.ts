@@ -7,6 +7,8 @@ import {
   IsOptional,
   IsString,
   Length,
+  Matches,
+  ValidateIf,
 } from 'class-validator';
 
 import { StatusFormacao, TipoVoluntario } from '../enums/voluntario.enum';
@@ -14,29 +16,45 @@ import { StatusFormacao, TipoVoluntario } from '../enums/voluntario.enum';
 export class CriarVoluntarioDto {
   // --- Dados referentes à entidade Pessoa ---
 
-  @ApiProperty({ type: String, example: 'Carlos Santos' })
-  @IsNotEmpty({ message: 'O nome é obrigatório.' })
-  @IsString({ message: 'O nome deve ser um texto.' })
-  nome: string;
+  @ApiProperty({ example: 'Carlos Santos' })
+  @ValidateIf((dto: CriarVoluntarioDto) => !dto.pessoaId)
+  @IsNotEmpty({ message: 'O campo nome não pode ser vazio' })
+  @IsString({ message: 'O campo nome deve ser uma string' })
+  nome?: string;
 
   @ApiProperty({ type: String, example: '12345678900' })
-  @IsNotEmpty({ message: 'O CPF é obrigatório.' })
+  @ValidateIf((dto: CriarVoluntarioDto) => !dto.pessoaId)
+  @IsNotEmpty({ message: 'O campo cpf não pode ser vazio' })
+  @IsString({ message: 'O campo cpf deve ser uma string' })
   @Length(11, 11, {
-    message: 'O CPF deve ter exatamente 11 caracteres (apenas números).',
+    message: 'O campo cpf deve ter exatamente 11 caracteres.',
   })
-  cpf: string;
+  @Matches(/^\d+$/, {
+    message: 'O campo cpf deve conter apenas números.',
+  })
+  cpf?: string;
 
   @ApiProperty({ type: Date, example: '2000-01-01' })
-  @IsNotEmpty({ message: 'A data de nascimento é obrigatória.' })
-  @IsDate({ message: 'A data de nascimento deve ser uma data válida.' })
+  @ValidateIf((dto: CriarVoluntarioDto) => !dto.pessoaId)
+  @IsNotEmpty({ message: 'O campo dataNascimento não pode ser vazio' })
+  @IsDate({ message: 'O campo dataNascimento deve ser uma data válida' })
   @Type(() => Date)
-  dataNascimento: Date;
+  dataNascimento?: Date;
+
+  @ApiProperty({
+    description: 'ID da pessoa, caso ela já possua cadastro no sistema.',
+    example: '123456',
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: 'O campo pessoaId deve ser uma string' })
+  pessoaId?: string;
 
   // --- Dados específicos da entidade Voluntário ---
 
   @ApiProperty({ type: String, example: 'Pedagogia' })
   @IsOptional()
-  @IsString({ message: 'A formação acadêmica deve ser um texto.' })
+  @IsString({ message: 'O campo formacaoAcademica deve ser uma string' })
   formacaoAcademica: string | null;
 
   @ApiProperty({
@@ -46,7 +64,7 @@ export class CriarVoluntarioDto {
   })
   @IsOptional()
   @IsEnum(StatusFormacao, {
-    message: 'O status de escolaridade fornecido é inválido.',
+    message: 'O campo statusFormacao deve ser um valor válido',
   })
   statusFormacao: StatusFormacao | null;
 
@@ -54,9 +72,9 @@ export class CriarVoluntarioDto {
     enum: TipoVoluntario,
     example: TipoVoluntario.PROFESSOR,
   })
-  @IsNotEmpty({ message: 'O tipo de voluntário é obrigatório.' })
+  @IsNotEmpty({ message: 'O campo tipoVoluntario não pode ser vazio' })
   @IsEnum(TipoVoluntario, {
-    message: 'O tipo de voluntário fornecido é inválido.',
+    message: 'O campo tipoVoluntario deve ser um valor válido',
   })
   tipoVoluntario: TipoVoluntario;
 }

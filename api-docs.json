@@ -2470,7 +2470,7 @@
             "description": "Beneficiário não encontrado."
           },
           "409": {
-            "description": "Já existe um beneficiário com o mesmo CPF."
+            "description": "Já existe uma pessoa cadastrada com este CPF."
           },
           "500": {
             "description": "Ocorreu um erro inesperado ao atualizar o beneficiário."
@@ -3022,7 +3022,7 @@
             }
           },
           "409": {
-            "description": "Já existe um voluntário com o mesmo CPF."
+            "description": "Já existe uma pessoa com este CPF ou a pessoa informada já possui um cadastro de voluntário ativo."
           },
           "500": {
             "description": "Ocorreu um erro inesperado ao criar o voluntário."
@@ -3035,7 +3035,28 @@
       },
       "get": {
         "operationId": "VoluntariosController_buscarTodos",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Número de itens a serem retornados por página",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Número de itens a serem ignorados na consulta",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Resposta paginada recebida com sucesso.",
@@ -3144,7 +3165,7 @@
             "description": "Voluntário não encontrado."
           },
           "409": {
-            "description": "Já existe um voluntário com o mesmo CPF."
+            "description": "Já existe uma pessoa cadastrada com este CPF."
           },
           "500": {
             "description": "Ocorreu um erro inesperado ao atualizar o voluntário."
@@ -4235,11 +4256,13 @@
         "properties": {
           "nome": {
             "type": "string",
-            "description": "Nome do beneficiário",
             "example": "João da Silva"
           },
           "cpf": {
             "type": "string",
+            "minLength": 11,
+            "maxLength": 11,
+            "pattern": "/^\\d+$/",
             "example": "12345678900"
           },
           "dataNascimento": {
@@ -4440,11 +4463,13 @@
         "properties": {
           "nome": {
             "type": "string",
-            "description": "Nome do beneficiário",
             "example": "João da Silva"
           },
           "cpf": {
             "type": "string",
+            "minLength": 11,
+            "maxLength": 11,
+            "pattern": "/^\\d+$/",
             "example": "12345678900"
           },
           "dataNascimento": {
@@ -4670,12 +4695,18 @@
             "type": "string",
             "minLength": 11,
             "maxLength": 11,
+            "pattern": "/^\\d+$/",
             "example": "12345678900"
           },
           "dataNascimento": {
             "format": "date-time",
             "type": "string",
             "example": "2000-01-01"
+          },
+          "pessoaId": {
+            "type": "string",
+            "description": "ID da pessoa, caso ela já possua cadastro no sistema.",
+            "example": "123456"
           },
           "formacaoAcademica": {
             "type": "string",
@@ -4703,9 +4734,6 @@
           }
         },
         "required": [
-          "nome",
-          "cpf",
-          "dataNascimento",
           "formacaoAcademica",
           "tipoVoluntario"
         ]
@@ -4769,6 +4797,7 @@
             "type": "string",
             "minLength": 11,
             "maxLength": 11,
+            "pattern": "/^\\d+$/",
             "example": "12345678900"
           },
           "dataNascimento": {

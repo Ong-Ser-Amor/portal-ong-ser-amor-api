@@ -57,23 +57,23 @@ export class BeneficiariosService {
         // Cenario B: Id da pessoa fornecido (pessoa já existe).
 
         await this.pessoasService.buscarPorId(pessoaId, queryRunner.manager);
+      }
 
-        const beneficioExistente = await queryRunner.manager.findOne(
-          Beneficiario,
-          {
-            where: { pessoaId },
-          },
+      const beneficioExistente = await queryRunner.manager.findOne(
+        Beneficiario,
+        {
+          where: { pessoaId },
+        },
+      );
+
+      if (beneficioExistente) {
+        throw new ConflictException(
+          'Esta pessoa já possui um cadastro de beneficiário ativo.',
         );
-
-        if (beneficioExistente) {
-          throw new ConflictException(
-            'Esta pessoa já possui um cadastro de beneficiário ativo.',
-          );
-        }
       }
 
       const beneficiario = new Beneficiario({
-        pessoaId: pessoaId,
+        pessoaId,
         familiaId: criarBeneficiarioDto.familiaId,
         nivelEscolaridade: criarBeneficiarioDto.nivelEscolaridade,
         estadoCivil: criarBeneficiarioDto.estadoCivil,
@@ -190,6 +190,7 @@ export class BeneficiariosService {
       };
 
       let pessoaAlterada = false;
+
       if (dadosPessoa.nome !== undefined) {
         beneficiario.pessoa.nome = dadosPessoa.nome;
         pessoaAlterada = true;

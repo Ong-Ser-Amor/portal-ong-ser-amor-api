@@ -1,9 +1,11 @@
 import {
+  DefaultValuePipe,
   Controller,
   Post,
   Body,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Delete,
   HttpCode,
@@ -18,6 +20,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 
@@ -42,7 +45,8 @@ export class VoluntariosController {
     type: VoluntarioRespostaDto,
   })
   @ApiConflictResponse({
-    description: 'Já existe um voluntário com o mesmo CPF.',
+    description:
+      'Já existe uma pessoa com este CPF ou a pessoa informada já possui um cadastro de voluntário ativo.',
   })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao criar o voluntário.',
@@ -58,12 +62,26 @@ export class VoluntariosController {
   @Get()
   @ApiOperation({ summary: 'Buscar uma lista paginada de voluntários' })
   @ApiPaginacaoResposta(VoluntarioRespostaDto)
+  @ApiQuery({
+    name: 'take',
+    required: false,
+    type: Number,
+    example: 10,
+    description: 'Número de itens a serem retornados por página',
+  })
+  @ApiQuery({
+    name: 'skip',
+    required: false,
+    type: Number,
+    example: 0,
+    description: 'Número de itens a serem ignorados na consulta',
+  })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar os voluntários.',
   })
   async buscarTodos(
-    @Query('take') take = 10,
-    @Query('skip') skip = 0,
+    @Query('take', new DefaultValuePipe(10), ParseIntPipe) take: number,
+    @Query('skip', new DefaultValuePipe(0), ParseIntPipe) skip: number,
   ): Promise<PaginacaoRespostaDto<VoluntarioRespostaDto>> {
     const voluntariosPaginados = await this.voluntariosService.buscarTodos(
       take,
@@ -109,7 +127,7 @@ export class VoluntariosController {
     description: 'Voluntário não encontrado.',
   })
   @ApiConflictResponse({
-    description: 'Já existe um voluntário com o mesmo CPF.',
+    description: 'Já existe uma pessoa cadastrada com este CPF.',
   })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao atualizar o voluntário.',

@@ -17,6 +17,9 @@ export class Voluntario {
   @PrimaryGeneratedColumn('identity', { type: 'bigint' })
   id: string;
 
+  @Column({ name: 'pessoa_id', type: 'bigint' })
+  pessoaId: string;
+
   @OneToOne(() => Pessoa)
   @JoinColumn({ name: 'pessoa_id' })
   pessoa: Pessoa;
