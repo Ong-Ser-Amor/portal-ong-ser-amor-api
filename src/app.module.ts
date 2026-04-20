@@ -18,7 +18,6 @@ import { CourseClassesModule } from './course-classes/course-classes.module';
 import { CoursesModule } from './courses/courses.module';
 import { EnderecosModule } from './enderecos/enderecos.module';
 import { FamiliasModule } from './familias/familias.module';
-import { FamiliesModule } from './families/families.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { LocationsModule } from './locations/locations.module';
 import { PeopleModule } from './people/people.module';
@@ -68,7 +67,6 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
     CourseClassesModule,
     EnderecosModule,
     FamiliasModule,
-    FamiliesModule,
     LessonsModule,
     LocationsModule,
     PeopleModule,
