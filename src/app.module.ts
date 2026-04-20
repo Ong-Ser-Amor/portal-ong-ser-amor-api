@@ -3,7 +3,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AddressesModule } from './addresses/addresses.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AreasModule } from './areas/areas.module';
@@ -53,7 +52,6 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
       inject: [ConfigService],
     }),
     ScheduleModule.forRoot(),
-    AddressesModule,
     AreasModule,
     AssetCategoriesModule,
     AttendancesModule,
