@@ -6,7 +6,7 @@ export const criarSenhaHash = async (senha: string): Promise<string> => {
 
 export const compararSenha = async (
   senha: string,
-  senhaHashed: string,
+  hashDaSenha: string,
 ): Promise<boolean> => {
-  return await compare(senha, senhaHashed);
+  return await compare(senha, hashDaSenha);
 };

@@ -28,6 +28,7 @@ import { UsersModule } from './users/users.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { VoluntariosModule } from './voluntarios/voluntarios.module';
 import { VolunteersModule } from './volunteers/volunteers.module';
+import { AutenticacaoModule } from './autenticacao/autenticacao.module';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { VolunteersModule } from './volunteers/volunteers.module';
     UsuariosModule,
     VoluntariosModule,
     VolunteersModule,
+    AutenticacaoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

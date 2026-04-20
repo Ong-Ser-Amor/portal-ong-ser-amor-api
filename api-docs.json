@@ -3385,6 +3385,47 @@
           "Volunteers"
         ]
       }
+    },
+    "/autenticacao/login": {
+      "post": {
+        "operationId": "AutenticacaoController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados de entrada inválidos (ex: e-mail mal formatado)."
+          },
+          "401": {
+            "description": "E-mail ou senha inválidos."
+          },
+          "500": {
+            "description": "Ocorreu um erro interno no servidor."
+          }
+        },
+        "summary": "Realizar login no sistema para obter o token de acesso",
+        "tags": [
+          "Autenticacao"
+        ]
+      }
     }
   },
   "info": {
@@ -4963,6 +5004,36 @@
             "example": "PROFESSOR"
           }
         }
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "senha": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "senha"
+        ]
+      },
+      "LoginRespostaDto": {
+        "type": "object",
+        "properties": {
+          "tokenAcesso": {
+            "type": "string"
+          },
+          "usuario": {
+            "$ref": "#/components/schemas/UsuarioRespostaDto"
+          }
+        },
+        "required": [
+          "tokenAcesso"
+        ]
       }
     }
   }
