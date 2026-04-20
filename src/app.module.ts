@@ -9,6 +9,7 @@ import { AppService } from './app.service';
 import { AreasModule } from './areas/areas.module';
 import { AssetCategoriesModule } from './asset-categories/asset-categories.module';
 import { AttendancesModule } from './attendances/attendances.module';
+import { AutenticacaoModule } from './autenticacao/autenticacao.module';
 import { AuthModule } from './auth/auth.module';
 import { BeneficiariosModule } from './beneficiarios/beneficiarios.module';
 import { ContactsModule } from './contacts/contacts.module';
@@ -27,8 +28,6 @@ import { TasksModule } from './tasks/tasks.module';
 import { UsersModule } from './users/users.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { VoluntariosModule } from './voluntarios/voluntarios.module';
-import { VolunteersModule } from './volunteers/volunteers.module';
-import { AutenticacaoModule } from './autenticacao/autenticacao.module';
 
 @Module({
   imports: [
@@ -79,7 +78,6 @@ import { AutenticacaoModule } from './autenticacao/autenticacao.module';
     UsersModule,
     UsuariosModule,
     VoluntariosModule,
-    VolunteersModule,
     AutenticacaoModule,
   ],
   controllers: [AppController],
