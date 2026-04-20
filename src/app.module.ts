@@ -12,7 +12,6 @@ import { AttendancesModule } from './attendances/attendances.module';
 import { AutenticacaoModule } from './autenticacao/autenticacao.module';
 import { AuthModule } from './auth/auth.module';
 import { BeneficiariosModule } from './beneficiarios/beneficiarios.module';
-import { ContactsModule } from './contacts/contacts.module';
 import { ContatosModule } from './contatos/contatos.module';
 import { CourseClassesModule } from './course-classes/course-classes.module';
 import { CoursesModule } from './courses/courses.module';
@@ -20,7 +19,6 @@ import { EnderecosModule } from './enderecos/enderecos.module';
 import { FamiliasModule } from './familias/familias.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { LocationsModule } from './locations/locations.module';
-import { PeopleModule } from './people/people.module';
 import { PessoasModule } from './pessoas/pessoas.module';
 import { StudentsModule } from './students/students.module';
 import { TasksModule } from './tasks/tasks.module';
@@ -61,7 +59,6 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
     AttendancesModule,
     AuthModule,
     BeneficiariosModule,
-    ContactsModule,
     ContatosModule,
     CoursesModule,
     CourseClassesModule,
@@ -69,7 +66,6 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
     FamiliasModule,
     LessonsModule,
     LocationsModule,
-    PeopleModule,
     PessoasModule,
     StudentsModule,
     TasksModule,
