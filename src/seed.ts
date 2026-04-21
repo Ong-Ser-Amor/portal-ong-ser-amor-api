@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
-import { UsersService } from './users/users.service';
+import { UsuariosService } from './usuarios/usuarios.service';
 
 async function seed() {
   const logger = new Logger('Seed');
@@ -16,13 +16,12 @@ async function seed() {
   const app = await NestFactory.createApplicationContext(AppModule);
 
   const configService = app.get(ConfigService);
-  const usersService = app.get(UsersService);
+  const usuariosService = app.get(UsuariosService);
 
-  const name = configService.get<string>('SEED_ADMIN_NAME');
   const email = configService.get<string>('SEED_ADMIN_EMAIL');
-  const password = configService.get<string>('SEED_ADMIN_PASSWORD');
+  const senha = configService.get<string>('SEED_ADMIN_PASSWORD');
 
-  if (!name || !email || !password) {
+  if (!email || !senha) {
     logger.error(
       'Variáveis SEED_ADMIN_NAME, SEED_ADMIN_EMAIL e SEED_ADMIN_PASSWORD são obrigatórias no .env.',
     );
@@ -30,12 +29,12 @@ async function seed() {
     process.exit(1);
   }
 
-  const existing = await usersService.findOneByEmail(email);
+  const existing = await usuariosService.buscarPorEmail(email);
 
   if (existing) {
     logger.log(`Usuário admin já existe (${email}). Nenhuma ação realizada.`);
   } else {
-    await usersService.create({ name, email, password });
+    await usuariosService.criar({ email, senha });
     logger.log(`Usuário admin criado com sucesso: ${email}`);
   }
 

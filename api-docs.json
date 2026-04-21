@@ -2114,47 +2114,6 @@
         ]
       }
     },
-    "/auth/signin": {
-      "post": {
-        "operationId": "AuthController_signIn",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SignInDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successfully signed in",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SignInResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Invalid email or password"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Sign in to obtain an access token",
-        "tags": [
-          "Auth"
-        ]
-      }
-    },
     "/beneficiarios": {
       "post": {
         "operationId": "BeneficiariosController_criar",
@@ -3495,36 +3454,6 @@
           "present",
           "student",
           "lesson"
-        ]
-      },
-      "SignInDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "password": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ]
-      },
-      "SignInResponseDto": {
-        "type": "object",
-        "properties": {
-          "access_token": {
-            "type": "string"
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserResponseDto"
-          }
-        },
-        "required": [
-          "access_token"
         ]
       },
       "CriarBeneficiarioDto": {

@@ -9,7 +9,6 @@ import { AreasModule } from './areas/areas.module';
 import { AssetCategoriesModule } from './asset-categories/asset-categories.module';
 import { AttendancesModule } from './attendances/attendances.module';
 import { AutenticacaoModule } from './autenticacao/autenticacao.module';
-import { AuthModule } from './auth/auth.module';
 import { BeneficiariosModule } from './beneficiarios/beneficiarios.module';
 import { ContatosModule } from './contatos/contatos.module';
 import { CourseClassesModule } from './course-classes/course-classes.module';
@@ -55,7 +54,6 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
     AreasModule,
     AssetCategoriesModule,
     AttendancesModule,
-    AuthModule,
     BeneficiariosModule,
     ContatosModule,
     CoursesModule,

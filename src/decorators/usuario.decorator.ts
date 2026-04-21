@@ -16,10 +16,10 @@ export const UsuarioDecorator = createParamDecorator(
       throw new BadRequestException('Cabeçalho de autorização não encontrado.');
     }
 
-    const payloadLoginDto = autorizacaoParaPayloadLogin(
+    const payloadJwtDto = autorizacaoParaPayloadLogin(
       autorizacao.replace('Bearer ', ''),
     );
 
-    return payloadLoginDto?.id;
+    return payloadJwtDto?.sub;
   },
 );
