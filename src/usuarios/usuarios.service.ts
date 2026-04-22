@@ -37,14 +37,39 @@ export class UsuariosService {
       const novoUsuario = this.repository.create({
         email: criarUsuarioDto.email,
         senhaHash,
+        voluntarioId: criarUsuarioDto.voluntarioId,
       });
 
       return await this.repository.save(novoUsuario);
-    } catch (erro) {
+    } catch (erro: unknown) {
+      if (
+        typeof erro === 'object' &&
+        erro !== null &&
+        'code' in erro &&
+        (erro as Record<string, unknown>).code === '23503'
+      ) {
+        // Foreign Key Violation
+        throw new BadRequestException(
+          'O ID de voluntário fornecido não existe.',
+        );
+      }
+
+      if (
+        typeof erro === 'object' &&
+        erro !== null &&
+        'code' in erro &&
+        (erro as Record<string, unknown>).code === '23505'
+      ) {
+        // Unique Constraint Violation (Para o voluntario_id)
+        throw new ConflictException(
+          'Este voluntário já possui um usuário de acesso cadastrado.',
+        );
+      }
+
       const mensagemErro =
         erro instanceof Error
           ? erro.message
-          : `Ocorreu um erro inesperado: ${String(erro)}`;
+          : `Ocorreu um erro inesperado: ${JSON.stringify(erro)}`;
       this.logger.error(`Erro ao criar usuário: ${mensagemErro}`);
 
       throw new InternalServerErrorException('Erro ao criar usuário.');
@@ -53,7 +78,10 @@ export class UsuariosService {
 
   async buscarPorId(id: string): Promise<Usuario> {
     try {
-      return await this.repository.findOneByOrFail({ id });
+      return await this.repository.findOneOrFail({
+        where: { id },
+        relations: ['voluntario', 'voluntario.pessoa'],
+      });
     } catch (erro) {
       if (erro instanceof EntityNotFoundError) {
         throw new NotFoundException(`Usuário não encontrado.`);
@@ -70,7 +98,9 @@ export class UsuariosService {
     try {
       return await this.repository
         .createQueryBuilder('usuario')
-        .addSelect('usuario.senhaHash') // Referencia a propriedade da entidade TypeScript
+        .addSelect('usuario.senhaHash')
+        .leftJoinAndSelect('usuario.voluntario', 'voluntario')
+        .leftJoinAndSelect('voluntario.pessoa', 'pessoa')
         .where('usuario.id = :id', { id })
         .getOne();
     } catch (erro) {
@@ -89,7 +119,10 @@ export class UsuariosService {
 
   async buscarPorEmail(email: string): Promise<Usuario | null> {
     try {
-      return await this.repository.findOneBy({ email });
+      return await this.repository.findOne({
+        where: { email },
+        relations: ['voluntario', 'voluntario.pessoa'],
+      });
     } catch (erro) {
       const mensagemErro =
         erro instanceof Error
@@ -115,6 +148,8 @@ export class UsuariosService {
       return await this.repository
         .createQueryBuilder('usuario')
         .addSelect('usuario.senhaHash')
+        .leftJoinAndSelect('usuario.voluntario', 'voluntario')
+        .leftJoinAndSelect('voluntario.pessoa', 'pessoa')
         .where('usuario.email = :email', { email })
         .getOne();
     } catch (erro) {

@@ -1,4 +1,5 @@
 import { Pessoa } from 'src/pessoas/entities/pessoa.entity';
+import { Usuario } from 'src/usuarios/entities/usuario.entity';
 import {
   Column,
   CreateDateColumn,
@@ -47,6 +48,9 @@ export class Voluntario {
     nullable: false,
   })
   tipoVoluntario: TipoVoluntario;
+
+  @OneToOne(() => Usuario, (usuario) => usuario.voluntario)
+  usuario: Usuario;
 
   @CreateDateColumn({ name: 'criado_em', nullable: false })
   criadoEm: Date;

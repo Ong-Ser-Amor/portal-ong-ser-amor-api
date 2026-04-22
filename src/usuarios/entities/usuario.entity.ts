@@ -1,8 +1,11 @@
+import { Voluntario } from 'src/voluntarios/entities/voluntario.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -11,6 +14,13 @@ import {
 export class Usuario {
   @PrimaryGeneratedColumn('identity', { type: 'bigint' })
   id: string;
+
+  @Column({ name: 'voluntario_id', type: 'bigint' })
+  voluntarioId: string;
+
+  @OneToOne(() => Voluntario)
+  @JoinColumn({ name: 'voluntario_id' })
+  voluntario: Voluntario;
 
   @Column({
     name: 'email',

@@ -8,6 +8,14 @@ import {
 } from 'class-validator';
 
 export class CriarUsuarioDto {
+  @ApiProperty({
+    type: String,
+    example: '123',
+  })
+  @IsNotEmpty({ message: 'O ID do voluntário é obrigatório.' })
+  @IsString({ message: 'O ID do voluntário deve ser um texto.' })
+  voluntarioId: string;
+
   @ApiProperty({ type: String, example: 'carlos.santos@example.com' })
   @IsEmail({}, { message: 'O e-mail deve ser um endereço válido.' })
   @MaxLength(255, { message: 'O e-mail não pode ter mais de 255 caracteres.' })

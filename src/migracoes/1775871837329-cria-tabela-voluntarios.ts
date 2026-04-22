@@ -37,7 +37,7 @@ export class CriaTabelaVoluntarios1775871837329 implements MigrationInterface {
             isNullable: true,
           },
           {
-            name: 'tipo_voluntariado',
+            name: 'tipo_voluntario',
             type: 'varchar',
             length: '100',
             isNullable: false,

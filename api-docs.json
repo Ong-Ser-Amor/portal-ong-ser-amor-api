@@ -3742,6 +3742,10 @@
       "CriarUsuarioDto": {
         "type": "object",
         "properties": {
+          "voluntarioId": {
+            "type": "string",
+            "example": "123"
+          },
           "email": {
             "type": "string",
             "maxLength": 255,
@@ -3756,6 +3760,7 @@
           }
         },
         "required": [
+          "voluntarioId",
           "email",
           "senha"
         ]
@@ -3778,6 +3783,10 @@
       "AtualizarUsuarioDto": {
         "type": "object",
         "properties": {
+          "voluntarioId": {
+            "type": "string",
+            "example": "123"
+          },
           "email": {
             "type": "string",
             "maxLength": 255,
