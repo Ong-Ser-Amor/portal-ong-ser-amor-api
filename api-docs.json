@@ -3979,20 +3979,16 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "example": "1"
+            "type": "string"
           },
           "email": {
-            "type": "string",
-            "example": "admin@email.com"
+            "type": "string"
           },
           "voluntarioId": {
-            "type": "string",
-            "example": "1"
+            "type": "string"
           },
           "nome": {
-            "type": "string",
-            "example": "Admin"
+            "type": "string"
           }
         },
         "required": [
@@ -4013,7 +4009,8 @@
           }
         },
         "required": [
-          "tokenAcesso"
+          "tokenAcesso",
+          "usuario"
         ]
       }
     }
