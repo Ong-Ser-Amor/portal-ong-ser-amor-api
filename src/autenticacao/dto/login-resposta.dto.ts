@@ -1,9 +1,14 @@
-import { UsuarioRespostaDto } from 'src/usuarios/dto/usuario-resposta.dto';
+import { ApiProperty } from '@nestjs/swagger';
 import { Usuario } from 'src/usuarios/entities/usuario.entity';
 
+import { UsuarioLoginRespostaDto } from './usuario-login-resposta.dto';
+
 export class LoginRespostaDto {
+  @ApiProperty()
   tokenAcesso: string;
-  usuario?: UsuarioRespostaDto;
+
+  @ApiProperty({ type: () => UsuarioLoginRespostaDto, required: false })
+  usuario?: UsuarioLoginRespostaDto;
 
   constructor({
     tokenAcesso,
@@ -13,6 +18,6 @@ export class LoginRespostaDto {
     usuario?: Usuario;
   }) {
     this.tokenAcesso = tokenAcesso;
-    this.usuario = usuario ? new UsuarioRespostaDto(usuario) : undefined;
+    this.usuario = usuario ? new UsuarioLoginRespostaDto(usuario) : undefined;
   }
 }
