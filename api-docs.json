@@ -3918,6 +3918,11 @@
       "VoluntarioRespostaDto": {
         "type": "object",
         "properties": {
+          "dataNascimento": {
+            "type": "string",
+            "format": "date",
+            "example": "2000-01-01"
+          },
           "id": {
             "type": "string"
           },
@@ -3925,10 +3930,6 @@
             "type": "string"
           },
           "cpf": {
-            "type": "string"
-          },
-          "dataNascimento": {
-            "format": "date-time",
             "type": "string"
           },
           "formacaoAcademica": {
@@ -3954,10 +3955,10 @@
           }
         },
         "required": [
+          "dataNascimento",
           "id",
           "nome",
           "cpf",
-          "dataNascimento",
           "formacaoAcademica",
           "statusFormacao",
           "tipoVoluntario"

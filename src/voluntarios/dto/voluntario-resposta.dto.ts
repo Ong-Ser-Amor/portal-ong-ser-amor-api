@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 import { Voluntario } from '../entities/voluntario.entity';
 import { StatusFormacao, TipoVoluntario } from '../enums/voluntario.enum';
 
@@ -5,6 +7,7 @@ export class VoluntarioRespostaDto {
   id: string;
   nome: string;
   cpf: string;
+  @ApiProperty({ type: String, format: 'date', example: '2000-01-01' })
   dataNascimento: Date;
   formacaoAcademica: string | null;
   statusFormacao: StatusFormacao | null;
