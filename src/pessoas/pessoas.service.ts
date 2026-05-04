@@ -86,4 +86,33 @@ export class PessoasService {
       );
     }
   }
+
+  async buscarPorCpf(cpf: string): Promise<Pessoa> {
+    try {
+      const pessoa = await this.repository.findOne({
+        where: { cpf },
+      });
+
+      if (!pessoa) {
+        throw new NotFoundException(
+          `Pessoa com CPF ${cpf} não encontrada no sistema.`,
+        );
+      }
+
+      return pessoa;
+    } catch (erro) {
+      if (erro instanceof NotFoundException) {
+        throw erro;
+      }
+
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro inesperado ao buscar pessoa por CPF: ${mensagemErro}`,
+      );
+
+      throw new InternalServerErrorException(
+        'Erro interno ao buscar a pessoa.',
+      );
+    }
+  }
 }

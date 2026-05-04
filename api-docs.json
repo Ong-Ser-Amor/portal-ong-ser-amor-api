@@ -2323,6 +2323,45 @@
         ]
       }
     },
+    "/pessoas/cpf/{cpf}": {
+      "get": {
+        "operationId": "PessoasController_buscarPorCpf",
+        "parameters": [
+          {
+            "name": "cpf",
+            "required": true,
+            "in": "path",
+            "description": "CPF com 11 dígitos numéricos.",
+            "schema": {
+              "example": "12345678900",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pessoa encontrada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PessoaRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "CPF inválido."
+          },
+          "404": {
+            "description": "Pessoa não encontrada."
+          }
+        },
+        "summary": "Buscar pessoa pelo CPF",
+        "tags": [
+          "Pessoas"
+        ]
+      }
+    },
     "/usuarios": {
       "post": {
         "operationId": "UsuariosController_criar",
@@ -3841,6 +3880,42 @@
             "example": 2
           }
         }
+      },
+      "PessoaRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "123456"
+          },
+          "nome": {
+            "type": "string",
+            "example": "Carlos Santos"
+          },
+          "cpf": {
+            "type": "string",
+            "example": "12345678900"
+          },
+          "dataNascimento": {
+            "type": "string",
+            "format": "date",
+            "example": "2000-01-01"
+          },
+          "podeSairSozinho": {
+            "type": "boolean",
+            "example": true
+          },
+          "responsavelId": {
+            "type": "string",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "id",
+          "nome",
+          "cpf",
+          "dataNascimento"
+        ]
       },
       "CriarUsuarioDto": {
         "type": "object",
