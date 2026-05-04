@@ -2523,10 +2523,113 @@
         "parameters": [],
         "requestBody": {
           "required": true,
+          "description": "Existem 2 cenários:\n1) Se o voluntário JÁ É beneficiário: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do voluntário.\n2) Se o voluntário NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do voluntário (não envie 'pessoaId').",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CriarVoluntarioDto"
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "pessoaId": {
+                        "type": "string",
+                        "example": "123456"
+                      },
+                      "tipoVoluntario": {
+                        "type": "string",
+                        "enum": [
+                          "COORDENADOR",
+                          "PROFESSOR",
+                          "GERAL"
+                        ]
+                      },
+                      "formacaoAcademica": {
+                        "type": "string",
+                        "example": "Pedagogia"
+                      },
+                      "statusFormacao": {
+                        "type": "string",
+                        "enum": [
+                          "COMPLETO",
+                          "CURSANDO",
+                          "INCOMPLETO"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "pessoaId",
+                      "tipoVoluntario"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "nome": {
+                        "type": "string",
+                        "example": "Carlos Santos"
+                      },
+                      "cpf": {
+                        "type": "string",
+                        "example": "12345678900",
+                        "minLength": 11,
+                        "maxLength": 11
+                      },
+                      "dataNascimento": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2000-01-01"
+                      },
+                      "tipoVoluntario": {
+                        "type": "string",
+                        "enum": [
+                          "COORDENADOR",
+                          "PROFESSOR",
+                          "GERAL"
+                        ]
+                      },
+                      "formacaoAcademica": {
+                        "type": "string",
+                        "example": "Pedagogia"
+                      },
+                      "statusFormacao": {
+                        "type": "string",
+                        "enum": [
+                          "COMPLETO",
+                          "CURSANDO",
+                          "INCOMPLETO"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "nome",
+                      "cpf",
+                      "dataNascimento",
+                      "tipoVoluntario"
+                    ]
+                  }
+                ]
+              },
+              "examples": {
+                "existingPerson": {
+                  "summary": "Pessoa já cadastrada (use pessoaId)",
+                  "value": {
+                    "pessoaId": "123456",
+                    "tipoVoluntario": "COORDENADOR",
+                    "formacaoAcademica": "Pedagogia",
+                    "statusFormacao": "COMPLETO"
+                  }
+                },
+                "newPerson": {
+                  "summary": "Pessoa nova (envia dados da pessoa)",
+                  "value": {
+                    "nome": "Carlos Santos",
+                    "cpf": "12345678900",
+                    "dataNascimento": "2000-01-01",
+                    "tipoVoluntario": "PROFESSOR",
+                    "formacaoAcademica": "Pedagogia",
+                    "statusFormacao": "COMPLETO"
+                  }
+                }
               }
             }
           }
@@ -3810,60 +3913,6 @@
         "required": [
           "senhaAtual",
           "novaSenha"
-        ]
-      },
-      "CriarVoluntarioDto": {
-        "type": "object",
-        "properties": {
-          "nome": {
-            "type": "string",
-            "example": "Carlos Santos"
-          },
-          "cpf": {
-            "type": "string",
-            "minLength": 11,
-            "maxLength": 11,
-            "pattern": "/^\\d+$/",
-            "example": "12345678900"
-          },
-          "dataNascimento": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2000-01-01"
-          },
-          "pessoaId": {
-            "type": "string",
-            "description": "ID da pessoa, caso ela já possua cadastro no sistema.",
-            "example": "123456"
-          },
-          "formacaoAcademica": {
-            "type": "string",
-            "nullable": true,
-            "example": "Pedagogia"
-          },
-          "statusFormacao": {
-            "nullable": true,
-            "enum": [
-              "COMPLETO",
-              "CURSANDO",
-              "INCOMPLETO"
-            ],
-            "type": "string",
-            "example": "COMPLETO"
-          },
-          "tipoVoluntario": {
-            "enum": [
-              "COORDENADOR",
-              "PROFESSOR",
-              "GERAL"
-            ],
-            "type": "string",
-            "example": "PROFESSOR"
-          }
-        },
-        "required": [
-          "formacaoAcademica",
-          "tipoVoluntario"
         ]
       },
       "VoluntarioRespostaDto": {

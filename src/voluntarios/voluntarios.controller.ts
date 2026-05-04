@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiConflictResponse,
+  ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
@@ -38,6 +39,78 @@ export class VoluntariosController {
   constructor(private readonly voluntariosService: VoluntariosService) {}
 
   @Publico()
+  @ApiBody({
+    description: `Existem 2 cenários:\n1) Se o voluntário JÁ É beneficiário: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do voluntário.\n2) Se o voluntário NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do voluntário (não envie 'pessoaId').`,
+    schema: {
+      oneOf: [
+        {
+          type: 'object',
+          properties: {
+            pessoaId: { type: 'string', example: '123456' },
+            tipoVoluntario: {
+              type: 'string',
+              enum: ['COORDENADOR', 'PROFESSOR', 'GERAL'],
+            },
+            formacaoAcademica: { type: 'string', example: 'Pedagogia' },
+            statusFormacao: {
+              type: 'string',
+              enum: ['COMPLETO', 'CURSANDO', 'INCOMPLETO'],
+            },
+          },
+          required: ['pessoaId', 'tipoVoluntario'],
+        },
+        {
+          type: 'object',
+          properties: {
+            nome: { type: 'string', example: 'Carlos Santos' },
+            cpf: {
+              type: 'string',
+              example: '12345678900',
+              minLength: 11,
+              maxLength: 11,
+            },
+            dataNascimento: {
+              type: 'string',
+              format: 'date',
+              example: '2000-01-01',
+            },
+            tipoVoluntario: {
+              type: 'string',
+              enum: ['COORDENADOR', 'PROFESSOR', 'GERAL'],
+            },
+            formacaoAcademica: { type: 'string', example: 'Pedagogia' },
+            statusFormacao: {
+              type: 'string',
+              enum: ['COMPLETO', 'CURSANDO', 'INCOMPLETO'],
+            },
+          },
+          required: ['nome', 'cpf', 'dataNascimento', 'tipoVoluntario'],
+        },
+      ],
+    },
+    examples: {
+      existingPerson: {
+        summary: 'Pessoa já cadastrada (use pessoaId)',
+        value: {
+          pessoaId: '123456',
+          tipoVoluntario: 'COORDENADOR',
+          formacaoAcademica: 'Pedagogia',
+          statusFormacao: 'COMPLETO',
+        },
+      },
+      newPerson: {
+        summary: 'Pessoa nova (envia dados da pessoa)',
+        value: {
+          nome: 'Carlos Santos',
+          cpf: '12345678900',
+          dataNascimento: '2000-01-01',
+          tipoVoluntario: 'PROFESSOR',
+          formacaoAcademica: 'Pedagogia',
+          statusFormacao: 'COMPLETO',
+        },
+      },
+    },
+  })
   @Post()
   @ApiOperation({ summary: 'Criar um novo voluntário' })
   @ApiCreatedResponse({
