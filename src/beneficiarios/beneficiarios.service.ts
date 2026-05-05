@@ -83,9 +83,18 @@ export class BeneficiariosService {
 
       const beneficiarioSalvo = await queryRunner.manager.save(beneficiario);
 
+      // Carrega as relações com Pessoa e Familia DENTRO da transação antes de fazer commit
+      const beneficiarioComRelacoes = await queryRunner.manager.findOneOrFail(
+        Beneficiario,
+        {
+          where: { id: beneficiarioSalvo.id },
+          relations: ['pessoa', 'familia'],
+        },
+      );
+
       await queryRunner.commitTransaction();
 
-      return beneficiarioSalvo;
+      return beneficiarioComRelacoes;
     } catch (erro) {
       await queryRunner.rollbackTransaction();
 

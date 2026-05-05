@@ -77,9 +77,18 @@ export class VoluntariosService {
 
       const voluntarioSalvo = await queryRunner.manager.save(voluntario);
 
+      // Carrega a relação com Pessoa DENTRO da transação antes de fazer commit
+      const voluntarioComPessoa = await queryRunner.manager.findOneOrFail(
+        Voluntario,
+        {
+          where: { id: voluntarioSalvo.id },
+          relations: ['pessoa'],
+        },
+      );
+
       await queryRunner.commitTransaction();
 
-      return voluntarioSalvo;
+      return voluntarioComPessoa;
     } catch (erro: unknown) {
       await queryRunner.rollbackTransaction();
 
