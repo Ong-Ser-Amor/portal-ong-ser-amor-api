@@ -3683,24 +3683,55 @@
           "nivelEscolaridade"
         ]
       },
+      "PessoaRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "123456"
+          },
+          "nome": {
+            "type": "string",
+            "example": "Carlos Santos"
+          },
+          "cpf": {
+            "type": "string",
+            "example": "12345678900"
+          },
+          "dataNascimento": {
+            "type": "string",
+            "format": "date",
+            "example": "2000-01-01"
+          },
+          "podeSairSozinho": {
+            "type": "boolean",
+            "example": true
+          },
+          "responsavelId": {
+            "type": "string",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "id",
+          "nome",
+          "cpf",
+          "dataNascimento"
+        ]
+      },
       "BeneficiarioRespostaDto": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "example": "ben-123"
           },
-          "nome": {
-            "type": "string"
-          },
-          "cpf": {
-            "type": "string"
-          },
-          "dataNascimento": {
-            "format": "date-time",
-            "type": "string"
+          "pessoa": {
+            "$ref": "#/components/schemas/PessoaRespostaDto"
           },
           "familiaId": {
-            "type": "string"
+            "type": "string",
+            "example": "fam-456"
           },
           "nivelEscolaridade": {
             "enum": [
@@ -3712,7 +3743,8 @@
               "ENSINO_SUPERIOR_COMPLETO",
               "SEM_ESCOLARIDADE"
             ],
-            "type": "string"
+            "type": "string",
+            "example": "ENSINO_FUNDAMENTAL_COMPLETO"
           },
           "estadoCivil": {
             "enum": [
@@ -3722,7 +3754,8 @@
               "UNIAO_ESTAVEL",
               "VIUVO"
             ],
-            "type": "string"
+            "type": "string",
+            "example": "SOLTEIRO"
           },
           "vinculoEmpregaticio": {
             "enum": [
@@ -3733,18 +3766,18 @@
               "INFORMAL",
               "OUTRO"
             ],
-            "type": "string"
+            "type": "string",
+            "example": "DESEMPREGADO"
           },
           "quantidadeFilhos": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "example": 2
           }
         },
         "required": [
           "id",
-          "nome",
-          "cpf",
-          "dataNascimento",
+          "pessoa",
           "familiaId",
           "nivelEscolaridade",
           "quantidadeFilhos"
@@ -3881,42 +3914,6 @@
           }
         }
       },
-      "PessoaRespostaDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "123456"
-          },
-          "nome": {
-            "type": "string",
-            "example": "Carlos Santos"
-          },
-          "cpf": {
-            "type": "string",
-            "example": "12345678900"
-          },
-          "dataNascimento": {
-            "type": "string",
-            "format": "date",
-            "example": "2000-01-01"
-          },
-          "podeSairSozinho": {
-            "type": "boolean",
-            "example": true
-          },
-          "responsavelId": {
-            "type": "string",
-            "example": "123456"
-          }
-        },
-        "required": [
-          "id",
-          "nome",
-          "cpf",
-          "dataNascimento"
-        ]
-      },
       "CriarUsuarioDto": {
         "type": "object",
         "properties": {
@@ -3993,23 +3990,17 @@
       "VoluntarioRespostaDto": {
         "type": "object",
         "properties": {
-          "dataNascimento": {
-            "type": "string",
-            "format": "date",
-            "example": "2000-01-01"
-          },
           "id": {
-            "type": "string"
+            "type": "string",
+            "example": "vol-123"
           },
-          "nome": {
-            "type": "string"
-          },
-          "cpf": {
-            "type": "string"
+          "pessoa": {
+            "$ref": "#/components/schemas/PessoaRespostaDto"
           },
           "formacaoAcademica": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "example": "Pedagogia"
           },
           "statusFormacao": {
             "nullable": true,
@@ -4018,7 +4009,8 @@
               "CURSANDO",
               "INCOMPLETO"
             ],
-            "type": "string"
+            "type": "string",
+            "example": "COMPLETO"
           },
           "tipoVoluntario": {
             "enum": [
@@ -4026,16 +4018,14 @@
               "PROFESSOR",
               "GERAL"
             ],
-            "type": "string"
+            "type": "string",
+            "example": "PROFESSOR"
           }
         },
         "required": [
-          "dataNascimento",
           "id",
-          "nome",
-          "cpf",
+          "pessoa",
           "formacaoAcademica",
-          "statusFormacao",
           "tipoVoluntario"
         ]
       },
