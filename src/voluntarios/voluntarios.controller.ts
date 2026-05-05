@@ -38,7 +38,6 @@ import { VoluntariosService } from './voluntarios.service';
 export class VoluntariosController {
   constructor(private readonly voluntariosService: VoluntariosService) {}
 
-  @Publico()
   @ApiBody({
     description: `Existem 2 cenários:\n1) Se o voluntário JÁ É beneficiário: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do voluntário.\n2) Se o voluntário NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do voluntário (não envie 'pessoaId').`,
     schema: {
