@@ -34,7 +34,6 @@ import { UsuariosService } from './usuarios.service';
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
-  @Publico()
   @Post()
   @ApiOperation({ summary: 'Criar um novo usuário' })
   @ApiCreatedResponse({
