@@ -2569,6 +2569,7 @@
                 "oneOf": [
                   {
                     "type": "object",
+                    "title": "Cenário com pessoa já cadastrada",
                     "properties": {
                       "pessoaId": {
                         "type": "string",
@@ -2602,6 +2603,7 @@
                   },
                   {
                     "type": "object",
+                    "title": "Cenário com nova pessoa",
                     "properties": {
                       "nome": {
                         "type": "string",

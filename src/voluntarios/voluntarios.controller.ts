@@ -44,6 +44,7 @@ export class VoluntariosController {
       oneOf: [
         {
           type: 'object',
+          title: 'Cenário com pessoa já cadastrada',
           properties: {
             pessoaId: { type: 'string', example: '123456' },
             tipoVoluntario: {
@@ -60,6 +61,7 @@ export class VoluntariosController {
         },
         {
           type: 'object',
+          title: 'Cenário com nova pessoa',
           properties: {
             nome: { type: 'string', example: 'Carlos Santos' },
             cpf: {
