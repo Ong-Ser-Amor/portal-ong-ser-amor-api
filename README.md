@@ -77,9 +77,11 @@ cp .env.example .env
 | `DATABASE_PASSWORD` | Senha do banco de dados                  | `admin123`                    |
 | `DATABASE_NAME`     | Nome do banco de dados                   | `portal_ong_ser_amor`         |
 
-| `SEED_ADMIN_NAME`   | Nome do usuário admin criado pelo seed          | —                             |
-| `SEED_ADMIN_EMAIL`  | E-mail do usuário admin criado pelo seed        | —                             |
-| `SEED_ADMIN_PASSWORD` | Senha do usuário admin criado pelo seed       | —                             |
+| `SEED_ADMIN_NAME` | Nome do usuário admin criado pelo seed | — |
+| `SEED_ADMIN_CPF` | CPF (11 dígitos) da pessoa vinculada ao admin | — |
+| `SEED_ADMIN_BIRTHDATE` | Data de nascimento da pessoa (YYYY-MM-DD) | — |
+| `SEED_ADMIN_EMAIL` | E-mail do usuário admin criado pelo seed | — |
+| `SEED_ADMIN_PASSWORD` | Senha do usuário admin criado pelo seed | — |
 
 > **Atenção:** em produção, substitua todos os valores padrão por valores seguros, especialmente `JWT_SECRET_KEY` e as credenciais do banco. **Não defina as variáveis `SEED_ADMIN_*` em produção.**
 
@@ -211,6 +213,8 @@ Como todos os endpoints são protegidos por autenticação JWT, é necessário c
 
    ```bash
    SEED_ADMIN_NAME="Admin"
+   SEED_ADMIN_CPF="12345678901"
+   SEED_ADMIN_BIRTHDATE="2000-01-01"
    SEED_ADMIN_EMAIL="admin@example.com"
    SEED_ADMIN_PASSWORD="SenhaForte123!"
    ```

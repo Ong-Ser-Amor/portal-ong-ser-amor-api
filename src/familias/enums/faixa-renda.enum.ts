@@ -1,0 +1,5 @@
+export enum FaixaRenda {
+  ATE_1_SALARIO = 'ATE_1_SALARIO',
+  DE_1_A_3_SALARIOS = 'DE_1_A_3_SALARIOS',
+  ACIMA_3_SALARIOS = 'ACIMA_3_SALARIOS',
+}

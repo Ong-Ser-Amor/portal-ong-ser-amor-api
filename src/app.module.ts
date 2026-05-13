@@ -1,19 +1,28 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AttendancesModule } from './attendances/attendances.module';
-import { AuthModule } from './auth/auth.module';
-import { CourseClassesModule } from './course-classes/course-classes.module';
-import { CoursesModule } from './courses/courses.module';
-import { LessonsModule } from './lessons/lessons.module';
-import { StudentsModule } from './students/students.module';
-import { UsersModule } from './users/users.module';
-import { LocationsModule } from './locations/locations.module';
 import { AreasModule } from './areas/areas.module';
 import { AssetCategoriesModule } from './asset-categories/asset-categories.module';
+import { AttendancesModule } from './attendances/attendances.module';
+import { AutenticacaoModule } from './autenticacao/autenticacao.module';
+import { BeneficiariosModule } from './beneficiarios/beneficiarios.module';
+import { ContatosModule } from './contatos/contatos.module';
+import { CourseClassesModule } from './course-classes/course-classes.module';
+import { CoursesModule } from './courses/courses.module';
+import { EnderecosModule } from './enderecos/enderecos.module';
+import { FamiliasModule } from './familias/familias.module';
+import { LessonsModule } from './lessons/lessons.module';
+import { LocationsModule } from './locations/locations.module';
+import { PessoasModule } from './pessoas/pessoas.module';
+import { StudentsModule } from './students/students.module';
+import { TasksModule } from './tasks/tasks.module';
+import { UsersModule } from './users/users.module';
+import { UsuariosModule } from './usuarios/usuarios.module';
+import { VoluntariosModule } from './voluntarios/voluntarios.module';
 
 @Module({
   imports: [
@@ -32,7 +41,7 @@ import { AssetCategoriesModule } from './asset-categories/asset-categories.modul
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         autoLoadEntities: true,
         synchronize: false,
-        migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
+        migrations: [__dirname + '/migracoes/**/*{.ts,.js}'],
         migrationsRun: true,
         ssl:
           configService.get<string>('NODE_ENV') === 'production'
@@ -41,16 +50,25 @@ import { AssetCategoriesModule } from './asset-categories/asset-categories.modul
       }),
       inject: [ConfigService],
     }),
-    UsersModule,
-    AuthModule,
-    StudentsModule,
-    CoursesModule,
-    CourseClassesModule,
-    LessonsModule,
-    AttendancesModule,
-    LocationsModule,
+    ScheduleModule.forRoot(),
     AreasModule,
     AssetCategoriesModule,
+    AttendancesModule,
+    BeneficiariosModule,
+    ContatosModule,
+    CoursesModule,
+    CourseClassesModule,
+    EnderecosModule,
+    FamiliasModule,
+    LessonsModule,
+    LocationsModule,
+    PessoasModule,
+    StudentsModule,
+    TasksModule,
+    UsersModule,
+    UsuariosModule,
+    VoluntariosModule,
+    AutenticacaoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

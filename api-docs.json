@@ -15,47 +15,512 @@
         ]
       }
     },
-    "/users": {
+    "/areas": {
       "post": {
-        "operationId": "UsersController_create",
+        "operationId": "AreasController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateUserDto"
+                "$ref": "#/components/schemas/CreateAreaDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "The user has been successfully created",
+            "description": "The area has been successfully created",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserResponseDto"
+                  "$ref": "#/components/schemas/AreaResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Create a new area",
+        "tags": [
+          "Areas"
+        ]
+      }
+    },
+    "/areas/{id}": {
+      "get": {
+        "operationId": "AreasController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The area has been successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AreaResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Area not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Get area by ID",
+        "tags": [
+          "Areas"
+        ]
+      },
+      "patch": {
+        "operationId": "AreasController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAreaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The area has been successfully updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AreaResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Area not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Update an area",
+        "tags": [
+          "Areas"
+        ]
+      },
+      "delete": {
+        "operationId": "AreasController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The area has been successfully deleted."
+          },
+          "404": {
+            "description": "Area not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Delete a area by ID",
+        "tags": [
+          "Areas"
+        ]
+      }
+    },
+    "/locations": {
+      "post": {
+        "operationId": "LocationsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLocationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The location has been successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Create a new location",
+        "tags": [
+          "Locations"
+        ]
+      },
+      "get": {
+        "operationId": "LocationsController_findAll",
+        "parameters": [
+          {
+            "name": "take",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully received paginated response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/LocationResponseDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Retrieve all locations",
+        "tags": [
+          "Locations"
+        ]
+      }
+    },
+    "/locations/{id}": {
+      "get": {
+        "operationId": "LocationsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The location has been successfully retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Location not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Retrieve a location by ID",
+        "tags": [
+          "Locations"
+        ]
+      },
+      "patch": {
+        "operationId": "LocationsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLocationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The location has been successfully updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Location not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Update a location by ID",
+        "tags": [
+          "Locations"
+        ]
+      },
+      "delete": {
+        "operationId": "LocationsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The location has been successfully deleted"
+          },
+          "404": {
+            "description": "Location not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Delete a location by ID",
+        "tags": [
+          "Locations"
+        ]
+      }
+    },
+    "/locations/{id}/areas": {
+      "get": {
+        "operationId": "LocationsController_findCourseClasses",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully received paginated response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/AreaResponseDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Location not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Get all areas from a location",
+        "tags": [
+          "Locations"
+        ]
+      }
+    },
+    "/asset-categories": {
+      "post": {
+        "operationId": "AssetCategoriesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAssetCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The asset category has been successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetCategory"
                 }
               }
             }
           },
           "409": {
-            "description": "User already exists"
+            "description": "Asset category already exists"
           },
           "500": {
             "description": "Internal server error"
           }
         },
-        "summary": "Create a new user",
+        "summary": "Create a new asset category",
         "tags": [
-          "Users"
+          "Asset Categories"
+        ]
+      },
+      "get": {
+        "operationId": "AssetCategoriesController_findAll",
+        "parameters": [
+          {
+            "name": "take",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully received paginated response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/AssetCategoryResponseDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Retrieve all asset categories",
+        "tags": [
+          "Asset Categories"
         ]
       }
     },
-    "/users/{id}": {
+    "/asset-categories/{id}": {
       "get": {
-        "operationId": "UsersController_findOne",
+        "operationId": "AssetCategoriesController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -68,32 +533,29 @@
         ],
         "responses": {
           "200": {
-            "description": "The user has been successfully retrieved",
+            "description": "The asset category has been successfully retrieved",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserResponseDto"
+                  "$ref": "#/components/schemas/AssetCategoryResponseDto"
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
           "404": {
-            "description": "User not found"
+            "description": "Asset category not found"
           },
           "500": {
             "description": "Internal server error"
           }
         },
-        "summary": "Get user by ID",
+        "summary": "Retrieve a asset category by ID",
         "tags": [
-          "Users"
+          "Asset Categories"
         ]
       },
       "patch": {
-        "operationId": "UsersController_update",
+        "operationId": "AssetCategoriesController_update",
         "parameters": [
           {
             "name": "id",
@@ -109,39 +571,39 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
+                "$ref": "#/components/schemas/UpdateAssetCategoryDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "The user has been successfully updated",
+            "description": "The asset category has been successfully updated",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserResponseDto"
+                  "$ref": "#/components/schemas/AssetCategoryResponseDto"
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
           "404": {
-            "description": "User not found"
+            "description": "Asset category not found"
+          },
+          "409": {
+            "description": "Asset category already exists"
           },
           "500": {
             "description": "Internal server error"
           }
         },
-        "summary": "Update user by ID",
+        "summary": "Update a asset category by ID",
         "tags": [
-          "Users"
+          "Asset Categories"
         ]
       },
       "delete": {
-        "operationId": "UsersController_remove",
+        "operationId": "AssetCategoriesController_remove",
         "parameters": [
           {
             "name": "id",
@@ -154,96 +616,18 @@
         ],
         "responses": {
           "204": {
-            "description": "The user has been successfully deleted"
-          },
-          "401": {
-            "description": "Unauthorized"
+            "description": "The asset category has been successfully deleted"
           },
           "404": {
-            "description": "User not found"
+            "description": "Asset category not found"
           },
           "500": {
             "description": "Internal server error"
           }
         },
-        "summary": "Delete user by ID",
+        "summary": "Delete a asset category by ID",
         "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/users/{id}/password": {
-      "patch": {
-        "operationId": "UsersController_updatePassword",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdatePasswordDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "The password has been successfully updated"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "User not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Update user password",
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/auth/signin": {
-      "post": {
-        "operationId": "AuthController_signIn",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SignInDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successfully signed in",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SignInResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Invalid email or password"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Sign in to obtain an access token",
-        "tags": [
-          "Auth"
+          "Asset Categories"
         ]
       }
     },
@@ -443,272 +827,6 @@
         "summary": "Delete student by ID",
         "tags": [
           "Students"
-        ]
-      }
-    },
-    "/courses": {
-      "post": {
-        "operationId": "CoursesController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCourseDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The course has been successfully created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Create a new course",
-        "tags": [
-          "Courses"
-        ]
-      },
-      "get": {
-        "operationId": "CoursesController_findAll",
-        "parameters": [
-          {
-            "name": "take",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "page",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully received paginated response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/PaginatedResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/CourseResponseDto"
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Get all courses",
-        "tags": [
-          "Courses"
-        ]
-      }
-    },
-    "/courses/{id}": {
-      "get": {
-        "operationId": "CoursesController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The course has been successfully retrieved",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Course not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Get course by ID",
-        "tags": [
-          "Courses"
-        ]
-      },
-      "patch": {
-        "operationId": "CoursesController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateCourseDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The course has been successfully updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Course not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Update a course by ID",
-        "tags": [
-          "Courses"
-        ]
-      },
-      "delete": {
-        "operationId": "CoursesController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "The course has been successfully deleted"
-          },
-          "404": {
-            "description": "Course not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Delete a course by ID",
-        "tags": [
-          "Courses"
-        ]
-      }
-    },
-    "/courses/{id}/classes": {
-      "get": {
-        "operationId": "CoursesController_findCourseClasses",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "take",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "page",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully received paginated response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/PaginatedResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/CourseClassResponseDto"
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Course not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Get all course classes from a course",
-        "tags": [
-          "Courses"
         ]
       }
     },
@@ -1224,6 +1342,463 @@
         ]
       }
     },
+    "/courses": {
+      "post": {
+        "operationId": "CoursesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCourseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The course has been successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Create a new course",
+        "tags": [
+          "Courses"
+        ]
+      },
+      "get": {
+        "operationId": "CoursesController_findAll",
+        "parameters": [
+          {
+            "name": "take",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully received paginated response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/CourseResponseDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Get all courses",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/courses/{id}": {
+      "get": {
+        "operationId": "CoursesController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The course has been successfully retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Get course by ID",
+        "tags": [
+          "Courses"
+        ]
+      },
+      "patch": {
+        "operationId": "CoursesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCourseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The course has been successfully updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Update a course by ID",
+        "tags": [
+          "Courses"
+        ]
+      },
+      "delete": {
+        "operationId": "CoursesController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The course has been successfully deleted"
+          },
+          "404": {
+            "description": "Course not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Delete a course by ID",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/courses/{id}/classes": {
+      "get": {
+        "operationId": "CoursesController_findCourseClasses",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "take",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully received paginated response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/CourseClassResponseDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Course not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Get all course classes from a course",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/users": {
+      "post": {
+        "operationId": "UsersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The user has been successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "User already exists"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Create a new user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "operationId": "UsersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The user has been successfully retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Get user by ID",
+        "tags": [
+          "Users"
+        ]
+      },
+      "patch": {
+        "operationId": "UsersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The user has been successfully updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Update user by ID",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The user has been successfully deleted"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Delete user by ID",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/{id}/password": {
+      "patch": {
+        "operationId": "UsersController_updatePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "The password has been successfully updated"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "summary": "Update user password",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
     "/lessons": {
       "post": {
         "operationId": "LessonsController_create",
@@ -1539,490 +2114,83 @@
         ]
       }
     },
-    "/locations": {
+    "/beneficiarios": {
       "post": {
-        "operationId": "LocationsController_create",
+        "operationId": "BeneficiariosController_criar",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateLocationDto"
+                "$ref": "#/components/schemas/CriarBeneficiarioDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "The location has been successfully created",
+            "description": "O beneficiário foi criado com sucesso.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LocationResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Create a new location",
-        "tags": [
-          "Locations"
-        ]
-      },
-      "get": {
-        "operationId": "LocationsController_findAll",
-        "parameters": [
-          {
-            "name": "take",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "page",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully received paginated response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/PaginatedResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/LocationResponseDto"
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Retrieve all locations",
-        "tags": [
-          "Locations"
-        ]
-      }
-    },
-    "/locations/{id}": {
-      "get": {
-        "operationId": "LocationsController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The location has been successfully retrieved",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LocationResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Location not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Retrieve a location by ID",
-        "tags": [
-          "Locations"
-        ]
-      },
-      "patch": {
-        "operationId": "LocationsController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateLocationDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The location has been successfully updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LocationResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Location not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Update a location by ID",
-        "tags": [
-          "Locations"
-        ]
-      },
-      "delete": {
-        "operationId": "LocationsController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "The location has been successfully deleted"
-          },
-          "404": {
-            "description": "Location not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Delete a location by ID",
-        "tags": [
-          "Locations"
-        ]
-      }
-    },
-    "/locations/{id}/areas": {
-      "get": {
-        "operationId": "LocationsController_findCourseClasses",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "take",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "page",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successfully received paginated response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/PaginatedResponseDto"
-                    },
-                    {
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/AreaResponseDto"
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Location not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Get all areas from a location",
-        "tags": [
-          "Locations"
-        ]
-      }
-    },
-    "/areas": {
-      "post": {
-        "operationId": "AreasController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateAreaDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The area has been successfully created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AreaResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Create a new area",
-        "tags": [
-          "Areas"
-        ]
-      }
-    },
-    "/areas/{id}": {
-      "get": {
-        "operationId": "AreasController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The area has been successfully retrieved.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AreaResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Area not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Get area by ID",
-        "tags": [
-          "Areas"
-        ]
-      },
-      "patch": {
-        "operationId": "AreasController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateAreaDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The area has been successfully updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AreaResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Area not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Update an area",
-        "tags": [
-          "Areas"
-        ]
-      },
-      "delete": {
-        "operationId": "AreasController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "The area has been successfully deleted."
-          },
-          "404": {
-            "description": "Area not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Delete a area by ID",
-        "tags": [
-          "Areas"
-        ]
-      }
-    },
-    "/asset-categories": {
-      "post": {
-        "operationId": "AssetCategoriesController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateAssetCategoryDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The asset category has been successfully created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AssetCategory"
+                  "$ref": "#/components/schemas/BeneficiarioRespostaDto"
                 }
               }
             }
           },
           "409": {
-            "description": "Asset category already exists"
+            "description": "Já existe uma pessoa com este CPF ou a pessoa informada já possui um benefício ativo."
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Ocorreu um erro inesperado ao criar o beneficiário."
           }
         },
-        "summary": "Create a new asset category",
+        "summary": "Criar um novo beneficiário",
         "tags": [
-          "Asset Categories"
+          "Beneficiarios"
         ]
       },
       "get": {
-        "operationId": "AssetCategoriesController_findAll",
+        "operationId": "BeneficiariosController_buscarTodos",
         "parameters": [
           {
             "name": "take",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Número de itens a serem retornados por página",
             "schema": {
+              "example": 10,
               "type": "number"
             }
           },
           {
-            "name": "page",
-            "required": true,
+            "name": "skip",
+            "required": false,
             "in": "query",
+            "description": "Número de itens a serem ignorados na consulta",
             "schema": {
+              "example": 0,
               "type": "number"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successfully received paginated response",
+            "description": "Resposta paginada recebida com sucesso.",
             "content": {
               "application/json": {
                 "schema": {
                   "allOf": [
                     {
-                      "$ref": "#/components/schemas/PaginatedResponseDto"
+                      "$ref": "#/components/schemas/PaginacaoRespostaDto"
                     },
                     {
                       "properties": {
-                        "data": {
+                        "dados": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/AssetCategoryResponseDto"
+                            "$ref": "#/components/schemas/BeneficiarioRespostaDto"
                           }
                         }
                       }
@@ -2033,60 +2201,60 @@
             }
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Ocorreu um erro inesperado ao buscar os beneficiários."
           }
         },
-        "summary": "Retrieve all asset categories",
+        "summary": "Buscar uma lista paginada de beneficiários",
         "tags": [
-          "Asset Categories"
+          "Beneficiarios"
         ]
       }
     },
-    "/asset-categories/{id}": {
+    "/beneficiarios/{id}": {
       "get": {
-        "operationId": "AssetCategoriesController_findOne",
+        "operationId": "BeneficiariosController_buscarPorId",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "The asset category has been successfully retrieved",
+            "description": "O beneficiário foi encontrado com sucesso.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AssetCategoryResponseDto"
+                  "$ref": "#/components/schemas/BeneficiarioRespostaDto"
                 }
               }
             }
           },
           "404": {
-            "description": "Asset category not found"
+            "description": "Beneficiário não encontrado."
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Ocorreu um erro inesperado ao buscar o beneficiário."
           }
         },
-        "summary": "Retrieve a asset category by ID",
+        "summary": "Buscar um beneficiário pelo ID",
         "tags": [
-          "Asset Categories"
+          "Beneficiarios"
         ]
       },
       "patch": {
-        "operationId": "AssetCategoriesController_update",
+        "operationId": "BeneficiariosController_atualizar",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           }
         ],
@@ -2095,63 +2263,651 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateAssetCategoryDto"
+                "$ref": "#/components/schemas/AtualizarBeneficiarioDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "The asset category has been successfully updated",
+            "description": "O beneficiário foi atualizado com sucesso.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AssetCategoryResponseDto"
+                  "$ref": "#/components/schemas/BeneficiarioRespostaDto"
                 }
               }
             }
           },
           "404": {
-            "description": "Asset category not found"
+            "description": "Beneficiário não encontrado."
           },
           "409": {
-            "description": "Asset category already exists"
+            "description": "Já existe uma pessoa cadastrada com este CPF."
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Ocorreu um erro inesperado ao atualizar o beneficiário."
           }
         },
-        "summary": "Update a asset category by ID",
+        "summary": "Atualizar os dados de um beneficiário",
         "tags": [
-          "Asset Categories"
+          "Beneficiarios"
         ]
       },
       "delete": {
-        "operationId": "AssetCategoriesController_remove",
+        "operationId": "BeneficiariosController_remover",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           }
         ],
         "responses": {
           "204": {
-            "description": "The asset category has been successfully deleted"
+            "description": "O beneficiário foi deletado com sucesso."
           },
           "404": {
-            "description": "Asset category not found"
+            "description": "Beneficiário não encontrado."
           },
           "500": {
-            "description": "Internal server error"
+            "description": "Ocorreu um erro inesperado ao deletar o beneficiário."
           }
         },
-        "summary": "Delete a asset category by ID",
+        "summary": "Deletar beneficiário pelo ID",
         "tags": [
-          "Asset Categories"
+          "Beneficiarios"
+        ]
+      }
+    },
+    "/pessoas/cpf/{cpf}": {
+      "get": {
+        "operationId": "PessoasController_buscarPorCpf",
+        "parameters": [
+          {
+            "name": "cpf",
+            "required": true,
+            "in": "path",
+            "description": "CPF com 11 dígitos numéricos.",
+            "schema": {
+              "example": "12345678900",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pessoa encontrada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PessoaRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "CPF inválido."
+          },
+          "404": {
+            "description": "Pessoa não encontrada."
+          }
+        },
+        "summary": "Buscar pessoa pelo CPF",
+        "tags": [
+          "Pessoas"
+        ]
+      }
+    },
+    "/usuarios": {
+      "post": {
+        "operationId": "UsuariosController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriarUsuarioDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "O usuário foi criado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioRespostaDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Já existe um usuário cadastrado com este e-mail."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao criar o usuário."
+          }
+        },
+        "summary": "Criar um novo usuário",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/usuarios/{id}": {
+      "get": {
+        "operationId": "UsuariosController_buscarPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O usuário foi encontrado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioRespostaDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "404": {
+            "description": "Usuário não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar o usuário."
+          }
+        },
+        "summary": "Buscar usuário pelo ID",
+        "tags": [
+          "Usuarios"
+        ]
+      },
+      "patch": {
+        "operationId": "UsuariosController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarUsuarioDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O usuário foi atualizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioRespostaDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "404": {
+            "description": "Usuário não encontrado."
+          },
+          "409": {
+            "description": "Este e-mail já está em uso por outro usuário."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar o usuário."
+          }
+        },
+        "summary": "Atualizar usuário pelo ID",
+        "tags": [
+          "Usuarios"
+        ]
+      },
+      "delete": {
+        "operationId": "UsuariosController_remover",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "O usuário foi deletado com sucesso."
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "404": {
+            "description": "Usuário não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao deletar o usuário."
+          }
+        },
+        "summary": "Deletar usuário pelo ID",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/usuarios/senha": {
+      "patch": {
+        "operationId": "UsuariosController_atualizarSenha",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarSenhaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "A senha foi atualizada com sucesso."
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "404": {
+            "description": "Usuário não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar a senha."
+          }
+        },
+        "summary": "Atualizar senha do usuário",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/voluntarios": {
+      "post": {
+        "operationId": "VoluntariosController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Existem 2 cenários:\n1) Se o voluntário JÁ É beneficiário: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do voluntário.\n2) Se o voluntário NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do voluntário (não envie 'pessoaId').",
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "title": "Cenário com pessoa já cadastrada",
+                    "properties": {
+                      "pessoaId": {
+                        "type": "string",
+                        "example": "123456"
+                      },
+                      "tipoVoluntario": {
+                        "type": "string",
+                        "enum": [
+                          "COORDENADOR",
+                          "PROFESSOR",
+                          "GERAL"
+                        ]
+                      },
+                      "formacaoAcademica": {
+                        "type": "string",
+                        "example": "Pedagogia"
+                      },
+                      "statusFormacao": {
+                        "type": "string",
+                        "enum": [
+                          "COMPLETO",
+                          "CURSANDO",
+                          "INCOMPLETO"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "pessoaId",
+                      "tipoVoluntario"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "title": "Cenário com nova pessoa",
+                    "properties": {
+                      "nome": {
+                        "type": "string",
+                        "example": "Carlos Santos"
+                      },
+                      "cpf": {
+                        "type": "string",
+                        "example": "12345678900",
+                        "minLength": 11,
+                        "maxLength": 11
+                      },
+                      "dataNascimento": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2000-01-01"
+                      },
+                      "tipoVoluntario": {
+                        "type": "string",
+                        "enum": [
+                          "COORDENADOR",
+                          "PROFESSOR",
+                          "GERAL"
+                        ]
+                      },
+                      "formacaoAcademica": {
+                        "type": "string",
+                        "example": "Pedagogia"
+                      },
+                      "statusFormacao": {
+                        "type": "string",
+                        "enum": [
+                          "COMPLETO",
+                          "CURSANDO",
+                          "INCOMPLETO"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "nome",
+                      "cpf",
+                      "dataNascimento",
+                      "tipoVoluntario"
+                    ]
+                  }
+                ]
+              },
+              "examples": {
+                "existingPerson": {
+                  "summary": "Pessoa já cadastrada (use pessoaId)",
+                  "value": {
+                    "pessoaId": "123456",
+                    "tipoVoluntario": "COORDENADOR",
+                    "formacaoAcademica": "Pedagogia",
+                    "statusFormacao": "COMPLETO"
+                  }
+                },
+                "newPerson": {
+                  "summary": "Pessoa nova (envia dados da pessoa)",
+                  "value": {
+                    "nome": "Carlos Santos",
+                    "cpf": "12345678900",
+                    "dataNascimento": "2000-01-01",
+                    "tipoVoluntario": "PROFESSOR",
+                    "formacaoAcademica": "Pedagogia",
+                    "statusFormacao": "COMPLETO"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "O voluntário foi criado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoluntarioRespostaDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Já existe uma pessoa com este CPF ou a pessoa informada já possui um cadastro de voluntário ativo."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao criar o voluntário."
+          }
+        },
+        "summary": "Criar um novo voluntário",
+        "tags": [
+          "Voluntarios"
+        ]
+      },
+      "get": {
+        "operationId": "VoluntariosController_buscarTodos",
+        "parameters": [
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Número de itens a serem retornados por página",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Número de itens a serem ignorados na consulta",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta paginada recebida com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginacaoRespostaDto"
+                    },
+                    {
+                      "properties": {
+                        "dados": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/VoluntarioRespostaDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar os voluntários."
+          }
+        },
+        "summary": "Buscar uma lista paginada de voluntários",
+        "tags": [
+          "Voluntarios"
+        ]
+      }
+    },
+    "/voluntarios/{id}": {
+      "get": {
+        "operationId": "VoluntariosController_buscarPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O voluntário foi encontrado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoluntarioRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Voluntário não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar o voluntário."
+          }
+        },
+        "summary": "Buscar voluntário pelo ID",
+        "tags": [
+          "Voluntarios"
+        ]
+      },
+      "patch": {
+        "operationId": "VoluntariosController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarVoluntarioDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O voluntário foi atualizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoluntarioRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Voluntário não encontrado."
+          },
+          "409": {
+            "description": "Já existe uma pessoa cadastrada com este CPF."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar o voluntário."
+          }
+        },
+        "summary": "Atualizar voluntário pelo ID",
+        "tags": [
+          "Voluntarios"
+        ]
+      },
+      "delete": {
+        "operationId": "VoluntariosController_remover",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "O voluntário foi deletado com sucesso."
+          },
+          "404": {
+            "description": "Voluntário não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao deletar o voluntário."
+          }
+        },
+        "summary": "Deletar voluntário pelo ID",
+        "tags": [
+          "Voluntarios"
+        ]
+      }
+    },
+    "/autenticacao/login": {
+      "post": {
+        "operationId": "AutenticacaoController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados de entrada inválidos (ex: e-mail mal formatado)."
+          },
+          "401": {
+            "description": "E-mail ou senha inválidos."
+          },
+          "500": {
+            "description": "Ocorreu um erro interno no servidor."
+          }
+        },
+        "summary": "Realizar login no sistema para obter o token de acesso",
+        "tags": [
+          "Autenticacao"
         ]
       }
     }
@@ -2166,155 +2922,92 @@
   "servers": [],
   "components": {
     "schemas": {
-      "CreateUserDto": {
+      "CreateAreaDto": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
-            "example": "Carlos Santos"
+            "example": "Sala de Aula"
           },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "carlos.santos@example.com"
-          },
-          "password": {
-            "type": "string",
-            "example": "strongPassword123"
+          "locationId": {
+            "type": "number",
+            "minimum": 1,
+            "example": 1
           }
         },
         "required": [
           "name",
-          "email",
-          "password"
+          "locationId"
         ]
       },
-      "UserResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "name": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "email"
-        ]
-      },
-      "UpdateUserDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "example": "Carlos Santos"
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "carlos.santos@example.com"
-          },
-          "password": {
-            "type": "string",
-            "example": "strongPassword123"
-          }
-        }
-      },
-      "UpdatePasswordDto": {
-        "type": "object",
-        "properties": {
-          "currentPassword": {
-            "type": "string"
-          },
-          "newPassword": {
-            "type": "string",
-            "minLength": 8,
-            "maxLength": 128
-          }
-        },
-        "required": [
-          "currentPassword",
-          "newPassword"
-        ]
-      },
-      "SignInDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "password": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ]
-      },
-      "SignInResponseDto": {
-        "type": "object",
-        "properties": {
-          "access_token": {
-            "type": "string"
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserResponseDto"
-          }
-        },
-        "required": [
-          "access_token"
-        ]
-      },
-      "CreateStudentDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "example": "Carlos Santos"
-          },
-          "birthDate": {
-            "format": "date",
-            "type": "string",
-            "example": "2000-01-01"
-          }
-        },
-        "required": [
-          "name",
-          "birthDate"
-        ]
-      },
-      "StudentResponseDto": {
+      "AreaResponseDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "number",
-            "example": 1,
-            "description": "Student ID"
+            "example": 1
           },
           "name": {
             "type": "string",
-            "example": "João Silva",
-            "description": "Student name"
+            "example": "Sala de Aula"
           },
-          "birthDate": {
-            "type": "string",
-            "example": "2010-05-15",
-            "description": "Student birth date (date only, no time)",
-            "format": "date"
+          "locationId": {
+            "type": "number",
+            "example": 1
           }
         },
         "required": [
           "id",
           "name",
-          "birthDate"
+          "locationId"
+        ]
+      },
+      "UpdateAreaDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Sala de Aula"
+          }
+        }
+      },
+      "CreateLocationDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Sede"
+          },
+          "address": {
+            "type": "string",
+            "example": "Rua Oceano, 123"
+          }
+        },
+        "required": [
+          "name",
+          "address"
+        ]
+      },
+      "LocationResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Sede"
+          },
+          "address": {
+            "type": "string",
+            "example": "Rua Oceano, 123"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "address"
         ]
       },
       "PaginationMetaDto": {
@@ -2372,6 +3065,132 @@
           "data"
         ]
       },
+      "UpdateLocationDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Sede"
+          },
+          "address": {
+            "type": "string",
+            "example": "Rua Oceano, 123"
+          }
+        }
+      },
+      "CreateAssetCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Computadores"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "AssetCategory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "createdAt",
+          "updatedAt",
+          "deletedAt"
+        ]
+      },
+      "AssetCategoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Computadores"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "UpdateAssetCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Computadores"
+          }
+        }
+      },
+      "CreateStudentDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Carlos Santos"
+          },
+          "birthDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2000-01-01"
+          }
+        },
+        "required": [
+          "name",
+          "birthDate"
+        ]
+      },
+      "StudentResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1,
+            "description": "Student ID"
+          },
+          "name": {
+            "type": "string",
+            "example": "João Silva",
+            "description": "Student name"
+          },
+          "birthDate": {
+            "type": "string",
+            "example": "2010-05-15",
+            "description": "Student birth date (date only, no time)",
+            "format": "date"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "birthDate"
+        ]
+      },
       "UpdateStudentDto": {
         "type": "object",
         "properties": {
@@ -2386,16 +3205,45 @@
           }
         }
       },
-      "CreateCourseDto": {
+      "CreateCourseClassDto": {
         "type": "object",
         "properties": {
+          "courseId": {
+            "type": "number",
+            "minimum": 1,
+            "example": 1
+          },
           "name": {
             "type": "string",
-            "example": "Carlos Santos"
+            "example": "Programming 2"
+          },
+          "startDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2024-01-01"
+          },
+          "endDate": {
+            "format": "date",
+            "type": "string",
+            "example": "2024-12-31"
+          },
+          "status": {
+            "enum": [
+              "EM_FORMACAO",
+              "EM_ANDAMENTO",
+              "FINALIZADA",
+              "CANCELADA"
+            ],
+            "type": "string",
+            "example": "EM_FORMACAO",
+            "default": "EM_FORMACAO"
           }
         },
         "required": [
-          "name"
+          "courseId",
+          "name",
+          "startDate",
+          "endDate"
         ]
       },
       "CourseResponseDto": {
@@ -2420,14 +3268,24 @@
           "name"
         ]
       },
-      "UpdateCourseDto": {
+      "UserResponseDto": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "number"
+          },
           "name": {
-            "type": "string",
-            "example": "Carlos Santos"
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
           }
-        }
+        },
+        "required": [
+          "id",
+          "name",
+          "email"
+        ]
       },
       "CourseClassResponseDto": {
         "type": "object",
@@ -2473,47 +3331,6 @@
           "course",
           "name",
           "status",
-          "startDate",
-          "endDate"
-        ]
-      },
-      "CreateCourseClassDto": {
-        "type": "object",
-        "properties": {
-          "courseId": {
-            "type": "number",
-            "minimum": 1,
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "example": "Programming 2"
-          },
-          "startDate": {
-            "format": "date",
-            "type": "string",
-            "example": "2024-01-01"
-          },
-          "endDate": {
-            "format": "date",
-            "type": "string",
-            "example": "2024-12-31"
-          },
-          "status": {
-            "enum": [
-              "EM_FORMACAO",
-              "EM_ANDAMENTO",
-              "FINALIZADA",
-              "CANCELADA"
-            ],
-            "type": "string",
-            "example": "EM_FORMACAO",
-            "default": "EM_FORMACAO"
-          }
-        },
-        "required": [
-          "courseId",
-          "name",
           "startDate",
           "endDate"
         ]
@@ -2597,6 +3414,85 @@
         },
         "required": [
           "studentId"
+        ]
+      },
+      "CreateCourseDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Carlos Santos"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateCourseDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Carlos Santos"
+          }
+        }
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Carlos Santos"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "carlos.santos@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "strongPassword123"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Carlos Santos"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "carlos.santos@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "strongPassword123"
+          }
+        }
+      },
+      "UpdatePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
         ]
       },
       "CreateLessonDto": {
@@ -2704,175 +3600,535 @@
           "lesson"
         ]
       },
-      "CreateLocationDto": {
+      "CriarBeneficiarioDto": {
         "type": "object",
         "properties": {
-          "name": {
+          "nome": {
             "type": "string",
-            "example": "Sede"
+            "example": "João da Silva"
           },
-          "address": {
+          "cpf": {
             "type": "string",
-            "example": "Rua Oceano, 123"
+            "minLength": 11,
+            "maxLength": 11,
+            "pattern": "/^\\d+$/",
+            "example": "12345678900"
+          },
+          "dataNascimento": {
+            "format": "date-time",
+            "type": "string",
+            "example": "1990-01-01"
+          },
+          "podeSairSozinho": {
+            "type": "boolean",
+            "example": true
+          },
+          "responsavelId": {
+            "type": "string",
+            "example": "10",
+            "description": "ID da pessoa responsável"
+          },
+          "pessoaId": {
+            "type": "string",
+            "description": "ID da pessoa, caso ela já possua cadastro no sistema.",
+            "example": "123456"
+          },
+          "familiaId": {
+            "type": "string",
+            "description": "ID da família",
+            "example": "789012"
+          },
+          "nivelEscolaridade": {
+            "enum": [
+              "ENSINO_FUNDAMENTAL_INCOMPLETO",
+              "ENSINO_FUNDAMENTAL_COMPLETO",
+              "ENSINO_MEDIO_INCOMPLETO",
+              "ENSINO_MEDIO_COMPLETO",
+              "ENSINO_SUPERIOR_INCOMPLETO",
+              "ENSINO_SUPERIOR_COMPLETO",
+              "SEM_ESCOLARIDADE"
+            ],
+            "type": "string",
+            "example": "ENSINO_FUNDAMENTAL_COMPLETO"
+          },
+          "estadoCivil": {
+            "enum": [
+              "CASADO",
+              "DIVORCIADO",
+              "SOLTEIRO",
+              "UNIAO_ESTAVEL",
+              "VIUVO"
+            ],
+            "type": "string",
+            "example": "SOLTEIRO"
+          },
+          "vinculoEmpregaticio": {
+            "enum": [
+              "APOSENTADO",
+              "AUTONOMO",
+              "DESEMPREGADO",
+              "EMPREGADO_CLT",
+              "INFORMAL",
+              "OUTRO"
+            ],
+            "type": "string",
+            "example": "DESEMPREGADO"
+          },
+          "quantidadeFilhos": {
+            "type": "number",
+            "minimum": 0,
+            "example": 2
           }
         },
         "required": [
-          "name",
-          "address"
+          "familiaId",
+          "nivelEscolaridade"
         ]
       },
-      "LocationResponseDto": {
+      "PessoaRespostaDto": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "number",
-            "example": 1
-          },
-          "name": {
             "type": "string",
-            "example": "Sede"
+            "example": "123456"
           },
-          "address": {
+          "nome": {
             "type": "string",
-            "example": "Rua Oceano, 123"
+            "example": "Carlos Santos"
+          },
+          "cpf": {
+            "type": "string",
+            "example": "12345678900"
+          },
+          "dataNascimento": {
+            "type": "string",
+            "format": "date",
+            "example": "2000-01-01"
+          },
+          "podeSairSozinho": {
+            "type": "boolean",
+            "example": true
+          },
+          "responsavelId": {
+            "type": "string",
+            "example": "123456"
           }
         },
         "required": [
           "id",
-          "name",
-          "address"
+          "nome",
+          "cpf",
+          "dataNascimento"
         ]
       },
-      "UpdateLocationDto": {
+      "BeneficiarioRespostaDto": {
         "type": "object",
         "properties": {
-          "name": {
+          "id": {
             "type": "string",
-            "example": "Sede"
+            "example": "ben-123"
           },
-          "address": {
+          "pessoa": {
+            "$ref": "#/components/schemas/PessoaRespostaDto"
+          },
+          "familiaId": {
             "type": "string",
-            "example": "Rua Oceano, 123"
+            "example": "fam-456"
+          },
+          "nivelEscolaridade": {
+            "enum": [
+              "ENSINO_FUNDAMENTAL_INCOMPLETO",
+              "ENSINO_FUNDAMENTAL_COMPLETO",
+              "ENSINO_MEDIO_INCOMPLETO",
+              "ENSINO_MEDIO_COMPLETO",
+              "ENSINO_SUPERIOR_INCOMPLETO",
+              "ENSINO_SUPERIOR_COMPLETO",
+              "SEM_ESCOLARIDADE"
+            ],
+            "type": "string",
+            "example": "ENSINO_FUNDAMENTAL_COMPLETO"
+          },
+          "estadoCivil": {
+            "enum": [
+              "CASADO",
+              "DIVORCIADO",
+              "SOLTEIRO",
+              "UNIAO_ESTAVEL",
+              "VIUVO"
+            ],
+            "type": "string",
+            "example": "SOLTEIRO"
+          },
+          "vinculoEmpregaticio": {
+            "enum": [
+              "APOSENTADO",
+              "AUTONOMO",
+              "DESEMPREGADO",
+              "EMPREGADO_CLT",
+              "INFORMAL",
+              "OUTRO"
+            ],
+            "type": "string",
+            "example": "DESEMPREGADO"
+          },
+          "quantidadeFilhos": {
+            "type": "number",
+            "nullable": true,
+            "example": 2
+          }
+        },
+        "required": [
+          "id",
+          "pessoa",
+          "familiaId",
+          "nivelEscolaridade",
+          "quantidadeFilhos"
+        ]
+      },
+      "PaginacaoMetaDto": {
+        "type": "object",
+        "properties": {
+          "itensPorPagina": {
+            "type": "number",
+            "description": "Número de itens por página",
+            "example": 10
+          },
+          "totalItens": {
+            "type": "number",
+            "description": "Total de itens",
+            "example": 100
+          },
+          "paginaAtual": {
+            "type": "number",
+            "description": "Página atual",
+            "example": 1
+          },
+          "totalPaginas": {
+            "type": "number",
+            "description": "Total de páginas",
+            "example": 10
+          }
+        },
+        "required": [
+          "itensPorPagina",
+          "totalItens",
+          "paginaAtual",
+          "totalPaginas"
+        ]
+      },
+      "PaginacaoRespostaDto": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "description": "Metadados da paginação",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaginacaoMetaDto"
+              }
+            ]
+          },
+          "dados": {
+            "description": "Dados paginados",
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "dados"
+        ]
+      },
+      "AtualizarBeneficiarioDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "João da Silva"
+          },
+          "cpf": {
+            "type": "string",
+            "minLength": 11,
+            "maxLength": 11,
+            "pattern": "/^\\d+$/",
+            "example": "12345678900"
+          },
+          "dataNascimento": {
+            "format": "date-time",
+            "type": "string",
+            "example": "1990-01-01"
+          },
+          "podeSairSozinho": {
+            "type": "boolean",
+            "example": true
+          },
+          "responsavelId": {
+            "type": "string",
+            "example": "10",
+            "description": "ID da pessoa responsável"
+          },
+          "familiaId": {
+            "type": "string",
+            "description": "ID da família",
+            "example": "789012"
+          },
+          "nivelEscolaridade": {
+            "enum": [
+              "ENSINO_FUNDAMENTAL_INCOMPLETO",
+              "ENSINO_FUNDAMENTAL_COMPLETO",
+              "ENSINO_MEDIO_INCOMPLETO",
+              "ENSINO_MEDIO_COMPLETO",
+              "ENSINO_SUPERIOR_INCOMPLETO",
+              "ENSINO_SUPERIOR_COMPLETO",
+              "SEM_ESCOLARIDADE"
+            ],
+            "type": "string",
+            "example": "ENSINO_FUNDAMENTAL_COMPLETO"
+          },
+          "estadoCivil": {
+            "enum": [
+              "CASADO",
+              "DIVORCIADO",
+              "SOLTEIRO",
+              "UNIAO_ESTAVEL",
+              "VIUVO"
+            ],
+            "type": "string",
+            "example": "SOLTEIRO"
+          },
+          "vinculoEmpregaticio": {
+            "enum": [
+              "APOSENTADO",
+              "AUTONOMO",
+              "DESEMPREGADO",
+              "EMPREGADO_CLT",
+              "INFORMAL",
+              "OUTRO"
+            ],
+            "type": "string",
+            "example": "DESEMPREGADO"
+          },
+          "quantidadeFilhos": {
+            "type": "number",
+            "minimum": 0,
+            "example": 2
           }
         }
       },
-      "AreaResponseDto": {
+      "CriarUsuarioDto": {
+        "type": "object",
+        "properties": {
+          "voluntarioId": {
+            "type": "string",
+            "example": "123"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 255,
+            "format": "email",
+            "example": "carlos.santos@example.com"
+          },
+          "senha": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128,
+            "example": "SenhaForte123"
+          }
+        },
+        "required": [
+          "voluntarioId",
+          "email",
+          "senha"
+        ]
+      },
+      "UsuarioRespostaDto": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "number",
-            "example": 1
+            "type": "string"
           },
-          "name": {
-            "type": "string",
-            "example": "Sala de Aula"
-          },
-          "locationId": {
-            "type": "number",
-            "example": 1
+          "email": {
+            "type": "string"
           }
         },
         "required": [
           "id",
-          "name",
-          "locationId"
+          "email"
         ]
       },
-      "CreateAreaDto": {
+      "AtualizarUsuarioDto": {
         "type": "object",
         "properties": {
-          "name": {
+          "voluntarioId": {
             "type": "string",
-            "example": "Sala de Aula"
+            "example": "123"
           },
-          "locationId": {
-            "type": "number",
-            "minimum": 1,
-            "example": 1
-          }
-        },
-        "required": [
-          "name",
-          "locationId"
-        ]
-      },
-      "UpdateAreaDto": {
-        "type": "object",
-        "properties": {
-          "name": {
+          "email": {
             "type": "string",
-            "example": "Sala de Aula"
+            "maxLength": 255,
+            "format": "email",
+            "example": "carlos.santos@example.com"
           }
         }
       },
-      "CreateAssetCategoryDto": {
+      "AtualizarSenhaDto": {
         "type": "object",
         "properties": {
-          "name": {
+          "senhaAtual": {
+            "type": "string"
+          },
+          "novaSenha": {
             "type": "string",
-            "example": "Computadores"
+            "minLength": 8,
+            "maxLength": 128
           }
         },
         "required": [
-          "name"
+          "senhaAtual",
+          "novaSenha"
         ]
       },
-      "AssetCategory": {
+      "VoluntarioRespostaDto": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "number"
-          },
-          "name": {
-            "type": "string"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "deletedAt": {
-            "format": "date-time",
             "type": "string",
-            "nullable": true
+            "example": "vol-123"
+          },
+          "pessoa": {
+            "$ref": "#/components/schemas/PessoaRespostaDto"
+          },
+          "formacaoAcademica": {
+            "type": "string",
+            "nullable": true,
+            "example": "Pedagogia"
+          },
+          "statusFormacao": {
+            "nullable": true,
+            "enum": [
+              "COMPLETO",
+              "CURSANDO",
+              "INCOMPLETO"
+            ],
+            "type": "string",
+            "example": "COMPLETO"
+          },
+          "tipoVoluntario": {
+            "enum": [
+              "COORDENADOR",
+              "PROFESSOR",
+              "GERAL"
+            ],
+            "type": "string",
+            "example": "PROFESSOR"
           }
         },
         "required": [
           "id",
-          "name",
-          "createdAt",
-          "updatedAt",
-          "deletedAt"
+          "pessoa",
+          "formacaoAcademica",
+          "tipoVoluntario"
         ]
       },
-      "AssetCategoryResponseDto": {
+      "AtualizarVoluntarioDto": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "number",
-            "example": 1
+          "nome": {
+            "type": "string",
+            "example": "Carlos Santos"
           },
-          "name": {
+          "cpf": {
             "type": "string",
-            "example": "Computadores"
-          }
-        },
-        "required": [
-          "id",
-          "name"
-        ]
-      },
-      "UpdateAssetCategoryDto": {
-        "type": "object",
-        "properties": {
-          "name": {
+            "minLength": 11,
+            "maxLength": 11,
+            "pattern": "/^\\d+$/",
+            "example": "12345678900"
+          },
+          "dataNascimento": {
+            "format": "date-time",
             "type": "string",
-            "example": "Computadores"
+            "example": "2000-01-01"
+          },
+          "formacaoAcademica": {
+            "type": "string",
+            "nullable": true,
+            "example": "Pedagogia"
+          },
+          "statusFormacao": {
+            "nullable": true,
+            "enum": [
+              "COMPLETO",
+              "CURSANDO",
+              "INCOMPLETO"
+            ],
+            "type": "string",
+            "example": "COMPLETO"
+          },
+          "tipoVoluntario": {
+            "enum": [
+              "COORDENADOR",
+              "PROFESSOR",
+              "GERAL"
+            ],
+            "type": "string",
+            "example": "PROFESSOR"
           }
         }
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "senha": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "senha"
+        ]
+      },
+      "UsuarioLoginRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "voluntarioId": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "voluntarioId",
+          "nome"
+        ]
+      },
+      "LoginRespostaDto": {
+        "type": "object",
+        "properties": {
+          "tokenAcesso": {
+            "type": "string"
+          },
+          "usuario": {
+            "$ref": "#/components/schemas/UsuarioLoginRespostaDto"
+          }
+        },
+        "required": [
+          "tokenAcesso",
+          "usuario"
+        ]
       }
     }
   }
