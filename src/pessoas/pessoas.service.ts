@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Voluntario } from 'src/voluntarios/entities/voluntario.entity';
 import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
 import { Pessoa } from './entities/pessoa.entity';
@@ -18,6 +19,8 @@ export class PessoasService {
   constructor(
     @InjectRepository(Pessoa)
     private readonly repository: Repository<Pessoa>,
+    @InjectRepository(Voluntario)
+    private readonly voluntarioRepository: Repository<Voluntario>,
   ) {}
 
   async criar(
@@ -87,21 +90,32 @@ export class PessoasService {
     }
   }
 
-  async buscarPorCpf(cpf: string): Promise<Pessoa> {
+  async verificarCadastroVoluntarioPorCpf(cpf: string): Promise<Pessoa> {
     try {
       const pessoa = await this.repository.findOne({
         where: { cpf },
       });
 
       if (!pessoa) {
-        throw new NotFoundException(
-          `Pessoa com CPF ${cpf} não encontrada no sistema.`,
+        throw new NotFoundException(`Pessoa com CPF ${cpf} não encontrada.`);
+      }
+
+      const voluntarioExistente = await this.voluntarioRepository.findOne({
+        where: { pessoaId: pessoa.id },
+      });
+
+      if (voluntarioExistente) {
+        throw new ConflictException(
+          'Esta pessoa já possui um cadastro de voluntário ativo.',
         );
       }
 
       return pessoa;
     } catch (erro) {
-      if (erro instanceof NotFoundException) {
+      if (
+        erro instanceof NotFoundException ||
+        erro instanceof ConflictException
+      ) {
         throw erro;
       }
 
@@ -114,5 +128,9 @@ export class PessoasService {
         'Erro interno ao buscar a pessoa.',
       );
     }
+  }
+
+  async buscarPorCpf(cpf: string): Promise<Pessoa> {
+    return this.verificarCadastroVoluntarioPorCpf(cpf);
   }
 }

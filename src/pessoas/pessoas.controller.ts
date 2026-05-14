@@ -1,6 +1,7 @@
 import { BadRequestException, Controller, Get, Param } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -16,9 +17,9 @@ import { PessoasService } from './pessoas.service';
 export class PessoasController {
   constructor(private readonly pessoasService: PessoasService) {}
 
-  @Get('cpf/:cpf')
+  @Get('verificar-cadastro/voluntario/cpf/:cpf')
   @ApiOperation({
-    summary: 'Buscar pessoa pelo CPF',
+    summary: 'Verificar cadastro de voluntário pelo CPF',
   })
   @ApiParam({
     name: 'cpf',
@@ -27,7 +28,7 @@ export class PessoasController {
     description: 'CPF com 11 dígitos numéricos.',
   })
   @ApiOkResponse({
-    description: 'Pessoa encontrada com sucesso.',
+    description: 'Pessoa encontrada com sucesso e sem voluntário vinculado.',
     type: PessoaRespostaDto,
   })
   @ApiBadRequestResponse({
@@ -36,7 +37,12 @@ export class PessoasController {
   @ApiNotFoundResponse({
     description: 'Pessoa não encontrada.',
   })
-  async buscarPorCpf(@Param('cpf') cpf: string): Promise<PessoaRespostaDto> {
+  @ApiConflictResponse({
+    description: 'Pessoa já possui um cadastro de voluntário ativo.',
+  })
+  async verificarCadastroVoluntarioPorCpf(
+    @Param('cpf') cpf: string,
+  ): Promise<PessoaRespostaDto> {
     if (!/^\d{11}$/.test(cpf)) {
       throw new BadRequestException('O CPF deve conter exatamente 11 dígitos.');
     }
