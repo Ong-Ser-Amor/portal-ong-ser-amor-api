@@ -2323,9 +2323,9 @@
         ]
       }
     },
-    "/pessoas/cpf/{cpf}": {
+    "/pessoas/verificar-cadastro/voluntario/cpf/{cpf}": {
       "get": {
-        "operationId": "PessoasController_buscarPorCpf",
+        "operationId": "PessoasController_verificarCadastroVoluntarioPorCpf",
         "parameters": [
           {
             "name": "cpf",
@@ -2340,7 +2340,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Pessoa encontrada com sucesso.",
+            "description": "Pessoa encontrada com sucesso e sem voluntário vinculado.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2354,9 +2354,12 @@
           },
           "404": {
             "description": "Pessoa não encontrada."
+          },
+          "409": {
+            "description": "Pessoa já possui um cadastro de voluntário ativo."
           }
         },
-        "summary": "Buscar pessoa pelo CPF",
+        "summary": "Verificar cadastro de voluntário pelo CPF",
         "tags": [
           "Pessoas"
         ]
