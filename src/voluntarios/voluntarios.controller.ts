@@ -25,7 +25,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { Publico } from '../decorators/publico.decorator';
 import { ApiPaginacaoResposta } from '../dtos/api-paginacao-resposta.decorator';
 import { PaginacaoRespostaDto } from '../dtos/paginacao-resposta.dto';
 import { AtualizarVoluntarioDto } from './dto/atualizar-voluntario.dto';
