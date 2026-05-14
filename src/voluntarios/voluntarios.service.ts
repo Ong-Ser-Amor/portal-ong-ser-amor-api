@@ -1,5 +1,7 @@
 import {
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -22,6 +24,7 @@ export class VoluntariosService {
   constructor(
     @InjectRepository(Voluntario)
     private readonly repository: Repository<Voluntario>,
+    @Inject(forwardRef(() => PessoasService))
     private readonly pessoasService: PessoasService,
     private readonly dataSource: DataSource,
   ) {}
@@ -266,6 +269,25 @@ export class VoluntariosService {
 
       this.logger.error(`Erro ao remover voluntário: ${mensagemErro}`);
       throw new InternalServerErrorException('Erro ao remover voluntário.');
+    }
+  }
+
+  async verificarExistenciaPorPessoaId(pessoaId: string): Promise<boolean> {
+    try {
+      return await this.repository.existsBy({ pessoaId });
+    } catch (erro) {
+      const mensagemErro =
+        erro instanceof Error
+          ? erro.message
+          : `Ocorreu um erro inesperado: ${String(erro)}`;
+
+      this.logger.error(
+        `Erro ao verificar existência de voluntário por pessoa ID: ${mensagemErro}`,
+      );
+
+      throw new InternalServerErrorException(
+        'Erro interno ao verificar o vínculo de voluntário.',
+      );
     }
   }
 }

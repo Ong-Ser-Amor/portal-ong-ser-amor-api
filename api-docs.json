@@ -2365,200 +2365,6 @@
         ]
       }
     },
-    "/usuarios": {
-      "post": {
-        "operationId": "UsuariosController_criar",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CriarUsuarioDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "O usuário foi criado com sucesso.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsuarioRespostaDto"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Já existe um usuário cadastrado com este e-mail."
-          },
-          "500": {
-            "description": "Ocorreu um erro inesperado ao criar o usuário."
-          }
-        },
-        "summary": "Criar um novo usuário",
-        "tags": [
-          "Usuarios"
-        ]
-      }
-    },
-    "/usuarios/{id}": {
-      "get": {
-        "operationId": "UsuariosController_buscarPorId",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "O usuário foi encontrado com sucesso.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsuarioRespostaDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Não autorizado."
-          },
-          "404": {
-            "description": "Usuário não encontrado."
-          },
-          "500": {
-            "description": "Ocorreu um erro inesperado ao buscar o usuário."
-          }
-        },
-        "summary": "Buscar usuário pelo ID",
-        "tags": [
-          "Usuarios"
-        ]
-      },
-      "patch": {
-        "operationId": "UsuariosController_atualizar",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AtualizarUsuarioDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "O usuário foi atualizado com sucesso.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsuarioRespostaDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Não autorizado."
-          },
-          "404": {
-            "description": "Usuário não encontrado."
-          },
-          "409": {
-            "description": "Este e-mail já está em uso por outro usuário."
-          },
-          "500": {
-            "description": "Ocorreu um erro inesperado ao atualizar o usuário."
-          }
-        },
-        "summary": "Atualizar usuário pelo ID",
-        "tags": [
-          "Usuarios"
-        ]
-      },
-      "delete": {
-        "operationId": "UsuariosController_remover",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "O usuário foi deletado com sucesso."
-          },
-          "401": {
-            "description": "Não autorizado."
-          },
-          "404": {
-            "description": "Usuário não encontrado."
-          },
-          "500": {
-            "description": "Ocorreu um erro inesperado ao deletar o usuário."
-          }
-        },
-        "summary": "Deletar usuário pelo ID",
-        "tags": [
-          "Usuarios"
-        ]
-      }
-    },
-    "/usuarios/senha": {
-      "patch": {
-        "operationId": "UsuariosController_atualizarSenha",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AtualizarSenhaDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "A senha foi atualizada com sucesso."
-          },
-          "401": {
-            "description": "Não autorizado."
-          },
-          "404": {
-            "description": "Usuário não encontrado."
-          },
-          "500": {
-            "description": "Ocorreu um erro inesperado ao atualizar a senha."
-          }
-        },
-        "summary": "Atualizar senha do usuário",
-        "tags": [
-          "Usuarios"
-        ]
-      }
-    },
     "/voluntarios": {
       "post": {
         "operationId": "VoluntariosController_criar",
@@ -2870,6 +2676,200 @@
         "summary": "Deletar voluntário pelo ID",
         "tags": [
           "Voluntarios"
+        ]
+      }
+    },
+    "/usuarios": {
+      "post": {
+        "operationId": "UsuariosController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriarUsuarioDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "O usuário foi criado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioRespostaDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Já existe um usuário cadastrado com este e-mail."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao criar o usuário."
+          }
+        },
+        "summary": "Criar um novo usuário",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/usuarios/{id}": {
+      "get": {
+        "operationId": "UsuariosController_buscarPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O usuário foi encontrado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioRespostaDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "404": {
+            "description": "Usuário não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar o usuário."
+          }
+        },
+        "summary": "Buscar usuário pelo ID",
+        "tags": [
+          "Usuarios"
+        ]
+      },
+      "patch": {
+        "operationId": "UsuariosController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarUsuarioDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O usuário foi atualizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioRespostaDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "404": {
+            "description": "Usuário não encontrado."
+          },
+          "409": {
+            "description": "Este e-mail já está em uso por outro usuário."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar o usuário."
+          }
+        },
+        "summary": "Atualizar usuário pelo ID",
+        "tags": [
+          "Usuarios"
+        ]
+      },
+      "delete": {
+        "operationId": "UsuariosController_remover",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "O usuário foi deletado com sucesso."
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "404": {
+            "description": "Usuário não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao deletar o usuário."
+          }
+        },
+        "summary": "Deletar usuário pelo ID",
+        "tags": [
+          "Usuarios"
+        ]
+      }
+    },
+    "/usuarios/senha": {
+      "patch": {
+        "operationId": "UsuariosController_atualizarSenha",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarSenhaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "A senha foi atualizada com sucesso."
+          },
+          "401": {
+            "description": "Não autorizado."
+          },
+          "404": {
+            "description": "Usuário não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar a senha."
+          }
+        },
+        "summary": "Atualizar senha do usuário",
+        "tags": [
+          "Usuarios"
         ]
       }
     },
@@ -3919,79 +3919,6 @@
           }
         }
       },
-      "CriarUsuarioDto": {
-        "type": "object",
-        "properties": {
-          "voluntarioId": {
-            "type": "string",
-            "example": "123"
-          },
-          "email": {
-            "type": "string",
-            "maxLength": 255,
-            "format": "email",
-            "example": "carlos.santos@example.com"
-          },
-          "senha": {
-            "type": "string",
-            "minLength": 8,
-            "maxLength": 128,
-            "example": "SenhaForte123"
-          }
-        },
-        "required": [
-          "voluntarioId",
-          "email",
-          "senha"
-        ]
-      },
-      "UsuarioRespostaDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "email"
-        ]
-      },
-      "AtualizarUsuarioDto": {
-        "type": "object",
-        "properties": {
-          "voluntarioId": {
-            "type": "string",
-            "example": "123"
-          },
-          "email": {
-            "type": "string",
-            "maxLength": 255,
-            "format": "email",
-            "example": "carlos.santos@example.com"
-          }
-        }
-      },
-      "AtualizarSenhaDto": {
-        "type": "object",
-        "properties": {
-          "senhaAtual": {
-            "type": "string"
-          },
-          "novaSenha": {
-            "type": "string",
-            "minLength": 8,
-            "maxLength": 128
-          }
-        },
-        "required": [
-          "senhaAtual",
-          "novaSenha"
-        ]
-      },
       "VoluntarioRespostaDto": {
         "type": "object",
         "properties": {
@@ -4078,6 +4005,79 @@
             "example": "PROFESSOR"
           }
         }
+      },
+      "CriarUsuarioDto": {
+        "type": "object",
+        "properties": {
+          "voluntarioId": {
+            "type": "string",
+            "example": "123"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 255,
+            "format": "email",
+            "example": "carlos.santos@example.com"
+          },
+          "senha": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128,
+            "example": "SenhaForte123"
+          }
+        },
+        "required": [
+          "voluntarioId",
+          "email",
+          "senha"
+        ]
+      },
+      "UsuarioRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email"
+        ]
+      },
+      "AtualizarUsuarioDto": {
+        "type": "object",
+        "properties": {
+          "voluntarioId": {
+            "type": "string",
+            "example": "123"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 255,
+            "format": "email",
+            "example": "carlos.santos@example.com"
+          }
+        }
+      },
+      "AtualizarSenhaDto": {
+        "type": "object",
+        "properties": {
+          "senhaAtual": {
+            "type": "string"
+          },
+          "novaSenha": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "senhaAtual",
+          "novaSenha"
+        ]
       },
       "LoginDto": {
         "type": "object",

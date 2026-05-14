@@ -1,12 +1,14 @@
 import {
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Voluntario } from 'src/voluntarios/entities/voluntario.entity';
+import { VoluntariosService } from 'src/voluntarios/voluntarios.service';
 import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
 import { Pessoa } from './entities/pessoa.entity';
@@ -19,8 +21,8 @@ export class PessoasService {
   constructor(
     @InjectRepository(Pessoa)
     private readonly repository: Repository<Pessoa>,
-    @InjectRepository(Voluntario)
-    private readonly voluntarioRepository: Repository<Voluntario>,
+    @Inject(forwardRef(() => VoluntariosService))
+    private readonly voluntariosService: VoluntariosService,
   ) {}
 
   async criar(
@@ -90,19 +92,39 @@ export class PessoasService {
     }
   }
 
-  async verificarCadastroVoluntarioPorCpf(cpf: string): Promise<Pessoa> {
+  private async buscarPorCpf(cpf: string): Promise<Pessoa> {
     try {
-      const pessoa = await this.repository.findOne({
-        where: { cpf },
+      const pessoa = await this.repository.findOneBy({
+        cpf,
       });
 
       if (!pessoa) {
         throw new NotFoundException(`Pessoa com CPF ${cpf} não encontrada.`);
       }
 
-      const voluntarioExistente = await this.voluntarioRepository.findOne({
-        where: { pessoaId: pessoa.id },
-      });
+      return pessoa;
+    } catch (erro) {
+      if (erro instanceof NotFoundException) {
+        throw erro;
+      }
+
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro inesperado ao buscar pessoa por CPF: ${mensagemErro}`,
+      );
+
+      throw new InternalServerErrorException(
+        'Erro interno ao buscar a pessoa.',
+      );
+    }
+  }
+
+  async verificarCadastroVoluntarioPorCpf(cpf: string): Promise<Pessoa> {
+    try {
+      const pessoa = await this.buscarPorCpf(cpf);
+
+      const voluntarioExistente =
+        await this.voluntariosService.verificarExistenciaPorPessoaId(pessoa.id);
 
       if (voluntarioExistente) {
         throw new ConflictException(
@@ -128,9 +150,5 @@ export class PessoasService {
         'Erro interno ao buscar a pessoa.',
       );
     }
-  }
-
-  async buscarPorCpf(cpf: string): Promise<Pessoa> {
-    return this.verificarCadastroVoluntarioPorCpf(cpf);
   }
 }

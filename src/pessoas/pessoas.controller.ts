@@ -47,7 +47,8 @@ export class PessoasController {
       throw new BadRequestException('O CPF deve conter exatamente 11 dígitos.');
     }
 
-    const pessoa = await this.pessoasService.buscarPorCpf(cpf);
+    const pessoa =
+      await this.pessoasService.verificarCadastroVoluntarioPorCpf(cpf);
     return new PessoaRespostaDto(pessoa);
   }
 }
