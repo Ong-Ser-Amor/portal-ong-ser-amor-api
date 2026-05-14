@@ -1,4 +1,11 @@
-import { BadRequestException, Controller, Get, Param } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,
@@ -9,6 +16,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { AtualizarPessoaDto } from './dto/atualizar-pessoa.dto';
 import { PessoaRespostaDto } from './dto/pessoa-resposta.dto';
 import { PessoasService } from './pessoas.service';
 
@@ -16,6 +24,35 @@ import { PessoasService } from './pessoas.service';
 @Controller('pessoas')
 export class PessoasController {
   constructor(private readonly pessoasService: PessoasService) {}
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Atualizar dados de uma pessoa' })
+  @ApiParam({ name: 'id', description: 'ID da pessoa', type: String })
+  @ApiOkResponse({
+    description: 'Pessoa atualizada com sucesso.',
+    type: PessoaRespostaDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Dados inválidos enviados na requisição.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Pessoa não encontrada',
+  })
+  @ApiConflictResponse({
+    description: 'Já existe outra pessoa cadastrada com este CPF.',
+  })
+  async atualizar(
+    @Param('id') id: string,
+    @Body() atualizarPessoaDto: AtualizarPessoaDto,
+  ): Promise<PessoaRespostaDto> {
+    // Chama o serviço para atualizar os dados
+    const pessoaAtualizada = await this.pessoasService.atualizar(
+      id,
+      atualizarPessoaDto,
+    );
+
+    return new PessoaRespostaDto(pessoaAtualizada);
+  }
 
   @Get('verificar-cadastro/voluntario/cpf/:cpf')
   @ApiOperation({

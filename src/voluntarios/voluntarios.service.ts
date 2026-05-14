@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
-import { CriarPessoaDados } from 'src/pessoas/interfaces/criar-pessoa-dados.interface';
+import { CriarPessoaDto } from 'src/pessoas/dto/criar-pessoa.dto';
 import { PessoasService } from 'src/pessoas/pessoas.service';
 import { DataSource, EntityNotFoundError, Repository } from 'typeorm';
 
@@ -40,7 +40,7 @@ export class VoluntariosService {
       if (!pessoaId) {
         // Cenario A: Id da pessoa não fornecido (pessoa não existe).
 
-        const dadosPessoa: CriarPessoaDados = {
+        const dadosPessoa: CriarPessoaDto = {
           nome: criarVoluntarioDto.nome,
           cpf: criarVoluntarioDto.cpf,
           dataNascimento: criarVoluntarioDto.dataNascimento,
@@ -181,39 +181,31 @@ export class VoluntariosService {
         dataNascimento: atualizarVoluntarioDto.dataNascimento,
       };
 
-      const dadosVoluntario = {
-        formacaoAcademica: atualizarVoluntarioDto.formacaoAcademica,
-        statusFormacao: atualizarVoluntarioDto.statusFormacao,
-        tipoVoluntario: atualizarVoluntarioDto.tipoVoluntario,
-      };
+      // 1. DELEGAÇÃO: Se veio algum dado de pessoa, a PessoasService atualizar na mesma transação
+      if (
+        dadosPessoa.nome !== undefined ||
+        dadosPessoa.cpf !== undefined ||
+        dadosPessoa.dataNascimento !== undefined
+      ) {
+        const pessoaAtualizada = await this.pessoasService.atualizar(
+          voluntario.pessoa.id,
+          dadosPessoa,
+          queryRunner.manager,
+        );
 
-      let pessoaAtualizada = false;
-
-      if (dadosPessoa.nome !== undefined) {
-        voluntario.pessoa.nome = dadosPessoa.nome;
-        pessoaAtualizada = true;
-      }
-      if (dadosPessoa.cpf !== undefined) {
-        voluntario.pessoa.cpf = dadosPessoa.cpf;
-        pessoaAtualizada = true;
-      }
-      if (dadosPessoa.dataNascimento !== undefined) {
-        voluntario.pessoa.dataNascimento = dadosPessoa.dataNascimento;
-        pessoaAtualizada = true;
+        // Substitui a referência em memória pela pessoa atualizada
+        voluntario.pessoa = pessoaAtualizada;
       }
 
-      if (pessoaAtualizada) {
-        await queryRunner.manager.save(voluntario.pessoa);
+      // 2. ATUALIZA OS DADOS ESPECÍFICOS DO VOLUNTÁRIO
+      if (atualizarVoluntarioDto.formacaoAcademica !== undefined) {
+        voluntario.formacaoAcademica = atualizarVoluntarioDto.formacaoAcademica;
       }
-
-      if (dadosVoluntario.formacaoAcademica !== undefined) {
-        voluntario.formacaoAcademica = dadosVoluntario.formacaoAcademica;
+      if (atualizarVoluntarioDto.statusFormacao !== undefined) {
+        voluntario.statusFormacao = atualizarVoluntarioDto.statusFormacao;
       }
-      if (dadosVoluntario.statusFormacao !== undefined) {
-        voluntario.statusFormacao = dadosVoluntario.statusFormacao;
-      }
-      if (dadosVoluntario.tipoVoluntario !== undefined) {
-        voluntario.tipoVoluntario = dadosVoluntario.tipoVoluntario;
+      if (atualizarVoluntarioDto.tipoVoluntario !== undefined) {
+        voluntario.tipoVoluntario = atualizarVoluntarioDto.tipoVoluntario;
       }
 
       const voluntarioAtualizado = await queryRunner.manager.save(voluntario);
@@ -231,19 +223,10 @@ export class VoluntariosService {
 
       this.logger.error(`Erro ao atualizar voluntário: ${mensagemErro}`);
 
-      // Tratamento para CPF duplicado durante a edição
       if (
-        typeof erro === 'object' &&
-        erro !== null &&
-        'code' in erro &&
-        (erro as Record<string, unknown>).code === '23505'
+        erro instanceof ConflictException ||
+        erro instanceof NotFoundException
       ) {
-        throw new ConflictException(
-          'Já existe uma pessoa cadastrada com este CPF.',
-        );
-      }
-
-      if (erro instanceof NotFoundException) {
         throw erro;
       }
 

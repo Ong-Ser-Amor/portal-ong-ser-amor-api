@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
-import { CriarPessoaDados } from 'src/pessoas/interfaces/criar-pessoa-dados.interface';
+import { CriarPessoaDto } from 'src/pessoas/dto/criar-pessoa.dto';
 import { PessoasService } from 'src/pessoas/pessoas.service';
 import { DataSource, EntityNotFoundError, Repository } from 'typeorm';
 
@@ -39,7 +39,7 @@ export class BeneficiariosService {
       if (!pessoaId) {
         // Cenario A: Id da pessoa não fornecido (pessoa não existe).
 
-        const dadosPessoa: CriarPessoaDados = {
+        const dadosPessoa: CriarPessoaDto = {
           nome: criarBeneficiarioDto.nome,
           cpf: criarBeneficiarioDto.cpf,
           dataNascimento: criarBeneficiarioDto.dataNascimento,
@@ -190,56 +190,42 @@ export class BeneficiariosService {
         responsavelId: atualizarBeneficiarioDto.responsavelId,
       };
 
-      const dadosBeneficiario = {
-        familiaId: atualizarBeneficiarioDto.familiaId,
-        nivelEscolaridade: atualizarBeneficiarioDto.nivelEscolaridade,
-        estadoCivil: atualizarBeneficiarioDto.estadoCivil,
-        vinculoEmpregaticio: atualizarBeneficiarioDto.vinculoEmpregaticio,
-        quantidadeFilhos: atualizarBeneficiarioDto.quantidadeFilhos,
-      };
+      // 1. DELEGAÇÃO: Se vier algum dado de pessoa, a PessoasService atualiza na mesma transação
+      if (
+        dadosPessoa.nome !== undefined ||
+        dadosPessoa.cpf !== undefined ||
+        dadosPessoa.dataNascimento !== undefined ||
+        dadosPessoa.podeSairSozinho !== undefined ||
+        dadosPessoa.responsavelId !== undefined
+      ) {
+        const pessoaAtualizada = await this.pessoasService.atualizar(
+          beneficiario.pessoa.id,
+          dadosPessoa,
+          queryRunner.manager,
+        );
 
-      let pessoaAlterada = false;
-
-      if (dadosPessoa.nome !== undefined) {
-        beneficiario.pessoa.nome = dadosPessoa.nome;
-        pessoaAlterada = true;
-      }
-      if (dadosPessoa.cpf !== undefined) {
-        beneficiario.pessoa.cpf = dadosPessoa.cpf;
-        pessoaAlterada = true;
-      }
-      if (dadosPessoa.dataNascimento !== undefined) {
-        beneficiario.pessoa.dataNascimento = dadosPessoa.dataNascimento;
-        pessoaAlterada = true;
-      }
-      if (dadosPessoa.podeSairSozinho !== undefined) {
-        beneficiario.pessoa.podeSairSozinho = dadosPessoa.podeSairSozinho;
-        pessoaAlterada = true;
-      }
-      if (dadosPessoa.responsavelId !== undefined) {
-        beneficiario.pessoa.responsavelId = dadosPessoa.responsavelId;
-        pessoaAlterada = true;
+        // Substitui a referência em memória pela pessoa atualizada
+        beneficiario.pessoa = pessoaAtualizada;
       }
 
-      if (pessoaAlterada) {
-        await queryRunner.manager.save(beneficiario.pessoa);
+      // 2. ATUALIZA OS DADOS ESPECÍFICOS DO BENEFICIÁRIO
+      if (atualizarBeneficiarioDto.familiaId !== undefined) {
+        beneficiario.familiaId = atualizarBeneficiarioDto.familiaId;
       }
-
-      if (dadosBeneficiario.familiaId !== undefined) {
-        beneficiario.familiaId = dadosBeneficiario.familiaId;
+      if (atualizarBeneficiarioDto.nivelEscolaridade !== undefined) {
+        beneficiario.nivelEscolaridade =
+          atualizarBeneficiarioDto.nivelEscolaridade;
       }
-      if (dadosBeneficiario.nivelEscolaridade !== undefined) {
-        beneficiario.nivelEscolaridade = dadosBeneficiario.nivelEscolaridade;
+      if (atualizarBeneficiarioDto.estadoCivil !== undefined) {
+        beneficiario.estadoCivil = atualizarBeneficiarioDto.estadoCivil;
       }
-      if (dadosBeneficiario.estadoCivil !== undefined) {
-        beneficiario.estadoCivil = dadosBeneficiario.estadoCivil;
-      }
-      if (dadosBeneficiario.vinculoEmpregaticio !== undefined) {
+      if (atualizarBeneficiarioDto.vinculoEmpregaticio !== undefined) {
         beneficiario.vinculoEmpregaticio =
-          dadosBeneficiario.vinculoEmpregaticio;
+          atualizarBeneficiarioDto.vinculoEmpregaticio;
       }
-      if (dadosBeneficiario.quantidadeFilhos !== undefined) {
-        beneficiario.quantidadeFilhos = dadosBeneficiario.quantidadeFilhos;
+      if (atualizarBeneficiarioDto.quantidadeFilhos !== undefined) {
+        beneficiario.quantidadeFilhos =
+          atualizarBeneficiarioDto.quantidadeFilhos;
       }
 
       const beneficiarioAtualizado =
@@ -258,20 +244,10 @@ export class BeneficiariosService {
 
       this.logger.error(`Erro ao atualizar beneficiário: ${mensagemErro}`);
 
-      // Tratamento para CPF duplicado durante a edição
       if (
-        typeof erro === 'object' &&
-        erro !== null &&
-        'code' in erro &&
-        (erro as Record<string, unknown>).code === '23505'
+        erro instanceof ConflictException ||
+        erro instanceof NotFoundException
       ) {
-        throw new ConflictException(
-          'Já existe uma pessoa cadastrada com este CPF.',
-        );
-      }
-
-      // Repassa NotFoundException caso venha de alguma validação interna
-      if (erro instanceof NotFoundException) {
         throw erro;
       }
 
@@ -279,7 +255,6 @@ export class BeneficiariosService {
         'Erro ao atualizar o beneficiário.',
       );
     } finally {
-      // Libera o queryRunner
       await queryRunner.release();
     }
   }

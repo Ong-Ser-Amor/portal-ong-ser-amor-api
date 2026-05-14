@@ -11,8 +11,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { VoluntariosService } from 'src/voluntarios/voluntarios.service';
 import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
+import { AtualizarPessoaDto } from './dto/atualizar-pessoa.dto';
+import { CriarPessoaDto } from './dto/criar-pessoa.dto';
 import { Pessoa } from './entities/pessoa.entity';
-import { CriarPessoaDados } from './interfaces/criar-pessoa-dados.interface';
 
 @Injectable()
 export class PessoasService {
@@ -26,16 +27,16 @@ export class PessoasService {
   ) {}
 
   async criar(
-    dadosPessoa: CriarPessoaDados,
+    criarPessoaDto: CriarPessoaDto,
     gerenciadorTransacao?: EntityManager,
   ): Promise<Pessoa> {
     try {
       const pessoa = new Pessoa({
-        nome: dadosPessoa.nome,
-        cpf: dadosPessoa.cpf,
-        dataNascimento: dadosPessoa.dataNascimento,
-        podeSairSozinho: dadosPessoa.podeSairSozinho,
-        responsavelId: dadosPessoa.responsavelId,
+        nome: criarPessoaDto.nome,
+        cpf: criarPessoaDto.cpf,
+        dataNascimento: criarPessoaDto.dataNascimento,
+        podeSairSozinho: criarPessoaDto.podeSairSozinho,
+        responsavelId: criarPessoaDto.responsavelId,
       });
 
       // Se uma transação foi passada por quem chamou, salva DENTRO da transação
@@ -116,6 +117,77 @@ export class PessoasService {
       throw new InternalServerErrorException(
         'Erro interno ao buscar a pessoa.',
       );
+    }
+  }
+
+  async atualizar(
+    id: string,
+    atualizarPessoaDto: AtualizarPessoaDto,
+    gerenciadorTransacao?: EntityManager,
+  ): Promise<Pessoa> {
+    const manager = gerenciadorTransacao || this.repository.manager;
+
+    try {
+      const pessoa = await this.buscarPorId(id, manager);
+
+      let houveAlteracao = false;
+
+      // Verificamos o que veio no DTO
+      if (
+        atualizarPessoaDto.nome !== undefined &&
+        atualizarPessoaDto.nome !== pessoa.nome
+      ) {
+        pessoa.nome = atualizarPessoaDto.nome;
+        houveAlteracao = true;
+      }
+      if (
+        atualizarPessoaDto.cpf !== undefined &&
+        atualizarPessoaDto.cpf !== pessoa.cpf
+      ) {
+        pessoa.cpf = atualizarPessoaDto.cpf;
+        houveAlteracao = true;
+      }
+      if (
+        atualizarPessoaDto.dataNascimento !== undefined &&
+        atualizarPessoaDto.dataNascimento !== pessoa.dataNascimento
+      ) {
+        pessoa.dataNascimento = atualizarPessoaDto.dataNascimento;
+        houveAlteracao = true;
+      }
+      if (
+        atualizarPessoaDto.podeSairSozinho !== undefined &&
+        atualizarPessoaDto.podeSairSozinho !== pessoa.podeSairSozinho
+      ) {
+        pessoa.podeSairSozinho = atualizarPessoaDto.podeSairSozinho;
+        houveAlteracao = true;
+      }
+      if (
+        atualizarPessoaDto.responsavelId !== undefined &&
+        atualizarPessoaDto.responsavelId !== pessoa.responsavelId
+      ) {
+        pessoa.responsavelId = atualizarPessoaDto.responsavelId;
+        houveAlteracao = true;
+      }
+
+      if (!houveAlteracao) {
+        return pessoa;
+      }
+
+      return await manager.save(pessoa);
+    } catch (erro: any) {
+      if (
+        typeof erro === 'object' &&
+        erro !== null &&
+        'code' in erro &&
+        (erro as Record<string, unknown>).code === '23505'
+      ) {
+        throw new ConflictException(
+          'Já existe uma pessoa cadastrada com este CPF.',
+        );
+      }
+
+      // Se for NotFoundException (vindo do buscarPorId) ou outro erro, sobe para quem chamou
+      throw erro;
     }
   }
 
