@@ -9,6 +9,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,
+  ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -76,6 +77,9 @@ export class PessoasController {
   })
   @ApiConflictResponse({
     description: 'Pessoa já possui um cadastro de voluntário ativo.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Erro interno ao verificar o cadastro de voluntário.',
   })
   async verificarCadastroVoluntarioPorCpf(
     @Param('cpf') cpf: string,

@@ -2408,6 +2408,9 @@
           },
           "409": {
             "description": "Pessoa já possui um cadastro de voluntário ativo."
+          },
+          "500": {
+            "description": "Erro interno ao verificar o cadastro de voluntário."
           }
         },
         "summary": "Verificar cadastro de voluntário pelo CPF",
