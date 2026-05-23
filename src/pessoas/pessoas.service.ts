@@ -8,6 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { BeneficiariosService } from 'src/beneficiarios/beneficiarios.service';
 import { VoluntariosService } from 'src/voluntarios/voluntarios.service';
 import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
@@ -24,6 +25,8 @@ export class PessoasService {
     private readonly repository: Repository<Pessoa>,
     @Inject(forwardRef(() => VoluntariosService))
     private readonly voluntariosService: VoluntariosService,
+    @Inject(forwardRef(() => BeneficiariosService))
+    private readonly beneficiariosService: BeneficiariosService,
   ) {}
 
   async criar(
@@ -188,6 +191,41 @@ export class PessoasService {
 
       // Se for NotFoundException (vindo do buscarPorId) ou outro erro, sobe para quem chamou
       throw erro;
+    }
+  }
+
+  async verificarCadastroBeneficiarioPorCpf(cpf: string): Promise<Pessoa> {
+    try {
+      const pessoa = await this.buscarPorCpf(cpf);
+
+      const beneficiarioExistente =
+        await this.beneficiariosService.verificarExistenciaPorPessoaId(
+          pessoa.id,
+        );
+
+      if (beneficiarioExistente) {
+        throw new ConflictException(
+          'Esta pessoa já possui um cadastro de beneficiário ativo.',
+        );
+      }
+
+      return pessoa;
+    } catch (erro) {
+      if (
+        erro instanceof NotFoundException ||
+        erro instanceof ConflictException
+      ) {
+        throw erro;
+      }
+
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro inesperado ao buscar pessoa por CPF: ${mensagemErro}`,
+      );
+
+      throw new InternalServerErrorException(
+        'Erro interno ao buscar a pessoa.',
+      );
     }
   }
 
