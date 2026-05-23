@@ -29,6 +29,11 @@ export class CriarPessoaDto {
   @Type(() => Date)
   dataNascimento: Date;
 
+  @ApiProperty({ required: false, example: false })
+  @IsOptional()
+  @IsBoolean({ message: 'O campo emancipado deve ser booleano' })
+  emancipado?: boolean;
+
   @ApiProperty({ required: false, example: true })
   @IsOptional()
   @IsBoolean({ message: 'O campo podeSairSozinho deve ser booleano' })

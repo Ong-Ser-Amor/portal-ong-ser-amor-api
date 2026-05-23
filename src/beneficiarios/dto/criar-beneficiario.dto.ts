@@ -53,10 +53,16 @@ export class CriarBeneficiarioDto {
   @IsNotEmpty({ message: 'O campo dataNascimento não pode ser vazio' })
   dataNascimento?: Date;
 
+  @ApiProperty({ example: false })
+  @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
+  @IsOptional()
+  @IsBoolean({ message: 'O campo emancipado deve ser booleano' })
+  emancipado?: boolean;
+
   @ApiProperty({ example: true })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
   @IsOptional()
-  @IsBoolean()
+  @IsBoolean({ message: 'O campo podeSairSozinho deve ser booleano' })
   podeSairSozinho?: boolean;
 
   @ApiProperty({

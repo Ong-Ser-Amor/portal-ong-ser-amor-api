@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   forwardRef,
   Inject,
@@ -11,6 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
 import { CriarPessoaDto } from 'src/pessoas/dto/criar-pessoa.dto';
 import { PessoasService } from 'src/pessoas/pessoas.service';
+import { calcularIdade } from 'src/utils/calculadora-idade';
 import { DataSource, EntityNotFoundError, Repository } from 'typeorm';
 
 import { AtualizarBeneficiarioDto } from './dto/atualizar-beneficiario.dto';
@@ -37,6 +39,12 @@ export class BeneficiariosService {
     await queryRunner.startTransaction();
 
     try {
+      this.validarRegrasMenoridade(
+        criarBeneficiarioDto.dataNascimento,
+        criarBeneficiarioDto.emancipado,
+        criarBeneficiarioDto.responsavelId,
+      );
+
       let pessoaId = criarBeneficiarioDto.pessoaId;
 
       if (!pessoaId) {
@@ -48,6 +56,7 @@ export class BeneficiariosService {
           dataNascimento: criarBeneficiarioDto.dataNascimento,
           podeSairSozinho: criarBeneficiarioDto.podeSairSozinho,
           responsavelId: criarBeneficiarioDto.responsavelId,
+          emancipado: criarBeneficiarioDto.emancipado,
         };
 
         // Passa o queryRunner.manager para garantir que a pessoa será criada na mesma transação
@@ -58,7 +67,6 @@ export class BeneficiariosService {
         pessoaId = novaPessoa.id;
       } else {
         // Cenario B: Id da pessoa fornecido (pessoa já existe).
-
         await this.pessoasService.buscarPorId(pessoaId, queryRunner.manager);
       }
 
@@ -178,7 +186,29 @@ export class BeneficiariosService {
     id: string,
     atualizarBeneficiarioDto: AtualizarBeneficiarioDto,
   ): Promise<Beneficiario> {
-    const beneficiario = await this.buscarPorId(id);
+    const beneficiarioAtual = await this.buscarPorId(id);
+
+    // O Update DTO pode trazer dados parciais. Para a validação, é preciso consolidar os dados atuais com os novos,
+    // dando preferência aos novos quando existirem.
+    const dataNascConsolidada =
+      atualizarBeneficiarioDto.dataNascimento ??
+      beneficiarioAtual.pessoa.dataNascimento;
+
+    const emancipadoConsolidado =
+      atualizarBeneficiarioDto.emancipado ??
+      beneficiarioAtual.pessoa.emancipado;
+
+    const responsavelConsolidado =
+      atualizarBeneficiarioDto.responsavelId !== undefined
+        ? atualizarBeneficiarioDto.responsavelId
+        : beneficiarioAtual.pessoa.responsavelId;
+
+    // 1. Aplica a Regra de Negócio Centralizada antes de abrir transação
+    this.validarRegrasMenoridade(
+      dataNascConsolidada,
+      emancipadoConsolidado,
+      responsavelConsolidado,
+    );
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -191,6 +221,7 @@ export class BeneficiariosService {
         dataNascimento: atualizarBeneficiarioDto.dataNascimento,
         podeSairSozinho: atualizarBeneficiarioDto.podeSairSozinho,
         responsavelId: atualizarBeneficiarioDto.responsavelId,
+        emancipado: atualizarBeneficiarioDto.emancipado,
       };
 
       // 1. DELEGAÇÃO: Se vier algum dado de pessoa, a PessoasService atualiza na mesma transação
@@ -199,40 +230,41 @@ export class BeneficiariosService {
         dadosPessoa.cpf !== undefined ||
         dadosPessoa.dataNascimento !== undefined ||
         dadosPessoa.podeSairSozinho !== undefined ||
-        dadosPessoa.responsavelId !== undefined
+        dadosPessoa.responsavelId !== undefined ||
+        dadosPessoa.emancipado !== undefined
       ) {
         const pessoaAtualizada = await this.pessoasService.atualizar(
-          beneficiario.pessoa.id,
+          beneficiarioAtual.pessoa.id,
           dadosPessoa,
           queryRunner.manager,
         );
 
         // Substitui a referência em memória pela pessoa atualizada
-        beneficiario.pessoa = pessoaAtualizada;
+        beneficiarioAtual.pessoa = pessoaAtualizada;
       }
 
       // 2. ATUALIZA OS DADOS ESPECÍFICOS DO BENEFICIÁRIO
       if (atualizarBeneficiarioDto.familiaId !== undefined) {
-        beneficiario.familiaId = atualizarBeneficiarioDto.familiaId;
+        beneficiarioAtual.familiaId = atualizarBeneficiarioDto.familiaId;
       }
       if (atualizarBeneficiarioDto.nivelEscolaridade !== undefined) {
-        beneficiario.nivelEscolaridade =
+        beneficiarioAtual.nivelEscolaridade =
           atualizarBeneficiarioDto.nivelEscolaridade;
       }
       if (atualizarBeneficiarioDto.estadoCivil !== undefined) {
-        beneficiario.estadoCivil = atualizarBeneficiarioDto.estadoCivil;
+        beneficiarioAtual.estadoCivil = atualizarBeneficiarioDto.estadoCivil;
       }
       if (atualizarBeneficiarioDto.vinculoEmpregaticio !== undefined) {
-        beneficiario.vinculoEmpregaticio =
+        beneficiarioAtual.vinculoEmpregaticio =
           atualizarBeneficiarioDto.vinculoEmpregaticio;
       }
       if (atualizarBeneficiarioDto.quantidadeFilhos !== undefined) {
-        beneficiario.quantidadeFilhos =
+        beneficiarioAtual.quantidadeFilhos =
           atualizarBeneficiarioDto.quantidadeFilhos;
       }
 
       const beneficiarioAtualizado =
-        await queryRunner.manager.save(beneficiario);
+        await queryRunner.manager.save(beneficiarioAtual);
 
       await queryRunner.commitTransaction();
 
@@ -249,7 +281,8 @@ export class BeneficiariosService {
 
       if (
         erro instanceof ConflictException ||
-        erro instanceof NotFoundException
+        erro instanceof NotFoundException ||
+        erro instanceof BadRequestException
       ) {
         throw erro;
       }
@@ -278,6 +311,40 @@ export class BeneficiariosService {
 
       this.logger.error(`Erro ao remover beneficiário: ${mensagemErro}`);
       throw new InternalServerErrorException('Erro ao remover beneficiário.');
+    }
+  }
+
+  // =========================================================================
+  // MÉTODOS PRIVADOS DE VALIDAÇÃO (REGRAS DE NEGÓCIO)
+  // =========================================================================
+
+  /**
+   * Valida se a pessoa atende aos requisitos legais de idade e emancipação.
+   * Lança exceções (BadRequest) se as regras forem violadas.
+   */
+  private validarRegrasMenoridade(
+    dataNascimento: Date,
+    emancipado?: boolean,
+    responsavelId?: string | null,
+  ): void {
+    const idade = calcularIdade(dataNascimento);
+
+    if (idade < 18) {
+      if (emancipado) {
+        if (idade < 16) {
+          throw new BadRequestException(
+            'Apenas maiores de 16 anos podem ser emancipados.',
+          );
+        }
+        // Se tem 16 ou 17 e é emancipado, passa direto!
+      } else {
+        // Se é menor de 18 e NÃO é emancipado, TEM que ter responsável
+        if (!responsavelId) {
+          throw new BadRequestException(
+            'O beneficiário é menor de idade e não é emancipado. É obrigatório informar o responsável (responsavelId) no cadastro da pessoa.',
+          );
+        }
+      }
     }
   }
 

@@ -32,6 +32,9 @@ export class Pessoa {
   @Column({ name: 'data_nascimento', type: 'date', nullable: false })
   dataNascimento: Date;
 
+  @Column({ name: 'emancipado', type: 'boolean', default: false })
+  emancipado: boolean;
+
   @Column({ name: 'pode_sair_sozinho', type: 'boolean', nullable: true })
   podeSairSozinho: boolean;
 

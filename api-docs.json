@@ -3676,6 +3676,10 @@
             "type": "string",
             "example": "1990-01-01"
           },
+          "emancipado": {
+            "type": "boolean",
+            "example": false
+          },
           "podeSairSozinho": {
             "type": "boolean",
             "example": true
@@ -3916,6 +3920,10 @@
             "type": "string",
             "example": "1990-01-01"
           },
+          "emancipado": {
+            "type": "boolean",
+            "example": false
+          },
           "podeSairSozinho": {
             "type": "boolean",
             "example": true
@@ -3991,6 +3999,10 @@
             "format": "date-time",
             "type": "string",
             "example": "2000-01-01"
+          },
+          "emancipado": {
+            "type": "boolean",
+            "example": false
           },
           "podeSairSozinho": {
             "type": "boolean",
