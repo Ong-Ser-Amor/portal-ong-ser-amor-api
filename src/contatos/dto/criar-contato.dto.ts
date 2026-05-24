@@ -3,12 +3,18 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsString,
   Matches,
   ValidateIf,
 } from 'class-validator';
 import { TipoContato } from 'src/contatos/enums/tipo-contato.enum';
 
 export class CriarContatoDto {
+  @ApiProperty({ example: '12345678900' })
+  @IsNotEmpty({ message: 'O campo pessoaId é obrigatório.' })
+  @IsString({ message: 'O campo pessoaId deve ser uma string.' })
+  pessoaId: string;
+
   @ApiProperty({ enum: TipoContato, example: TipoContato.EMAIL })
   @IsEnum(TipoContato, { message: 'O tipo de contato fornecido é inválido.' })
   @IsNotEmpty({ message: 'O tipo de contato é obrigatório.' })
@@ -23,7 +29,6 @@ export class CriarContatoDto {
     (object: CriarContatoDto) => object.tipoContato === TipoContato.EMAIL,
   )
   @IsEmail({}, { message: 'O valor deve ser um endereço de e-mail válido.' })
-
   // 2. Se for CELULAR: Exatamente 11 dígitos (Ex: 11 9 9999 9999)
   @ValidateIf(
     (object: CriarContatoDto) => object.tipoContato === TipoContato.CELULAR,
@@ -32,7 +37,6 @@ export class CriarContatoDto {
     message:
       'O número de celular deve conter exatamente 11 dígitos (apenas números).',
   })
-
   // 3. Se for TELEFONE_FIXO: Exatamente 10 dígitos (Ex: 11 4000 0000)
   @ValidateIf(
     (object: CriarContatoDto) =>
@@ -42,5 +46,6 @@ export class CriarContatoDto {
     message:
       'O número fixo deve conter exatamente 10 dígitos (apenas números).',
   })
+  @IsString({ message: 'O campo valor deve ser uma string.' })
   valor: string;
 }

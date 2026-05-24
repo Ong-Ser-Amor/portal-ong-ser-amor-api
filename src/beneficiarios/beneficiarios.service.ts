@@ -9,11 +9,18 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ContatosService } from 'src/contatos/contatos.service';
+import { CriarContatoDto } from 'src/contatos/dto/criar-contato.dto';
 import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
 import { CriarPessoaDto } from 'src/pessoas/dto/criar-pessoa.dto';
 import { PessoasService } from 'src/pessoas/pessoas.service';
 import { calcularIdade } from 'src/utils/calculadora-idade';
-import { DataSource, EntityNotFoundError, Repository } from 'typeorm';
+import {
+  DataSource,
+  EntityManager,
+  EntityNotFoundError,
+  Repository,
+} from 'typeorm';
 
 import { AtualizarBeneficiarioDto } from './dto/atualizar-beneficiario.dto';
 import { CriarBeneficiarioDto } from './dto/criar-beneficiario.dto';
@@ -28,6 +35,8 @@ export class BeneficiariosService {
     private readonly repository: Repository<Beneficiario>,
     @Inject(forwardRef(() => PessoasService))
     private readonly pessoasService: PessoasService,
+    @Inject(ContatosService)
+    private readonly contatosService: ContatosService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -39,10 +48,11 @@ export class BeneficiariosService {
     await queryRunner.startTransaction();
 
     try {
-      this.validarRegrasMenoridade(
+      await this.validarRegrasMenoridade(
         criarBeneficiarioDto.dataNascimento,
         criarBeneficiarioDto.emancipado,
         criarBeneficiarioDto.responsavelId,
+        queryRunner.manager,
       );
 
       let pessoaId = criarBeneficiarioDto.pessoaId;
@@ -65,6 +75,23 @@ export class BeneficiariosService {
           queryRunner.manager,
         );
         pessoaId = novaPessoa.id;
+
+        if (
+          criarBeneficiarioDto.contatos &&
+          criarBeneficiarioDto.contatos.length > 0
+        ) {
+          const contatosParaSalvar: CriarContatoDto[] =
+            criarBeneficiarioDto.contatos.map((contato) => ({
+              ...contato,
+              pessoaId, // <-- Injetamos o ID da pessoa que acabou de nascer!
+            }));
+
+          // Chama o novo método elegante!
+          await this.contatosService.criarVarios(
+            contatosParaSalvar,
+            queryRunner.manager,
+          );
+        }
       } else {
         // Cenario B: Id da pessoa fornecido (pessoa já existe).
         await this.pessoasService.buscarPorId(pessoaId, queryRunner.manager);
@@ -104,7 +131,6 @@ export class BeneficiariosService {
       );
 
       await queryRunner.commitTransaction();
-
       return beneficiarioComRelacoes;
     } catch (erro) {
       await queryRunner.rollbackTransaction();
@@ -203,8 +229,7 @@ export class BeneficiariosService {
         ? atualizarBeneficiarioDto.responsavelId
         : beneficiarioAtual.pessoa.responsavelId;
 
-    // 1. Aplica a Regra de Negócio Centralizada antes de abrir transação
-    this.validarRegrasMenoridade(
+    await this.validarRegrasMenoridade(
       dataNascConsolidada,
       emancipadoConsolidado,
       responsavelConsolidado,
@@ -224,7 +249,7 @@ export class BeneficiariosService {
         emancipado: atualizarBeneficiarioDto.emancipado,
       };
 
-      // 1. DELEGAÇÃO: Se vier algum dado de pessoa, a PessoasService atualiza na mesma transação
+      // Se vier algum dado de pessoa, a PessoasService atualiza na mesma transação
       if (
         dadosPessoa.nome !== undefined ||
         dadosPessoa.cpf !== undefined ||
@@ -243,7 +268,7 @@ export class BeneficiariosService {
         beneficiarioAtual.pessoa = pessoaAtualizada;
       }
 
-      // 2. ATUALIZA OS DADOS ESPECÍFICOS DO BENEFICIÁRIO
+      // Atualiza os dados específicos do beneficiário
       if (atualizarBeneficiarioDto.familiaId !== undefined) {
         beneficiarioAtual.familiaId = atualizarBeneficiarioDto.familiaId;
       }
@@ -322,11 +347,12 @@ export class BeneficiariosService {
    * Valida se a pessoa atende aos requisitos legais de idade e emancipação.
    * Lança exceções (BadRequest) se as regras forem violadas.
    */
-  private validarRegrasMenoridade(
+  private async validarRegrasMenoridade(
     dataNascimento: Date,
     emancipado?: boolean,
     responsavelId?: string | null,
-  ): void {
+    manager?: EntityManager,
+  ): Promise<void> {
     const idade = calcularIdade(dataNascimento);
 
     if (idade < 18) {
@@ -336,12 +362,24 @@ export class BeneficiariosService {
             'Apenas maiores de 16 anos podem ser emancipados.',
           );
         }
-        // Se tem 16 ou 17 e é emancipado, passa direto!
       } else {
-        // Se é menor de 18 e NÃO é emancipado, TEM que ter responsável
         if (!responsavelId) {
           throw new BadRequestException(
             'O beneficiário é menor de idade e não é emancipado. É obrigatório informar o responsável (responsavelId) no cadastro da pessoa.',
+          );
+        }
+
+        // Verifica no ContatosService se o responsável tem celular cadastrado,
+        // para garantir um meio de contato em caso de emergências.
+        const responsavelTemCelular =
+          await this.contatosService.possuiCelularCadastrado(
+            responsavelId,
+            manager,
+          );
+
+        if (!responsavelTemCelular) {
+          throw new BadRequestException(
+            'O responsável selecionado não possui um telemóvel (CELULAR) registado. Cadastre o contato do responsável primeiro para garantir contacto em emergências.',
           );
         }
       }

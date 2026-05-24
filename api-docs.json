@@ -3657,6 +3657,29 @@
           "lesson"
         ]
       },
+      "ContatoAninhadoDto": {
+        "type": "object",
+        "properties": {
+          "tipoContato": {
+            "enum": [
+              "CELULAR",
+              "TELEFONE_FIXO",
+              "EMAIL"
+            ],
+            "type": "string",
+            "example": "EMAIL"
+          },
+          "valor": {
+            "type": "string",
+            "format": "email",
+            "pattern": "/^[0-9]{11}$/"
+          }
+        },
+        "required": [
+          "tipoContato",
+          "valor"
+        ]
+      },
       "CriarBeneficiarioDto": {
         "type": "object",
         "properties": {
@@ -3739,6 +3762,12 @@
             "type": "number",
             "minimum": 0,
             "example": 2
+          },
+          "contatos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContatoAninhadoDto"
+            }
           }
         },
         "required": [
@@ -3978,6 +4007,12 @@
             "type": "number",
             "minimum": 0,
             "example": 2
+          },
+          "contatos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContatoAninhadoDto"
+            }
           }
         }
       },

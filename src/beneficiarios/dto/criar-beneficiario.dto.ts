@@ -1,6 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsBoolean,
   IsDate,
   IsEnum,
@@ -12,13 +13,19 @@ import {
   Matches,
   Min,
   ValidateIf,
+  ValidateNested,
 } from 'class-validator';
+import { CriarContatoDto } from 'src/contatos/dto/criar-contato.dto';
 
 import {
   EstadoCivil,
   NivelEscolaridade,
   VinculoEmpregaticio,
 } from '../enums/beneficiario.enum';
+
+export class ContatoAninhadoDto extends OmitType(CriarContatoDto, [
+  'pessoaId',
+] as const) {}
 
 export class CriarBeneficiarioDto {
   // --- Dados referentes à entidade Pessoa ---
@@ -124,4 +131,12 @@ export class CriarBeneficiarioDto {
   @IsInt({ message: 'A quantidade de filhos deve ser um número inteiro.' })
   @Min(0, { message: 'A quantidade de filhos não pode ser negativa.' })
   quantidadeFilhos?: number;
+
+  @ApiProperty({ type: [ContatoAninhadoDto], required: false })
+  @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ContatoAninhadoDto)
+  contatos?: ContatoAninhadoDto[];
 }
