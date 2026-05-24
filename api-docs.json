@@ -3657,6 +3657,48 @@
           "lesson"
         ]
       },
+      "CriarFamiliaDto": {
+        "type": "object",
+        "properties": {
+          "faixaRenda": {
+            "enum": [
+              "ATE_1_SALARIO",
+              "DE_1_A_3_SALARIOS",
+              "ACIMA_3_SALARIOS"
+            ],
+            "type": "string",
+            "description": "A faixa de renda da família",
+            "example": "DE_1_A_3_SALARIOS_MINIMOS"
+          },
+          "possuiBeneficioSocial": {
+            "type": "boolean",
+            "description": "Indica se a família participa de programas sociais (ex: Bolsa Família, Auxílio Gás)",
+            "example": true
+          },
+          "tipoMoradia": {
+            "enum": [
+              "PROPRIA",
+              "ALUGADA",
+              "CEDIDA",
+              "OCUPACAO_IRREGULAR"
+            ],
+            "type": "string",
+            "description": "O tipo de moradia da família",
+            "example": "ALUGADA"
+          },
+          "enderecoId": {
+            "type": "string",
+            "description": "O ID do endereço associado à família",
+            "example": "1"
+          }
+        },
+        "required": [
+          "faixaRenda",
+          "possuiBeneficioSocial",
+          "tipoMoradia",
+          "enderecoId"
+        ]
+      },
       "ContatoAninhadoDto": {
         "type": "object",
         "properties": {
@@ -3719,8 +3761,16 @@
           },
           "familiaId": {
             "type": "string",
-            "description": "ID da família",
+            "description": "ID da família (se já existir)",
             "example": "789012"
+          },
+          "novaFamilia": {
+            "description": "Dados para criar uma nova família",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CriarFamiliaDto"
+              }
+            ]
           },
           "nivelEscolaridade": {
             "enum": [
@@ -3771,7 +3821,6 @@
           }
         },
         "required": [
-          "familiaId",
           "nivelEscolaridade"
         ]
       },
@@ -3964,8 +4013,16 @@
           },
           "familiaId": {
             "type": "string",
-            "description": "ID da família",
+            "description": "ID da família (se já existir)",
             "example": "789012"
+          },
+          "novaFamilia": {
+            "description": "Dados para criar uma nova família",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CriarFamiliaDto"
+              }
+            ]
           },
           "nivelEscolaridade": {
             "enum": [

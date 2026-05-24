@@ -16,6 +16,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { CriarContatoDto } from 'src/contatos/dto/criar-contato.dto';
+import { CriarFamiliaDto } from 'src/familias/dto/criar-familia.dto';
 
 import {
   EstadoCivil,
@@ -91,10 +92,26 @@ export class CriarBeneficiarioDto {
   @IsString({ message: 'O campo pessoaId deve ser uma string' })
   pessoaId?: string;
 
-  @ApiProperty({ description: 'ID da família', example: '789012' })
-  @IsNotEmpty({ message: 'O campo familiaId é obrigatório' })
+  @ApiProperty({
+    description: 'ID da família (se já existir)',
+    example: '789012',
+  })
+  @IsOptional()
   @IsString({ message: 'O campo familiaId deve ser uma string' })
-  familiaId: string;
+  familiaId?: string;
+
+  @ApiProperty({
+    description: 'Dados para criar uma nova família',
+    type: CriarFamiliaDto,
+  })
+  @ValidateIf((dto: CriarBeneficiarioDto) => !dto.familiaId)
+  @IsNotEmpty({
+    message:
+      'É obrigatório informar o familiaId ou os dados de uma nova familia.',
+  })
+  @ValidateNested()
+  @Type(() => CriarFamiliaDto)
+  novaFamilia?: CriarFamiliaDto;
 
   @ApiProperty({
     enum: NivelEscolaridade,
