@@ -47,34 +47,14 @@ export class CriarFamiliaDto {
   @IsNotEmpty({ message: 'O tipo de moradia é obrigatório.' })
   tipoMoradia: TipoMoradia;
 
-  // =========================================================
-  // VALIDAÇÃO CONDICIONAL PARA ENDEREÇO
-  // =========================================================
-
   @ApiProperty({
-    description: 'ID do endereço (caso já exista)',
-    example: '1',
-    required: false,
-  })
-  @ValidateIf((dto: CriarFamiliaDto) => !dto.novoEndereco)
-  @IsString({ message: 'O ID do endereço deve ser um texto.' })
-  @IsNotEmpty({
-    message:
-      'O ID do endereço é obrigatório se um novo endereço não for fornecido.',
-  })
-  enderecoId?: string;
-
-  @ApiProperty({
-    description: 'Dados para criar um novo endereço',
+    description: 'Dados do endereço da família',
     type: CriarEnderecoDto,
-    required: false,
   })
-  @ValidateIf((dto: CriarFamiliaDto) => !dto.enderecoId)
   @IsNotEmpty({
-    message:
-      'É obrigatório informar o enderecoId ou os dados de um novoEndereco.',
+    message: 'Os dados do endereço são obrigatórios ao criar uma família.',
   })
   @ValidateNested()
   @Type(() => CriarEnderecoDto)
-  novoEndereco?: CriarEnderecoDto;
+  endereco: CriarEnderecoDto;
 }

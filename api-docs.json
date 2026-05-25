@@ -3768,13 +3768,8 @@
             "description": "O tipo de moradia da família",
             "example": "ALUGADA"
           },
-          "enderecoId": {
-            "type": "string",
-            "description": "ID do endereço (caso já exista)",
-            "example": "1"
-          },
-          "novoEndereco": {
-            "description": "Dados para criar um novo endereço",
+          "endereco": {
+            "description": "Dados do endereço da família",
             "allOf": [
               {
                 "$ref": "#/components/schemas/CriarEnderecoDto"
@@ -3785,7 +3780,8 @@
         "required": [
           "faixaRenda",
           "possuiBeneficioSocial",
-          "tipoMoradia"
+          "tipoMoradia",
+          "endereco"
         ]
       },
       "ContatoAninhadoDto": {

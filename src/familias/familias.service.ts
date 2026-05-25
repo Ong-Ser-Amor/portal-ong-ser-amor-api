@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BeneficiariosService } from 'src/beneficiarios/beneficiarios.service';
+import { EnderecosService } from 'src/enderecos/enderecos.service';
 import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
 import { CriarFamiliaDto } from './dto/criar-familia.dto';
@@ -20,6 +21,8 @@ export class FamiliasService {
   private readonly logger = new Logger(FamiliasService.name);
 
   constructor(
+    @Inject(EnderecosService)
+    private readonly enderecosService: EnderecosService,
     @InjectRepository(Familia)
     private readonly repository: Repository<Familia>,
     @Inject(forwardRef(() => BeneficiariosService))
@@ -28,14 +31,26 @@ export class FamiliasService {
 
   async criar(
     criarFamiliaDto: CriarFamiliaDto,
-    manager?: EntityManager,
+    manager: EntityManager,
   ): Promise<Familia> {
     const familiaRepo = manager
       ? manager.getRepository(Familia)
       : this.repository;
 
     try {
-      const familia = familiaRepo.create(criarFamiliaDto);
+      const enderecoCriado = await this.enderecosService.criar(
+        criarFamiliaDto.endereco,
+        manager,
+      );
+
+      const dadosFamilia = {
+        faixaRenda: criarFamiliaDto.faixaRenda,
+        possuiBeneficioSocial: criarFamiliaDto.possuiBeneficioSocial,
+        tipoMoradia: criarFamiliaDto.tipoMoradia,
+        enderecoId: enderecoCriado.id,
+      };
+
+      const familia = familiaRepo.create(dadosFamilia);
       return await familiaRepo.save(familia);
     } catch (erro) {
       const mensagemErro =
