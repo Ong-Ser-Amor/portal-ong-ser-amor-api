@@ -2733,6 +2733,53 @@
         ]
       }
     },
+    "/enderecos/{id}": {
+      "patch": {
+        "operationId": "EnderecosController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarEnderecoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O endereço foi atualizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnderecoRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Endereço com o ID especificado não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar o endereço."
+          }
+        },
+        "summary": "Atualizar os dados de um endereço",
+        "tags": [
+          "Endereços"
+        ]
+      }
+    },
     "/usuarios": {
       "post": {
         "operationId": "UsuariosController_criar",
@@ -4264,6 +4311,149 @@
             "example": "PROFESSOR"
           }
         }
+      },
+      "AtualizarEnderecoDto": {
+        "type": "object",
+        "properties": {
+          "logradouro": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100,
+            "example": "Avenida Brasil"
+          },
+          "numero": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20,
+            "example": "123"
+          },
+          "complemento": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 3,
+            "maxLength": 50,
+            "example": "Apto 45"
+          },
+          "bairro": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80,
+            "example": "Centro"
+          },
+          "cep": {
+            "type": "string",
+            "pattern": "/^\\d{8}$/",
+            "example": "12345678"
+          },
+          "cidade": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80,
+            "example": "São Paulo"
+          },
+          "uf": {
+            "enum": [
+              "AC",
+              "AL",
+              "AP",
+              "AM",
+              "BA",
+              "CE",
+              "DF",
+              "ES",
+              "GO",
+              "MA",
+              "MT",
+              "MS",
+              "MG",
+              "PA",
+              "PB",
+              "PR",
+              "PE",
+              "PI",
+              "RJ",
+              "RN",
+              "RS",
+              "RO",
+              "RR",
+              "SC",
+              "SP",
+              "SE",
+              "TO"
+            ],
+            "type": "string",
+            "example": "SP"
+          }
+        }
+      },
+      "EnderecoRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "logradouro": {
+            "type": "string"
+          },
+          "numero": {
+            "type": "string"
+          },
+          "complemento": {
+            "type": "string",
+            "nullable": true
+          },
+          "bairro": {
+            "type": "string"
+          },
+          "cep": {
+            "type": "string"
+          },
+          "cidade": {
+            "type": "string"
+          },
+          "uf": {
+            "type": "string",
+            "enum": [
+              "AC",
+              "AL",
+              "AP",
+              "AM",
+              "BA",
+              "CE",
+              "DF",
+              "ES",
+              "GO",
+              "MA",
+              "MT",
+              "MS",
+              "MG",
+              "PA",
+              "PB",
+              "PR",
+              "PE",
+              "PI",
+              "RJ",
+              "RN",
+              "RS",
+              "RO",
+              "RR",
+              "SC",
+              "SP",
+              "SE",
+              "TO"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "logradouro",
+          "numero",
+          "complemento",
+          "bairro",
+          "cep",
+          "cidade",
+          "uf"
+        ]
       },
       "CriarUsuarioDto": {
         "type": "object",
