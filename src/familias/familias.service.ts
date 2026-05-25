@@ -42,7 +42,7 @@ export class FamiliasService {
         erro instanceof Error
           ? erro.message
           : 'Erro desconhecido ao criar família.';
-      this.logger.error(`Erro ao criar beneficiário: ${mensagemErro}`);
+      this.logger.error(`Erro ao criar família: ${mensagemErro}`);
       throw new InternalServerErrorException(
         'Ocorreu um erro ao criar a família. Por favor, tente novamente.',
       );

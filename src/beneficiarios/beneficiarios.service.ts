@@ -12,6 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ContatosService } from 'src/contatos/contatos.service';
 import { CriarContatoDto } from 'src/contatos/dto/criar-contato.dto';
 import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
+import { FamiliasService } from 'src/familias/familias.service';
 import { CriarPessoaDto } from 'src/pessoas/dto/criar-pessoa.dto';
 import { PessoasService } from 'src/pessoas/pessoas.service';
 import { calcularIdade } from 'src/utils/calculadora-idade';
@@ -24,6 +25,7 @@ import {
 
 import { AtualizarBeneficiarioDto } from './dto/atualizar-beneficiario.dto';
 import { CriarBeneficiarioDto } from './dto/criar-beneficiario.dto';
+import { TransferirFamiliaDto } from './dto/transferir-familia.dto';
 import { Beneficiario } from './entities/beneficiario.entity';
 
 @Injectable()
@@ -37,6 +39,8 @@ export class BeneficiariosService {
     private readonly pessoasService: PessoasService,
     @Inject(ContatosService)
     private readonly contatosService: ContatosService,
+    @Inject(forwardRef(() => FamiliasService))
+    private readonly familiasService: FamiliasService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -269,9 +273,6 @@ export class BeneficiariosService {
       }
 
       // Atualiza os dados específicos do beneficiário
-      if (atualizarBeneficiarioDto.familiaId !== undefined) {
-        beneficiarioAtual.familiaId = atualizarBeneficiarioDto.familiaId;
-      }
       if (atualizarBeneficiarioDto.nivelEscolaridade !== undefined) {
         beneficiarioAtual.nivelEscolaridade =
           atualizarBeneficiarioDto.nivelEscolaridade;
@@ -336,6 +337,74 @@ export class BeneficiariosService {
 
       this.logger.error(`Erro ao remover beneficiário: ${mensagemErro}`);
       throw new InternalServerErrorException('Erro ao remover beneficiário.');
+    }
+  }
+
+  async transferirFamilia(
+    beneficiarioId: string,
+    transferirFamiliaDto: TransferirFamiliaDto,
+  ): Promise<Beneficiario> {
+    const beneficiario = await this.buscarPorId(beneficiarioId);
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      let novaFamiliaId = transferirFamiliaDto.familiaId;
+
+      if (!novaFamiliaId && transferirFamiliaDto.novaFamilia) {
+        // Cenario A: Criar uma nova familia e vincular o beneficiário a ela
+
+        const familiaCriada = await this.familiasService.criar(
+          transferirFamiliaDto.novaFamilia,
+          queryRunner.manager,
+        );
+        novaFamiliaId = familiaCriada.id;
+      } else if (novaFamiliaId) {
+        // Cenario B: Vincular o beneficiário a uma familia existente (apenas atualiza o familiaId)
+        await this.familiasService.buscarPorId(
+          novaFamiliaId,
+          queryRunner.manager,
+        );
+      }
+
+      if (beneficiario.familiaId === novaFamiliaId) {
+        throw new BadRequestException(
+          'O beneficiário já pertence a esta família.',
+        );
+      }
+
+      beneficiario.familiaId = novaFamiliaId;
+      const beneficiarioAtualizado =
+        await queryRunner.manager.save(beneficiario);
+
+      await queryRunner.commitTransaction();
+      return beneficiarioAtualizado;
+    } catch (erro) {
+      await queryRunner.rollbackTransaction();
+
+      const mensagemErro =
+        erro instanceof Error
+          ? erro.message
+          : `Ocorreu um erro inesperado: ${JSON.stringify(erro)}`;
+
+      this.logger.error(
+        `Erro ao transferir família do beneficiário: ${mensagemErro}`,
+      );
+
+      if (
+        erro instanceof NotFoundException ||
+        erro instanceof BadRequestException
+      ) {
+        throw erro;
+      }
+
+      throw new InternalServerErrorException(
+        'Erro ao transferir família do beneficiário.',
+      );
+    } finally {
+      await queryRunner.release();
     }
   }
 

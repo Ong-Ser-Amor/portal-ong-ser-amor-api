@@ -4100,19 +4100,6 @@
             "example": "10",
             "description": "ID da pessoa responsável"
           },
-          "familiaId": {
-            "type": "string",
-            "description": "ID da família (se já existir)",
-            "example": "789012"
-          },
-          "novaFamilia": {
-            "description": "Dados para criar uma nova família",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CriarFamiliaDto"
-              }
-            ]
-          },
           "nivelEscolaridade": {
             "enum": [
               "ENSINO_FUNDAMENTAL_INCOMPLETO",
