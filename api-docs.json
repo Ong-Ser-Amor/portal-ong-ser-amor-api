@@ -3657,6 +3657,88 @@
           "lesson"
         ]
       },
+      "CriarEnderecoDto": {
+        "type": "object",
+        "properties": {
+          "logradouro": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100,
+            "example": "Avenida Brasil"
+          },
+          "numero": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20,
+            "example": "123"
+          },
+          "complemento": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 3,
+            "maxLength": 50,
+            "example": "Apto 45"
+          },
+          "bairro": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80,
+            "example": "Centro"
+          },
+          "cep": {
+            "type": "string",
+            "pattern": "/^\\d{8}$/",
+            "example": "12345678"
+          },
+          "cidade": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80,
+            "example": "São Paulo"
+          },
+          "uf": {
+            "enum": [
+              "AC",
+              "AL",
+              "AP",
+              "AM",
+              "BA",
+              "CE",
+              "DF",
+              "ES",
+              "GO",
+              "MA",
+              "MT",
+              "MS",
+              "MG",
+              "PA",
+              "PB",
+              "PR",
+              "PE",
+              "PI",
+              "RJ",
+              "RN",
+              "RS",
+              "RO",
+              "RR",
+              "SC",
+              "SP",
+              "SE",
+              "TO"
+            ],
+            "type": "string",
+            "example": "SP"
+          }
+        },
+        "required": [
+          "logradouro",
+          "numero",
+          "bairro",
+          "cep",
+          "cidade",
+          "uf"
+        ]
+      },
       "CriarFamiliaDto": {
         "type": "object",
         "properties": {
@@ -3688,15 +3770,22 @@
           },
           "enderecoId": {
             "type": "string",
-            "description": "O ID do endereço associado à família",
+            "description": "ID do endereço (caso já exista)",
             "example": "1"
+          },
+          "novoEndereco": {
+            "description": "Dados para criar um novo endereço",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CriarEnderecoDto"
+              }
+            ]
           }
         },
         "required": [
           "faixaRenda",
           "possuiBeneficioSocial",
-          "tipoMoradia",
-          "enderecoId"
+          "tipoMoradia"
         ]
       },
       "ContatoAninhadoDto": {

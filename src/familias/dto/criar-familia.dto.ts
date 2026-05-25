@@ -1,5 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  ValidateIf,
+  ValidateNested,
+} from 'class-validator';
+import { CriarEnderecoDto } from 'src/enderecos/dto/criar-endereco.dto';
 
 import { FaixaRenda } from '../enums/faixa-renda.enum';
 import { TipoMoradia } from '../enums/tipo-moradia.enum';
@@ -38,11 +47,34 @@ export class CriarFamiliaDto {
   @IsNotEmpty({ message: 'O tipo de moradia é obrigatório.' })
   tipoMoradia: TipoMoradia;
 
+  // =========================================================
+  // VALIDAÇÃO CONDICIONAL PARA ENDEREÇO
+  // =========================================================
+
   @ApiProperty({
-    description: 'O ID do endereço associado à família',
+    description: 'ID do endereço (caso já exista)',
     example: '1',
+    required: false,
   })
+  @ValidateIf((dto: CriarFamiliaDto) => !dto.novoEndereco)
   @IsString({ message: 'O ID do endereço deve ser um texto.' })
-  @IsNotEmpty({ message: 'O ID do endereço é obrigatório.' })
-  enderecoId: string;
+  @IsNotEmpty({
+    message:
+      'O ID do endereço é obrigatório se um novo endereço não for fornecido.',
+  })
+  enderecoId?: string;
+
+  @ApiProperty({
+    description: 'Dados para criar um novo endereço',
+    type: CriarEnderecoDto,
+    required: false,
+  })
+  @ValidateIf((dto: CriarFamiliaDto) => !dto.enderecoId)
+  @IsNotEmpty({
+    message:
+      'É obrigatório informar o enderecoId ou os dados de um novoEndereco.',
+  })
+  @ValidateNested()
+  @Type(() => CriarEnderecoDto)
+  novoEndereco?: CriarEnderecoDto;
 }

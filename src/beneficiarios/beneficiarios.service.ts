@@ -343,6 +343,32 @@ export class BeneficiariosService {
   // MÉTODOS PRIVADOS DE VALIDAÇÃO (REGRAS DE NEGÓCIO)
   // =========================================================================
 
+  async existeBeneficiarioNaFamilia(
+    familiaId: string,
+    manager?: EntityManager,
+  ): Promise<boolean> {
+    const beneficiarioRepo = manager
+      ? manager.getRepository(Beneficiario)
+      : this.repository;
+
+    try {
+      return await beneficiarioRepo.existsBy({ familiaId });
+    } catch (erro) {
+      const mensagemErro =
+        erro instanceof Error
+          ? erro.message
+          : `Ocorreu um erro inesperado: ${String(erro)}`;
+
+      this.logger.error(
+        `Erro ao verificar existência de beneficiário na família: ${mensagemErro}`,
+      );
+
+      throw new InternalServerErrorException(
+        'Erro interno ao verificar beneficiários na família.',
+      );
+    }
+  }
+
   /**
    * Valida se a pessoa atende aos requisitos legais de idade e emancipação.
    * Lança exceções (BadRequest) se as regras forem violadas.

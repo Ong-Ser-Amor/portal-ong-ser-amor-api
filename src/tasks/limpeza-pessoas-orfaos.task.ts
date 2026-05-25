@@ -5,8 +5,8 @@ import { Pessoa } from 'src/pessoas/entities/pessoa.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class LimpezaOrfaosTask {
-  private readonly logger = new Logger(LimpezaOrfaosTask.name);
+export class LimpezaPessoasOrfaosTask {
+  private readonly logger = new Logger(LimpezaPessoasOrfaosTask.name);
 
   constructor(
     @InjectRepository(Pessoa)

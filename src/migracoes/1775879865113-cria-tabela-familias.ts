@@ -38,6 +38,7 @@ export class CriaTabelaFamilias1775879865113 implements MigrationInterface {
           {
             name: 'endereco_id',
             type: 'bigint',
+            isUnique: true,
             isNullable: false,
           },
           {

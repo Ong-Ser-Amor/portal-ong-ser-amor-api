@@ -1,10 +1,14 @@
 import {
+  ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { BeneficiariosService } from 'src/beneficiarios/beneficiarios.service';
 import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
 import { CriarFamiliaDto } from './dto/criar-familia.dto';
@@ -18,6 +22,8 @@ export class FamiliasService {
   constructor(
     @InjectRepository(Familia)
     private readonly repository: Repository<Familia>,
+    @Inject(forwardRef(() => BeneficiariosService))
+    private readonly beneficiariosService: BeneficiariosService,
   ) {}
 
   async criar(
@@ -112,6 +118,15 @@ export class FamiliasService {
       : this.repository;
 
     await this.buscarPorId(id, manager);
+
+    const possuiMembros =
+      await this.beneficiariosService.existeBeneficiarioNaFamilia(id, manager);
+
+    if (possuiMembros) {
+      throw new ConflictException(
+        'Esta família não pode ser removida pois existem beneficiários vinculados a ela.',
+      );
+    }
 
     try {
       await familiaRepo.softDelete(id);

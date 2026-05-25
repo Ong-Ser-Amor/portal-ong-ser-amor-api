@@ -4,7 +4,7 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
-  ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -34,7 +34,7 @@ export class Familia {
   @Column({ name: 'endereco_id', type: 'bigint' })
   enderecoId: string;
 
-  @ManyToOne(() => Endereco)
+  @OneToOne(() => Endereco)
   @JoinColumn({ name: 'endereco_id' })
   endereco: Endereco;
 
