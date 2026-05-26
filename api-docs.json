@@ -2323,6 +2323,56 @@
         ]
       }
     },
+    "/beneficiarios/{id}/transferir-familia": {
+      "patch": {
+        "operationId": "BeneficiariosController_transferirFamilia",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferirFamiliaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O beneficiário foi transferido com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeneficiarioRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "O beneficiário já pertence a esta família ou os dados enviados são inválidos."
+          },
+          "404": {
+            "description": "Beneficiário ou família destino não encontrados."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao transferir o beneficiário."
+          }
+        },
+        "summary": "Transfere o beneficiário para uma nova família (existente ou recém-criada)",
+        "tags": [
+          "Beneficiarios"
+        ]
+      }
+    },
     "/pessoas/{id}": {
       "patch": {
         "operationId": "PessoasController_atualizar",
@@ -4236,6 +4286,24 @@
             "items": {
               "$ref": "#/components/schemas/ContatoAninhadoDto"
             }
+          }
+        }
+      },
+      "TransferirFamiliaDto": {
+        "type": "object",
+        "properties": {
+          "familiaId": {
+            "type": "string",
+            "description": "ID da família destino, se já existir",
+            "example": "123"
+          },
+          "novaFamilia": {
+            "description": "Dados para criar o novo núcleo familiar",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CriarFamiliaDto"
+              }
+            ]
           }
         }
       },

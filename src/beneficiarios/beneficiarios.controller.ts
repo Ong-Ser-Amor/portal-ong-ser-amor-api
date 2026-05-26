@@ -13,6 +13,7 @@ import {
   Query,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -30,6 +31,7 @@ import { BeneficiariosService } from './beneficiarios.service';
 import { AtualizarBeneficiarioDto } from './dto/atualizar-beneficiario.dto';
 import { BeneficiarioRespostaDto } from './dto/beneficiario-resposta.dto';
 import { CriarBeneficiarioDto } from './dto/criar-beneficiario.dto';
+import { TransferirFamiliaDto } from './dto/transferir-familia.dto';
 
 @ApiTags('Beneficiarios')
 @Controller('beneficiarios')
@@ -138,6 +140,37 @@ export class BeneficiariosController {
       id,
       atualizarBeneficiarioDto,
     );
+    return new BeneficiarioRespostaDto(beneficiarioAtualizado);
+  }
+
+  @Patch(':id/transferir-familia')
+  @ApiOperation({
+    summary:
+      'Transfere o beneficiário para uma nova família (existente ou recém-criada)',
+  })
+  @ApiOkResponse({
+    description: 'O beneficiário foi transferido com sucesso.',
+    type: BeneficiarioRespostaDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'Beneficiário ou família destino não encontrados.',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'O beneficiário já pertence a esta família ou os dados enviados são inválidos.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Ocorreu um erro inesperado ao transferir o beneficiário.',
+  })
+  async transferirFamilia(
+    @Param('id') id: string,
+    @Body() transferirFamiliaDto: TransferirFamiliaDto,
+  ): Promise<BeneficiarioRespostaDto> {
+    const beneficiarioAtualizado =
+      await this.beneficiariosService.transferirFamilia(
+        id,
+        transferirFamiliaDto,
+      );
     return new BeneficiarioRespostaDto(beneficiarioAtualizado);
   }
 
