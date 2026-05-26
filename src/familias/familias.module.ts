@@ -5,6 +5,7 @@ import { EnderecosModule } from 'src/enderecos/enderecos.module';
 
 import { Familia } from './entities/familia.entity';
 import { FamiliasService } from './familias.service';
+import { FamiliasController } from './familias.controller';
 
 @Module({
   imports: [
@@ -14,5 +15,6 @@ import { FamiliasService } from './familias.service';
   ],
   providers: [FamiliasService],
   exports: [FamiliasService],
+  controllers: [FamiliasController],
 })
 export class FamiliasModule {}

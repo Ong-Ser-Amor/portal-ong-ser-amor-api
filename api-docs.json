@@ -2733,6 +2733,53 @@
         ]
       }
     },
+    "/familias/{id}": {
+      "patch": {
+        "operationId": "FamiliasController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarFamiliaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A família foi atualizada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamiliaRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Família não encontrada."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar a família."
+          }
+        },
+        "summary": "Atualizar os dados da família",
+        "tags": [
+          "Famílias"
+        ]
+      }
+    },
     "/enderecos/{id}": {
       "patch": {
         "operationId": "EnderecosController_atualizar",
@@ -4311,6 +4358,75 @@
             "example": "PROFESSOR"
           }
         }
+      },
+      "AtualizarFamiliaDto": {
+        "type": "object",
+        "properties": {
+          "faixaRenda": {
+            "enum": [
+              "ATE_1_SALARIO",
+              "DE_1_A_3_SALARIOS",
+              "ACIMA_3_SALARIOS"
+            ],
+            "type": "string",
+            "description": "A faixa de renda da família",
+            "example": "DE_1_A_3_SALARIOS_MINIMOS"
+          },
+          "possuiBeneficioSocial": {
+            "type": "boolean",
+            "description": "Indica se a família participa de programas sociais (ex: Bolsa Família, Auxílio Gás)",
+            "example": true
+          },
+          "tipoMoradia": {
+            "enum": [
+              "PROPRIA",
+              "ALUGADA",
+              "CEDIDA",
+              "OCUPACAO_IRREGULAR"
+            ],
+            "type": "string",
+            "description": "O tipo de moradia da família",
+            "example": "ALUGADA"
+          }
+        }
+      },
+      "FamiliaRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "faixaRenda": {
+            "type": "string",
+            "enum": [
+              "ATE_1_SALARIO",
+              "DE_1_A_3_SALARIOS",
+              "ACIMA_3_SALARIOS"
+            ]
+          },
+          "possuiBeneficioSocial": {
+            "type": "boolean"
+          },
+          "tipoMoradia": {
+            "type": "string",
+            "enum": [
+              "PROPRIA",
+              "ALUGADA",
+              "CEDIDA",
+              "OCUPACAO_IRREGULAR"
+            ]
+          },
+          "enderecoId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "faixaRenda",
+          "possuiBeneficioSocial",
+          "tipoMoradia",
+          "enderecoId"
+        ]
       },
       "AtualizarEnderecoDto": {
         "type": "object",

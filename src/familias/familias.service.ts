@@ -12,8 +12,8 @@ import { BeneficiariosService } from 'src/beneficiarios/beneficiarios.service';
 import { EnderecosService } from 'src/enderecos/enderecos.service';
 import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
+import { AtualizarFamiliaDto } from './dto/atualizar-familia.dto';
 import { CriarFamiliaDto } from './dto/criar-familia.dto';
-import { UpdateFamiliaDto } from './dto/update-familia.dto';
 import { Familia } from './entities/familia.entity';
 
 @Injectable()
@@ -107,7 +107,7 @@ export class FamiliasService {
 
   async atualizar(
     id: string,
-    atualizarFamiliaDto: UpdateFamiliaDto,
+    atualizarFamiliaDto: AtualizarFamiliaDto,
     manager?: EntityManager,
   ): Promise<Familia> {
     const familiaRepo = manager
