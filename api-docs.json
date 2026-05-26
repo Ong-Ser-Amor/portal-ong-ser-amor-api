@@ -2120,10 +2120,494 @@
         "parameters": [],
         "requestBody": {
           "required": true,
+          "description": "Existem 2 cenários:\n1) Se a pessoa JÁ É cadastrada: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do beneficiário.\n2) Se a pessoa NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do beneficiário (não envie 'pessoaId'). Em ambos os casos você pode informar 'familiaId' ou os dados de 'novaFamilia'.",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CriarBeneficiarioDto"
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "title": "Pessoa existente + família existente",
+                    "properties": {
+                      "pessoaId": {
+                        "type": "string",
+                        "example": "123456"
+                      },
+                      "emancipado": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "podeSairSozinho": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "responsavelId": {
+                        "type": "string",
+                        "example": "10"
+                      },
+                      "estadoCivil": {
+                        "type": "string",
+                        "enum": [
+                          "CASADO",
+                          "DIVORCIADO",
+                          "SOLTEIRO",
+                          "UNIAO_ESTAVEL",
+                          "VIUVO"
+                        ]
+                      },
+                      "vinculoEmpregaticio": {
+                        "type": "string",
+                        "enum": [
+                          "APOSENTADO",
+                          "AUTONOMO",
+                          "DESEMPREGADO",
+                          "EMPREGADO_CLT",
+                          "INFORMAL",
+                          "OUTRO"
+                        ]
+                      },
+                      "quantidadeFilhos": {
+                        "type": "number",
+                        "example": 2
+                      },
+                      "nivelEscolaridade": {
+                        "type": "string",
+                        "enum": [
+                          "ENSINO_FUNDAMENTAL_INCOMPLETO",
+                          "ENSINO_FUNDAMENTAL_COMPLETO",
+                          "ENSINO_MEDIO_INCOMPLETO",
+                          "ENSINO_MEDIO_COMPLETO",
+                          "ENSINO_SUPERIOR_INCOMPLETO",
+                          "ENSINO_SUPERIOR_COMPLETO",
+                          "SEM_ESCOLARIDADE"
+                        ]
+                      },
+                      "familiaId": {
+                        "type": "string",
+                        "example": "789012"
+                      },
+                      "contatos": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "tipoContato": {
+                              "type": "string",
+                              "enum": [
+                                "CELULAR",
+                                "TELEFONE_FIXO",
+                                "EMAIL"
+                              ]
+                            },
+                            "valor": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "pessoaId",
+                      "familiaId",
+                      "nivelEscolaridade"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "title": "Pessoa existente + criar nova família",
+                    "properties": {
+                      "pessoaId": {
+                        "type": "string",
+                        "example": "123456"
+                      },
+                      "emancipado": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "podeSairSozinho": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "responsavelId": {
+                        "type": "string",
+                        "example": "10"
+                      },
+                      "estadoCivil": {
+                        "type": "string",
+                        "enum": [
+                          "CASADO",
+                          "DIVORCIADO",
+                          "SOLTEIRO",
+                          "UNIAO_ESTAVEL",
+                          "VIUVO"
+                        ]
+                      },
+                      "vinculoEmpregaticio": {
+                        "type": "string",
+                        "enum": [
+                          "APOSENTADO",
+                          "AUTONOMO",
+                          "DESEMPREGADO",
+                          "EMPREGADO_CLT",
+                          "INFORMAL",
+                          "OUTRO"
+                        ]
+                      },
+                      "quantidadeFilhos": {
+                        "type": "number",
+                        "example": 2
+                      },
+                      "nivelEscolaridade": {
+                        "type": "string",
+                        "enum": [
+                          "ENSINO_FUNDAMENTAL_INCOMPLETO",
+                          "ENSINO_FUNDAMENTAL_COMPLETO",
+                          "ENSINO_MEDIO_INCOMPLETO",
+                          "ENSINO_MEDIO_COMPLETO",
+                          "ENSINO_SUPERIOR_INCOMPLETO",
+                          "ENSINO_SUPERIOR_COMPLETO",
+                          "SEM_ESCOLARIDADE"
+                        ]
+                      },
+                      "novaFamilia": {
+                        "$ref": "#/components/schemas/CriarFamiliaDto"
+                      },
+                      "contatos": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "tipoContato": {
+                              "type": "string",
+                              "enum": [
+                                "CELULAR",
+                                "TELEFONE_FIXO",
+                                "EMAIL"
+                              ]
+                            },
+                            "valor": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "pessoaId",
+                      "novaFamilia",
+                      "nivelEscolaridade"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "title": "Nova pessoa + família existente",
+                    "properties": {
+                      "nome": {
+                        "type": "string",
+                        "example": "João da Silva"
+                      },
+                      "cpf": {
+                        "type": "string",
+                        "example": "12345678900",
+                        "minLength": 11,
+                        "maxLength": 11
+                      },
+                      "dataNascimento": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1990-01-01"
+                      },
+                      "emancipado": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "podeSairSozinho": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "responsavelId": {
+                        "type": "string",
+                        "example": "10"
+                      },
+                      "estadoCivil": {
+                        "type": "string",
+                        "enum": [
+                          "CASADO",
+                          "DIVORCIADO",
+                          "SOLTEIRO",
+                          "UNIAO_ESTAVEL",
+                          "VIUVO"
+                        ]
+                      },
+                      "vinculoEmpregaticio": {
+                        "type": "string",
+                        "enum": [
+                          "APOSENTADO",
+                          "AUTONOMO",
+                          "DESEMPREGADO",
+                          "EMPREGADO_CLT",
+                          "INFORMAL",
+                          "OUTRO"
+                        ]
+                      },
+                      "quantidadeFilhos": {
+                        "type": "number",
+                        "example": 2
+                      },
+                      "nivelEscolaridade": {
+                        "type": "string",
+                        "enum": [
+                          "ENSINO_FUNDAMENTAL_INCOMPLETO",
+                          "ENSINO_FUNDAMENTAL_COMPLETO",
+                          "ENSINO_MEDIO_INCOMPLETO",
+                          "ENSINO_MEDIO_COMPLETO",
+                          "ENSINO_SUPERIOR_INCOMPLETO",
+                          "ENSINO_SUPERIOR_COMPLETO",
+                          "SEM_ESCOLARIDADE"
+                        ]
+                      },
+                      "familiaId": {
+                        "type": "string",
+                        "example": "789012"
+                      },
+                      "contatos": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "tipoContato": {
+                              "type": "string",
+                              "enum": [
+                                "CELULAR",
+                                "TELEFONE_FIXO",
+                                "EMAIL"
+                              ]
+                            },
+                            "valor": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "nome",
+                      "cpf",
+                      "dataNascimento",
+                      "familiaId",
+                      "nivelEscolaridade"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "title": "Nova pessoa + criar nova família",
+                    "properties": {
+                      "nome": {
+                        "type": "string",
+                        "example": "João da Silva"
+                      },
+                      "cpf": {
+                        "type": "string",
+                        "example": "12345678900",
+                        "minLength": 11,
+                        "maxLength": 11
+                      },
+                      "dataNascimento": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1990-01-01"
+                      },
+                      "emancipado": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "podeSairSozinho": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "responsavelId": {
+                        "type": "string",
+                        "example": "10"
+                      },
+                      "estadoCivil": {
+                        "type": "string",
+                        "enum": [
+                          "CASADO",
+                          "DIVORCIADO",
+                          "SOLTEIRO",
+                          "UNIAO_ESTAVEL",
+                          "VIUVO"
+                        ]
+                      },
+                      "vinculoEmpregaticio": {
+                        "type": "string",
+                        "enum": [
+                          "APOSENTADO",
+                          "AUTONOMO",
+                          "DESEMPREGADO",
+                          "EMPREGADO_CLT",
+                          "INFORMAL",
+                          "OUTRO"
+                        ]
+                      },
+                      "quantidadeFilhos": {
+                        "type": "number",
+                        "example": 2
+                      },
+                      "nivelEscolaridade": {
+                        "type": "string",
+                        "enum": [
+                          "ENSINO_FUNDAMENTAL_INCOMPLETO",
+                          "ENSINO_FUNDAMENTAL_COMPLETO",
+                          "ENSINO_MEDIO_INCOMPLETO",
+                          "ENSINO_MEDIO_COMPLETO",
+                          "ENSINO_SUPERIOR_INCOMPLETO",
+                          "ENSINO_SUPERIOR_COMPLETO",
+                          "SEM_ESCOLARIDADE"
+                        ]
+                      },
+                      "novaFamilia": {
+                        "$ref": "#/components/schemas/CriarFamiliaDto"
+                      },
+                      "contatos": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "tipoContato": {
+                              "type": "string",
+                              "enum": [
+                                "CELULAR",
+                                "TELEFONE_FIXO",
+                                "EMAIL"
+                              ]
+                            },
+                            "valor": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "nome",
+                      "cpf",
+                      "dataNascimento",
+                      "novaFamilia",
+                      "nivelEscolaridade"
+                    ]
+                  }
+                ]
+              },
+              "examples": {
+                "pessoa_existente_familia_existente": {
+                  "summary": "Pessoa existente + família existente",
+                  "value": {
+                    "pessoaId": "123456",
+                    "familiaId": "789012",
+                    "emancipado": false,
+                    "podeSairSozinho": true,
+                    "responsavelId": "10",
+                    "estadoCivil": "SOLTEIRO",
+                    "vinculoEmpregaticio": "DESEMPREGADO",
+                    "quantidadeFilhos": 2,
+                    "nivelEscolaridade": "ENSINO_FUNDAMENTAL_COMPLETO",
+                    "contatos": [
+                      {
+                        "tipoContato": "CELULAR",
+                        "valor": "11999998888"
+                      }
+                    ]
+                  }
+                },
+                "pessoa_existente_nova_familia": {
+                  "summary": "Pessoa existente + criar nova família",
+                  "value": {
+                    "pessoaId": "123456",
+                    "emancipado": false,
+                    "podeSairSozinho": true,
+                    "responsavelId": "10",
+                    "estadoCivil": "SOLTEIRO",
+                    "vinculoEmpregaticio": "DESEMPREGADO",
+                    "quantidadeFilhos": 2,
+                    "contatos": [
+                      {
+                        "tipoContato": "CELULAR",
+                        "valor": "11999998888"
+                      }
+                    ],
+                    "novaFamilia": {
+                      "faixaRenda": "DE_1_A_3_SALARIOS_MINIMOS",
+                      "possuiBeneficioSocial": true,
+                      "tipoMoradia": "ALUGADA",
+                      "endereco": {
+                        "cep": "12345678",
+                        "logradouro": "Rua A",
+                        "numero": "123",
+                        "bairro": "Centro",
+                        "cidade": "Cidade",
+                        "estado": "SP"
+                      }
+                    },
+                    "nivelEscolaridade": "ENSINO_FUNDAMENTAL_COMPLETO"
+                  }
+                },
+                "pessoa_nova_familia_existente": {
+                  "summary": "Nova pessoa + família existente",
+                  "value": {
+                    "nome": "João da Silva",
+                    "cpf": "12345678900",
+                    "dataNascimento": "1990-01-01",
+                    "familiaId": "789012",
+                    "emancipado": false,
+                    "podeSairSozinho": true,
+                    "responsavelId": "10",
+                    "estadoCivil": "SOLTEIRO",
+                    "vinculoEmpregaticio": "DESEMPREGADO",
+                    "quantidadeFilhos": 2,
+                    "contatos": [
+                      {
+                        "tipoContato": "CELULAR",
+                        "valor": "11999998888"
+                      }
+                    ],
+                    "nivelEscolaridade": "ENSINO_FUNDAMENTAL_COMPLETO"
+                  }
+                },
+                "pessoa_nova_nova_familia": {
+                  "summary": "Nova pessoa + criar nova família",
+                  "value": {
+                    "nome": "João da Silva",
+                    "cpf": "12345678900",
+                    "dataNascimento": "1990-01-01",
+                    "emancipado": false,
+                    "podeSairSozinho": true,
+                    "responsavelId": "10",
+                    "estadoCivil": "SOLTEIRO",
+                    "vinculoEmpregaticio": "DESEMPREGADO",
+                    "quantidadeFilhos": 2,
+                    "contatos": [
+                      {
+                        "tipoContato": "CELULAR",
+                        "valor": "11999998888"
+                      }
+                    ],
+                    "novaFamilia": {
+                      "faixaRenda": "DE_1_A_3_SALARIOS_MINIMOS",
+                      "possuiBeneficioSocial": true,
+                      "tipoMoradia": "ALUGADA",
+                      "endereco": {
+                        "cep": "12345678",
+                        "logradouro": "Rua A",
+                        "numero": "123",
+                        "bairro": "Centro",
+                        "cidade": "Cidade",
+                        "estado": "SP"
+                      }
+                    },
+                    "nivelEscolaridade": "ENSINO_FUNDAMENTAL_COMPLETO"
+                  }
+                }
               }
             }
           }
@@ -2338,10 +2822,63 @@
         ],
         "requestBody": {
           "required": true,
+          "description": "Envie o 'familiaId' de destino OU os dados de 'novaFamilia' para criar a família de destino.",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TransferirFamiliaDto"
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "title": "Família existente",
+                    "properties": {
+                      "familiaId": {
+                        "type": "string",
+                        "example": "123"
+                      }
+                    },
+                    "required": [
+                      "familiaId"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "title": "Criar nova família",
+                    "properties": {
+                      "novaFamilia": {
+                        "$ref": "#/components/schemas/CriarFamiliaDto"
+                      }
+                    },
+                    "required": [
+                      "novaFamilia"
+                    ]
+                  }
+                ]
+              },
+              "examples": {
+                "existingFamily": {
+                  "summary": "Usar família já existente",
+                  "value": {
+                    "familiaId": "123"
+                  }
+                },
+                "newFamily": {
+                  "summary": "Criar nova família",
+                  "value": {
+                    "novaFamilia": {
+                      "faixaRenda": "DE_1_A_3_SALARIOS_MINIMOS",
+                      "possuiBeneficioSocial": true,
+                      "tipoMoradia": "ALUGADA",
+                      "endereco": {
+                        "cep": "12345678",
+                        "logradouro": "Rua A",
+                        "numero": "123",
+                        "bairro": "Centro",
+                        "cidade": "Cidade",
+                        "estado": "SP"
+                      }
+                    }
+                  }
+                }
               }
             }
           }
@@ -3801,258 +4338,6 @@
           "lesson"
         ]
       },
-      "CriarEnderecoDto": {
-        "type": "object",
-        "properties": {
-          "logradouro": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 100,
-            "example": "Avenida Brasil"
-          },
-          "numero": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 20,
-            "example": "123"
-          },
-          "complemento": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 3,
-            "maxLength": 50,
-            "example": "Apto 45"
-          },
-          "bairro": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 80,
-            "example": "Centro"
-          },
-          "cep": {
-            "type": "string",
-            "pattern": "/^\\d{8}$/",
-            "example": "12345678"
-          },
-          "cidade": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 80,
-            "example": "São Paulo"
-          },
-          "uf": {
-            "enum": [
-              "AC",
-              "AL",
-              "AP",
-              "AM",
-              "BA",
-              "CE",
-              "DF",
-              "ES",
-              "GO",
-              "MA",
-              "MT",
-              "MS",
-              "MG",
-              "PA",
-              "PB",
-              "PR",
-              "PE",
-              "PI",
-              "RJ",
-              "RN",
-              "RS",
-              "RO",
-              "RR",
-              "SC",
-              "SP",
-              "SE",
-              "TO"
-            ],
-            "type": "string",
-            "example": "SP"
-          }
-        },
-        "required": [
-          "logradouro",
-          "numero",
-          "bairro",
-          "cep",
-          "cidade",
-          "uf"
-        ]
-      },
-      "CriarFamiliaDto": {
-        "type": "object",
-        "properties": {
-          "faixaRenda": {
-            "enum": [
-              "ATE_1_SALARIO",
-              "DE_1_A_3_SALARIOS",
-              "ACIMA_3_SALARIOS"
-            ],
-            "type": "string",
-            "description": "A faixa de renda da família",
-            "example": "DE_1_A_3_SALARIOS_MINIMOS"
-          },
-          "possuiBeneficioSocial": {
-            "type": "boolean",
-            "description": "Indica se a família participa de programas sociais (ex: Bolsa Família, Auxílio Gás)",
-            "example": true
-          },
-          "tipoMoradia": {
-            "enum": [
-              "PROPRIA",
-              "ALUGADA",
-              "CEDIDA",
-              "OCUPACAO_IRREGULAR"
-            ],
-            "type": "string",
-            "description": "O tipo de moradia da família",
-            "example": "ALUGADA"
-          },
-          "endereco": {
-            "description": "Dados do endereço da família",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CriarEnderecoDto"
-              }
-            ]
-          }
-        },
-        "required": [
-          "faixaRenda",
-          "possuiBeneficioSocial",
-          "tipoMoradia",
-          "endereco"
-        ]
-      },
-      "ContatoAninhadoDto": {
-        "type": "object",
-        "properties": {
-          "tipoContato": {
-            "enum": [
-              "CELULAR",
-              "TELEFONE_FIXO",
-              "EMAIL"
-            ],
-            "type": "string",
-            "example": "EMAIL"
-          },
-          "valor": {
-            "type": "string",
-            "format": "email",
-            "pattern": "/^[0-9]{11}$/"
-          }
-        },
-        "required": [
-          "tipoContato",
-          "valor"
-        ]
-      },
-      "CriarBeneficiarioDto": {
-        "type": "object",
-        "properties": {
-          "nome": {
-            "type": "string",
-            "example": "João da Silva"
-          },
-          "cpf": {
-            "type": "string",
-            "minLength": 11,
-            "maxLength": 11,
-            "pattern": "/^\\d+$/",
-            "example": "12345678900"
-          },
-          "dataNascimento": {
-            "format": "date-time",
-            "type": "string",
-            "example": "1990-01-01"
-          },
-          "emancipado": {
-            "type": "boolean",
-            "example": false
-          },
-          "podeSairSozinho": {
-            "type": "boolean",
-            "example": true
-          },
-          "responsavelId": {
-            "type": "string",
-            "example": "10",
-            "description": "ID da pessoa responsável"
-          },
-          "pessoaId": {
-            "type": "string",
-            "description": "ID da pessoa, caso ela já possua cadastro no sistema.",
-            "example": "123456"
-          },
-          "familiaId": {
-            "type": "string",
-            "description": "ID da família (se já existir)",
-            "example": "789012"
-          },
-          "novaFamilia": {
-            "description": "Dados para criar uma nova família",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CriarFamiliaDto"
-              }
-            ]
-          },
-          "nivelEscolaridade": {
-            "enum": [
-              "ENSINO_FUNDAMENTAL_INCOMPLETO",
-              "ENSINO_FUNDAMENTAL_COMPLETO",
-              "ENSINO_MEDIO_INCOMPLETO",
-              "ENSINO_MEDIO_COMPLETO",
-              "ENSINO_SUPERIOR_INCOMPLETO",
-              "ENSINO_SUPERIOR_COMPLETO",
-              "SEM_ESCOLARIDADE"
-            ],
-            "type": "string",
-            "example": "ENSINO_FUNDAMENTAL_COMPLETO"
-          },
-          "estadoCivil": {
-            "enum": [
-              "CASADO",
-              "DIVORCIADO",
-              "SOLTEIRO",
-              "UNIAO_ESTAVEL",
-              "VIUVO"
-            ],
-            "type": "string",
-            "example": "SOLTEIRO"
-          },
-          "vinculoEmpregaticio": {
-            "enum": [
-              "APOSENTADO",
-              "AUTONOMO",
-              "DESEMPREGADO",
-              "EMPREGADO_CLT",
-              "INFORMAL",
-              "OUTRO"
-            ],
-            "type": "string",
-            "example": "DESEMPREGADO"
-          },
-          "quantidadeFilhos": {
-            "type": "number",
-            "minimum": 0,
-            "example": 2
-          },
-          "contatos": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ContatoAninhadoDto"
-            }
-          }
-        },
-        "required": [
-          "nivelEscolaridade"
-        ]
-      },
       "PessoaRespostaDto": {
         "type": "object",
         "properties": {
@@ -4208,6 +4493,29 @@
           "dados"
         ]
       },
+      "ContatoAninhadoDto": {
+        "type": "object",
+        "properties": {
+          "tipoContato": {
+            "enum": [
+              "CELULAR",
+              "TELEFONE_FIXO",
+              "EMAIL"
+            ],
+            "type": "string",
+            "example": "EMAIL"
+          },
+          "valor": {
+            "type": "string",
+            "format": "email",
+            "pattern": "/^[0-9]{11}$/"
+          }
+        },
+        "required": [
+          "tipoContato",
+          "valor"
+        ]
+      },
       "AtualizarBeneficiarioDto": {
         "type": "object",
         "properties": {
@@ -4286,24 +4594,6 @@
             "items": {
               "$ref": "#/components/schemas/ContatoAninhadoDto"
             }
-          }
-        }
-      },
-      "TransferirFamiliaDto": {
-        "type": "object",
-        "properties": {
-          "familiaId": {
-            "type": "string",
-            "description": "ID da família destino, se já existir",
-            "example": "123"
-          },
-          "novaFamilia": {
-            "description": "Dados para criar o novo núcleo familiar",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CriarFamiliaDto"
-              }
-            ]
           }
         }
       },

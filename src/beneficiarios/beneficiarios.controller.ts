@@ -16,6 +16,7 @@ import {
   ApiBadRequestResponse,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiBody,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
@@ -24,6 +25,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { TipoContato } from 'src/contatos/enums/tipo-contato.enum';
 import { ApiPaginacaoResposta } from 'src/dtos/api-paginacao-resposta.decorator';
 import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
 
@@ -32,12 +34,320 @@ import { AtualizarBeneficiarioDto } from './dto/atualizar-beneficiario.dto';
 import { BeneficiarioRespostaDto } from './dto/beneficiario-resposta.dto';
 import { CriarBeneficiarioDto } from './dto/criar-beneficiario.dto';
 import { TransferirFamiliaDto } from './dto/transferir-familia.dto';
+import {
+  EstadoCivil,
+  NivelEscolaridade,
+  VinculoEmpregaticio,
+} from './enums/beneficiario.enum';
 
 @ApiTags('Beneficiarios')
 @Controller('beneficiarios')
 export class BeneficiariosController {
   constructor(private readonly beneficiariosService: BeneficiariosService) {}
 
+  @ApiBody({
+    description: `Existem 2 cenários:\n1) Se a pessoa JÁ É cadastrada: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do beneficiário.\n2) Se a pessoa NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do beneficiário (não envie 'pessoaId'). Em ambos os casos você pode informar 'familiaId' ou os dados de 'novaFamilia'.`,
+    schema: {
+      oneOf: [
+        {
+          type: 'object',
+          title: 'Pessoa existente + família existente',
+          properties: {
+            pessoaId: { type: 'string', example: '123456' },
+            emancipado: { type: 'boolean', example: false },
+            podeSairSozinho: { type: 'boolean', example: true },
+            responsavelId: { type: 'string', example: '10' },
+            estadoCivil: {
+              type: 'string',
+              enum: Object.values(EstadoCivil),
+            },
+            vinculoEmpregaticio: {
+              type: 'string',
+              enum: Object.values(VinculoEmpregaticio),
+            },
+            quantidadeFilhos: { type: 'number', example: 2 },
+            nivelEscolaridade: {
+              type: 'string',
+              enum: Object.values(NivelEscolaridade),
+            },
+            familiaId: { type: 'string', example: '789012' },
+            contatos: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  tipoContato: {
+                    type: 'string',
+                    enum: Object.values(TipoContato),
+                  },
+                  valor: { type: 'string' },
+                },
+              },
+            },
+          },
+          required: ['pessoaId', 'familiaId', 'nivelEscolaridade'],
+        },
+        {
+          type: 'object',
+          title: 'Pessoa existente + criar nova família',
+          properties: {
+            pessoaId: { type: 'string', example: '123456' },
+            emancipado: { type: 'boolean', example: false },
+            podeSairSozinho: { type: 'boolean', example: true },
+            responsavelId: { type: 'string', example: '10' },
+            estadoCivil: {
+              type: 'string',
+              enum: Object.values(EstadoCivil),
+            },
+            vinculoEmpregaticio: {
+              type: 'string',
+              enum: Object.values(VinculoEmpregaticio),
+            },
+            quantidadeFilhos: { type: 'number', example: 2 },
+            nivelEscolaridade: {
+              type: 'string',
+              enum: Object.values(NivelEscolaridade),
+            },
+            novaFamilia: { $ref: '#/components/schemas/CriarFamiliaDto' },
+            contatos: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  tipoContato: {
+                    type: 'string',
+                    enum: Object.values(TipoContato),
+                  },
+                  valor: { type: 'string' },
+                },
+              },
+            },
+          },
+          required: ['pessoaId', 'novaFamilia', 'nivelEscolaridade'],
+        },
+        {
+          type: 'object',
+          title: 'Nova pessoa + família existente',
+          properties: {
+            nome: { type: 'string', example: 'João da Silva' },
+            cpf: {
+              type: 'string',
+              example: '12345678900',
+              minLength: 11,
+              maxLength: 11,
+            },
+            dataNascimento: {
+              type: 'string',
+              format: 'date',
+              example: '1990-01-01',
+            },
+            emancipado: { type: 'boolean', example: false },
+            podeSairSozinho: { type: 'boolean', example: true },
+            responsavelId: { type: 'string', example: '10' },
+            estadoCivil: {
+              type: 'string',
+              enum: Object.values(EstadoCivil),
+            },
+            vinculoEmpregaticio: {
+              type: 'string',
+              enum: Object.values(VinculoEmpregaticio),
+            },
+            quantidadeFilhos: { type: 'number', example: 2 },
+            nivelEscolaridade: {
+              type: 'string',
+              enum: Object.values(NivelEscolaridade),
+            },
+            familiaId: { type: 'string', example: '789012' },
+            contatos: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  tipoContato: {
+                    type: 'string',
+                    enum: Object.values(TipoContato),
+                  },
+                  valor: { type: 'string' },
+                },
+              },
+            },
+          },
+          required: [
+            'nome',
+            'cpf',
+            'dataNascimento',
+            'familiaId',
+            'nivelEscolaridade',
+          ],
+        },
+        {
+          type: 'object',
+          title: 'Nova pessoa + criar nova família',
+          properties: {
+            nome: { type: 'string', example: 'João da Silva' },
+            cpf: {
+              type: 'string',
+              example: '12345678900',
+              minLength: 11,
+              maxLength: 11,
+            },
+            dataNascimento: {
+              type: 'string',
+              format: 'date',
+              example: '1990-01-01',
+            },
+            emancipado: { type: 'boolean', example: false },
+            podeSairSozinho: { type: 'boolean', example: true },
+            responsavelId: { type: 'string', example: '10' },
+            estadoCivil: {
+              type: 'string',
+              enum: Object.values(EstadoCivil),
+            },
+            vinculoEmpregaticio: {
+              type: 'string',
+              enum: Object.values(VinculoEmpregaticio),
+            },
+            quantidadeFilhos: { type: 'number', example: 2 },
+            nivelEscolaridade: {
+              type: 'string',
+              enum: Object.values(NivelEscolaridade),
+            },
+            novaFamilia: { $ref: '#/components/schemas/CriarFamiliaDto' },
+            contatos: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  tipoContato: {
+                    type: 'string',
+                    enum: Object.values(TipoContato),
+                  },
+                  valor: { type: 'string' },
+                },
+              },
+            },
+          },
+          required: [
+            'nome',
+            'cpf',
+            'dataNascimento',
+            'novaFamilia',
+            'nivelEscolaridade',
+          ],
+        },
+      ],
+    },
+    examples: {
+      pessoa_existente_familia_existente: {
+        summary: 'Pessoa existente + família existente',
+        value: {
+          pessoaId: '123456',
+          familiaId: '789012',
+          emancipado: false,
+          podeSairSozinho: true,
+          responsavelId: '10',
+          estadoCivil: 'SOLTEIRO',
+          vinculoEmpregaticio: 'DESEMPREGADO',
+          quantidadeFilhos: 2,
+          nivelEscolaridade: 'ENSINO_FUNDAMENTAL_COMPLETO',
+          contatos: [
+            {
+              tipoContato: 'CELULAR',
+              valor: '11999998888',
+            },
+          ],
+        },
+      },
+      pessoa_existente_nova_familia: {
+        summary: 'Pessoa existente + criar nova família',
+        value: {
+          pessoaId: '123456',
+          emancipado: false,
+          podeSairSozinho: true,
+          responsavelId: '10',
+          estadoCivil: 'SOLTEIRO',
+          vinculoEmpregaticio: 'DESEMPREGADO',
+          quantidadeFilhos: 2,
+          contatos: [
+            {
+              tipoContato: 'CELULAR',
+              valor: '11999998888',
+            },
+          ],
+          novaFamilia: {
+            faixaRenda: 'DE_1_A_3_SALARIOS_MINIMOS',
+            possuiBeneficioSocial: true,
+            tipoMoradia: 'ALUGADA',
+            endereco: {
+              cep: '12345678',
+              logradouro: 'Rua A',
+              numero: '123',
+              bairro: 'Centro',
+              cidade: 'Cidade',
+              estado: 'SP',
+            },
+          },
+          nivelEscolaridade: 'ENSINO_FUNDAMENTAL_COMPLETO',
+        },
+      },
+      pessoa_nova_familia_existente: {
+        summary: 'Nova pessoa + família existente',
+        value: {
+          nome: 'João da Silva',
+          cpf: '12345678900',
+          dataNascimento: '1990-01-01',
+          familiaId: '789012',
+          emancipado: false,
+          podeSairSozinho: true,
+          responsavelId: '10',
+          estadoCivil: 'SOLTEIRO',
+          vinculoEmpregaticio: 'DESEMPREGADO',
+          quantidadeFilhos: 2,
+          contatos: [
+            {
+              tipoContato: 'CELULAR',
+              valor: '11999998888',
+            },
+          ],
+          nivelEscolaridade: 'ENSINO_FUNDAMENTAL_COMPLETO',
+        },
+      },
+      pessoa_nova_nova_familia: {
+        summary: 'Nova pessoa + criar nova família',
+        value: {
+          nome: 'João da Silva',
+          cpf: '12345678900',
+          dataNascimento: '1990-01-01',
+          emancipado: false,
+          podeSairSozinho: true,
+          responsavelId: '10',
+          estadoCivil: 'SOLTEIRO',
+          vinculoEmpregaticio: 'DESEMPREGADO',
+          quantidadeFilhos: 2,
+          contatos: [
+            {
+              tipoContato: 'CELULAR',
+              valor: '11999998888',
+            },
+          ],
+          novaFamilia: {
+            faixaRenda: 'DE_1_A_3_SALARIOS_MINIMOS',
+            possuiBeneficioSocial: true,
+            tipoMoradia: 'ALUGADA',
+            endereco: {
+              cep: '12345678',
+              logradouro: 'Rua A',
+              numero: '123',
+              bairro: 'Centro',
+              cidade: 'Cidade',
+              estado: 'SP',
+            },
+          },
+          nivelEscolaridade: 'ENSINO_FUNDAMENTAL_COMPLETO',
+        },
+      },
+    },
+  })
   @Post()
   @ApiOperation({ summary: 'Criar um novo beneficiário' })
   @ApiCreatedResponse({
@@ -144,6 +454,53 @@ export class BeneficiariosController {
   }
 
   @Patch(':id/transferir-familia')
+  @ApiBody({
+    description: `Envie o 'familiaId' de destino OU os dados de 'novaFamilia' para criar a família de destino.`,
+    schema: {
+      oneOf: [
+        {
+          type: 'object',
+          title: 'Família existente',
+          properties: {
+            familiaId: { type: 'string', example: '123' },
+          },
+          required: ['familiaId'],
+        },
+        {
+          type: 'object',
+          title: 'Criar nova família',
+          properties: {
+            novaFamilia: { $ref: '#/components/schemas/CriarFamiliaDto' },
+          },
+          required: ['novaFamilia'],
+        },
+      ],
+    },
+    examples: {
+      existingFamily: {
+        summary: 'Usar família já existente',
+        value: { familiaId: '123' },
+      },
+      newFamily: {
+        summary: 'Criar nova família',
+        value: {
+          novaFamilia: {
+            faixaRenda: 'DE_1_A_3_SALARIOS_MINIMOS',
+            possuiBeneficioSocial: true,
+            tipoMoradia: 'ALUGADA',
+            endereco: {
+              cep: '12345678',
+              logradouro: 'Rua A',
+              numero: '123',
+              bairro: 'Centro',
+              cidade: 'Cidade',
+              estado: 'SP',
+            },
+          },
+        },
+      },
+    },
+  })
   @ApiOperation({
     summary:
       'Transfere o beneficiário para uma nova família (existente ou recém-criada)',
