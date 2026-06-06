@@ -37,6 +37,12 @@ export class CriaTabelaPessoas1775407443870 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'emancipado',
+            type: 'boolean',
+            isNullable: false,
+            default: false,
+          },
+          {
             name: 'pode_sair_sozinho',
             type: 'boolean',
             isNullable: true,
