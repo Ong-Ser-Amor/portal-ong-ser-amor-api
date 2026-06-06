@@ -2961,6 +2961,51 @@
         ]
       }
     },
+    "/pessoas/verificar-cadastro/beneficiario/cpf/{cpf}": {
+      "get": {
+        "operationId": "PessoasController_verificarCadastroBeneficiarioPorCpf",
+        "parameters": [
+          {
+            "name": "cpf",
+            "required": true,
+            "in": "path",
+            "description": "CPF com 11 dígitos numéricos.",
+            "schema": {
+              "example": "12345678900",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pessoa encontrada com sucesso e sem beneficiário vinculado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PessoaRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "CPF inválido."
+          },
+          "404": {
+            "description": "Pessoa não encontrada."
+          },
+          "409": {
+            "description": "Pessoa já possui um cadastro de beneficiário ativo."
+          },
+          "500": {
+            "description": "Erro interno ao verificar o cadastro de beneficiário."
+          }
+        },
+        "summary": "Verificar cadastro de beneficiário pelo CPF",
+        "tags": [
+          "Pessoas"
+        ]
+      }
+    },
     "/pessoas/verificar-cadastro/voluntario/cpf/{cpf}": {
       "get": {
         "operationId": "PessoasController_verificarCadastroVoluntarioPorCpf",
