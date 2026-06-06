@@ -3619,7 +3619,7 @@
         ]
       }
     },
-    "/usuarios/senha": {
+    "/usuarios/alterar-senha": {
       "patch": {
         "operationId": "UsuariosController_atualizarSenha",
         "parameters": [],

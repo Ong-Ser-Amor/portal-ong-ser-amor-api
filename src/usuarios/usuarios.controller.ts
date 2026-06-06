@@ -102,7 +102,7 @@ export class UsuariosController {
     return new UsuarioRespostaDto(usuarioAtualizado);
   }
 
-  @Patch('senha')
+  @Patch('alterar-senha')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Atualizar senha do usuário' })
   @ApiNoContentResponse({
