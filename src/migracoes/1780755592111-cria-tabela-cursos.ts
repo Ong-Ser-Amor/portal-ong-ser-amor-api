@@ -21,11 +21,6 @@ export class CriaTabelaCursos1780755592111 implements MigrationInterface {
             isUnique: true,
           },
           {
-            name: 'descricao',
-            type: 'text',
-            isNullable: true,
-          },
-          {
             name: 'criado_em',
             type: 'timestamp',
             isNullable: false,
