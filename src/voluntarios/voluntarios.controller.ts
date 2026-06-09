@@ -136,36 +136,34 @@ export class VoluntariosController {
   @ApiOperation({ summary: 'Buscar uma lista paginada de voluntários' })
   @ApiPaginacaoResposta(VoluntarioRespostaDto)
   @ApiQuery({
-    name: 'take',
+    name: 'limite',
     required: false,
-    type: Number,
     example: 10,
-    description: 'Número de itens a serem retornados por página',
+    description: 'Número de itens por página (padrão: 10)',
   })
   @ApiQuery({
-    name: 'skip',
+    name: 'pagina',
     required: false,
-    type: Number,
-    example: 0,
-    description: 'Número de itens a serem ignorados na consulta',
+    example: 1,
+    description: 'Número da página atual (padrão: 1)',
   })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar os voluntários.',
   })
   async buscarTodos(
-    @Query('take', new DefaultValuePipe(10), ParseIntPipe) take: number,
-    @Query('skip', new DefaultValuePipe(0), ParseIntPipe) skip: number,
+    @Query('limite', new DefaultValuePipe(10), ParseIntPipe) limite: number,
+    @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
   ): Promise<PaginacaoRespostaDto<VoluntarioRespostaDto>> {
     const voluntariosPaginados = await this.voluntariosService.buscarTodos(
-      take,
-      skip,
+      limite,
+      pagina,
     );
 
     const voluntariosDtos = voluntariosPaginados.dados.map(
       (voluntario) => new VoluntarioRespostaDto(voluntario),
     );
 
-    return new PaginacaoRespostaDto(
+    return new PaginacaoRespostaDto<VoluntarioRespostaDto>(
       voluntariosDtos,
       voluntariosPaginados.meta.totalItens,
       voluntariosPaginados.meta.itensPorPagina,

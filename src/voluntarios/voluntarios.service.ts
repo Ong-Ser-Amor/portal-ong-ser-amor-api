@@ -116,10 +116,13 @@ export class VoluntariosService {
   }
 
   async buscarTodos(
-    take = 10,
-    skip = 0,
+    limite = 10,
+    pagina = 1,
   ): Promise<PaginacaoRespostaDto<Voluntario>> {
     try {
+      const take = limite;
+      const skip = (pagina - 1) * limite;
+
       const [voluntarios, total] = await this.repository.findAndCount({
         relations: ['pessoa'],
         take,
@@ -130,8 +133,8 @@ export class VoluntariosService {
       return new PaginacaoRespostaDto<Voluntario>(
         voluntarios,
         total,
-        take,
-        skip,
+        limite,
+        pagina,
       );
     } catch (erro) {
       const mensagemErro =
