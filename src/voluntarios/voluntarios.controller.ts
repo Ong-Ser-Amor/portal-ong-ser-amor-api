@@ -30,6 +30,7 @@ import { PaginacaoRespostaDto } from '../dtos/paginacao-resposta.dto';
 import { AtualizarVoluntarioDto } from './dto/atualizar-voluntario.dto';
 import { CriarVoluntarioDto } from './dto/criar-voluntario.dto';
 import { VoluntarioRespostaDto } from './dto/voluntario-resposta.dto';
+import { StatusFormacao, TipoVoluntario } from './enums/voluntario.enum';
 import { VoluntariosService } from './voluntarios.service';
 
 @ApiTags('Voluntarios')
@@ -48,12 +49,12 @@ export class VoluntariosController {
             pessoaId: { type: 'string', example: '123456' },
             tipoVoluntario: {
               type: 'string',
-              enum: ['COORDENADOR', 'PROFESSOR', 'GERAL'],
+              enum: Object.values(TipoVoluntario),
             },
             formacaoAcademica: { type: 'string', example: 'Pedagogia' },
             statusFormacao: {
               type: 'string',
-              enum: ['COMPLETO', 'CURSANDO', 'INCOMPLETO'],
+              enum: Object.values(StatusFormacao),
             },
           },
           required: ['pessoaId', 'tipoVoluntario'],
@@ -76,12 +77,12 @@ export class VoluntariosController {
             },
             tipoVoluntario: {
               type: 'string',
-              enum: ['COORDENADOR', 'PROFESSOR', 'GERAL'],
+              enum: Object.values(TipoVoluntario),
             },
             formacaoAcademica: { type: 'string', example: 'Pedagogia' },
             statusFormacao: {
               type: 'string',
-              enum: ['COMPLETO', 'CURSANDO', 'INCOMPLETO'],
+              enum: Object.values(StatusFormacao),
             },
           },
           required: ['nome', 'cpf', 'dataNascimento', 'tipoVoluntario'],
@@ -89,24 +90,24 @@ export class VoluntariosController {
       ],
     },
     examples: {
-      existingPerson: {
+      pessoa_existente: {
         summary: 'Pessoa já cadastrada (use pessoaId)',
         value: {
           pessoaId: '123456',
-          tipoVoluntario: 'COORDENADOR',
+          tipoVoluntario: TipoVoluntario.COORDENADOR,
           formacaoAcademica: 'Pedagogia',
-          statusFormacao: 'COMPLETO',
+          statusFormacao: StatusFormacao.COMPLETO,
         },
       },
-      newPerson: {
+      pessoa_nova: {
         summary: 'Pessoa nova (envia dados da pessoa)',
         value: {
           nome: 'Carlos Santos',
           cpf: '12345678900',
           dataNascimento: '2000-01-01',
-          tipoVoluntario: 'PROFESSOR',
+          tipoVoluntario: TipoVoluntario.PROFESSOR,
           formacaoAcademica: 'Pedagogia',
-          statusFormacao: 'COMPLETO',
+          statusFormacao: StatusFormacao.COMPLETO,
         },
       },
     },

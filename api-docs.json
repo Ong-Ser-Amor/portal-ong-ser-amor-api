@@ -3154,7 +3154,7 @@
                 ]
               },
               "examples": {
-                "existingPerson": {
+                "pessoa_existente": {
                   "summary": "Pessoa já cadastrada (use pessoaId)",
                   "value": {
                     "pessoaId": "123456",
@@ -3163,7 +3163,7 @@
                     "statusFormacao": "COMPLETO"
                   }
                 },
-                "newPerson": {
+                "pessoa_nova": {
                   "summary": "Pessoa nova (envia dados da pessoa)",
                   "value": {
                     "nome": "Carlos Santos",
