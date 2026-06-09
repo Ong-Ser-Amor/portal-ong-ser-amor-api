@@ -3693,6 +3693,215 @@
           "Autenticacao"
         ]
       }
+    },
+    "/cursos": {
+      "post": {
+        "operationId": "CursosController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriarCursoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "O curso foi criado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CursoRespostaDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Já existe um curso cadastrado com este nome."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao criar o curso."
+          }
+        },
+        "summary": "Criar um novo curso",
+        "tags": [
+          "Cursos"
+        ]
+      },
+      "get": {
+        "operationId": "CursosController_buscarTodos",
+        "parameters": [
+          {
+            "name": "take",
+            "required": false,
+            "in": "query",
+            "description": "Número de itens a serem retornados (padrão: 10)",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "skip",
+            "required": false,
+            "in": "query",
+            "description": "Número de itens a serem pulados para paginação (padrão: 0)",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta paginada recebida com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginacaoRespostaDto"
+                    },
+                    {
+                      "properties": {
+                        "dados": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/CursoRespostaDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar os cursos."
+          }
+        },
+        "summary": "Buscar uma lista paginada de cursos",
+        "tags": [
+          "Cursos"
+        ]
+      }
+    },
+    "/cursos/{id}": {
+      "get": {
+        "operationId": "CursosController_buscarPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O curso foi encontrado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CursoRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Curso com o ID especificado não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar o curso."
+          }
+        },
+        "summary": "Buscar curso pelo ID",
+        "tags": [
+          "Cursos"
+        ]
+      },
+      "patch": {
+        "operationId": "CursosController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarCursoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O curso foi atualizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CursoRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Curso não encontrado."
+          },
+          "409": {
+            "description": "Já existe um curso cadastrado com este nome."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar o curso."
+          }
+        },
+        "summary": "Atualizar curso pelo ID",
+        "tags": [
+          "Cursos"
+        ]
+      },
+      "delete": {
+        "operationId": "CursosController_remover",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "O curso foi deletado com sucesso."
+          },
+          "404": {
+            "description": "Curso não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao deletar o curso."
+          }
+        },
+        "summary": "Deletar curso pelo ID",
+        "tags": [
+          "Cursos"
+        ]
+      }
     }
   },
   "info": {
@@ -5100,6 +5309,46 @@
           "tokenAcesso",
           "usuario"
         ]
+      },
+      "CriarCursoDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100,
+            "example": "Avenida Brasil"
+          }
+        },
+        "required": [
+          "nome"
+        ]
+      },
+      "CursoRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome"
+        ]
+      },
+      "AtualizarCursoDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100,
+            "example": "Avenida Brasil"
+          }
+        }
       }
     }
   }

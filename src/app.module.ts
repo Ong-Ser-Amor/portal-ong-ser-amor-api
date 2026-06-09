@@ -23,6 +23,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { UsersModule } from './users/users.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { VoluntariosModule } from './voluntarios/voluntarios.module';
+import { CursosModule } from './cursos/cursos.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
     UsuariosModule,
     VoluntariosModule,
     AutenticacaoModule,
+    CursosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
