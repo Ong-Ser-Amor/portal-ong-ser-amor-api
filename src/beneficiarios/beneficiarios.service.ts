@@ -52,18 +52,13 @@ export class BeneficiariosService {
     await queryRunner.startTransaction();
 
     try {
-      await this.validarRegrasMenoridade(
-        criarBeneficiarioDto.dataNascimento,
-        criarBeneficiarioDto.emancipado,
-        criarBeneficiarioDto.responsavelId,
-        queryRunner.manager,
-      );
-
       let pessoaId = criarBeneficiarioDto.pessoaId;
+      let dataNascConsolidada = criarBeneficiarioDto.dataNascimento;
+      let emancipadoConsolidado = criarBeneficiarioDto.emancipado;
+      let responsavelConsolidado = criarBeneficiarioDto.responsavelId;
 
       if (!pessoaId) {
         // Cenario A: Id da pessoa não fornecido (pessoa não existe).
-
         const dadosPessoa: CriarPessoaDto = {
           nome: criarBeneficiarioDto.nome,
           cpf: criarBeneficiarioDto.cpf,
@@ -73,7 +68,6 @@ export class BeneficiariosService {
           emancipado: criarBeneficiarioDto.emancipado,
         };
 
-        // Passa o queryRunner.manager para garantir que a pessoa será criada na mesma transação
         const novaPessoa = await this.pessoasService.criar(
           dadosPessoa,
           queryRunner.manager,
@@ -87,25 +81,40 @@ export class BeneficiariosService {
           const contatosParaSalvar: CriarContatoDto[] =
             criarBeneficiarioDto.contatos.map((contato) => ({
               ...contato,
-              pessoaId, // <-- Injetamos o ID da pessoa que acabou de nascer!
+              pessoaId,
             }));
-
-          // Chama o novo método elegante!
           await this.contatosService.criarVarios(
             contatosParaSalvar,
             queryRunner.manager,
           );
         }
       } else {
-        // Cenario B: Id da pessoa fornecido (pessoa já existe).
-        await this.pessoasService.buscarPorId(pessoaId, queryRunner.manager);
+        // Cenario B: Pessoa já existe. Buscamos para ter a Data de Nascimento real!
+        const pessoaExistente = await this.pessoasService.buscarPorId(
+          pessoaId,
+          queryRunner.manager,
+        );
+
+        // Consolida os dados para a validação
+        dataNascConsolidada = pessoaExistente.dataNascimento;
+        emancipadoConsolidado =
+          criarBeneficiarioDto.emancipado ?? pessoaExistente.emancipado;
+        responsavelConsolidado =
+          criarBeneficiarioDto.responsavelId !== undefined
+            ? criarBeneficiarioDto.responsavelId
+            : pessoaExistente.responsavelId;
       }
+
+      await this.validarRegrasMenoridade(
+        dataNascConsolidada,
+        emancipadoConsolidado,
+        responsavelConsolidado,
+        queryRunner.manager,
+      );
 
       const beneficioExistente = await queryRunner.manager.findOne(
         Beneficiario,
-        {
-          where: { pessoaId },
-        },
+        { where: { pessoaId } },
       );
 
       if (beneficioExistente) {
@@ -114,9 +123,19 @@ export class BeneficiariosService {
         );
       }
 
+      let familiaIdFinal = criarBeneficiarioDto.familiaId;
+
+      if (!familiaIdFinal && criarBeneficiarioDto.novaFamilia) {
+        const familiaCriada = await this.familiasService.criar(
+          criarBeneficiarioDto.novaFamilia,
+          queryRunner.manager,
+        );
+        familiaIdFinal = familiaCriada.id;
+      }
+
       const beneficiario = new Beneficiario({
         pessoaId,
-        familiaId: criarBeneficiarioDto.familiaId,
+        familiaId: familiaIdFinal,
         nivelEscolaridade: criarBeneficiarioDto.nivelEscolaridade,
         estadoCivil: criarBeneficiarioDto.estadoCivil,
         vinculoEmpregaticio: criarBeneficiarioDto.vinculoEmpregaticio,
@@ -125,7 +144,6 @@ export class BeneficiariosService {
 
       const beneficiarioSalvo = await queryRunner.manager.save(beneficiario);
 
-      // Carrega as relações com Pessoa e Familia DENTRO da transação antes de fazer commit
       const beneficiarioComRelacoes = await queryRunner.manager.findOneOrFail(
         Beneficiario,
         {
@@ -146,10 +164,10 @@ export class BeneficiariosService {
 
       this.logger.error(`Erro ao criar beneficiário: ${mensagemErro}`);
 
-      // Repassa erros (NotFound, Conflict)
       if (
         erro instanceof NotFoundException ||
-        erro instanceof ConflictException
+        erro instanceof ConflictException ||
+        erro instanceof BadRequestException
       ) {
         throw erro;
       }
