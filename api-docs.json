@@ -2639,22 +2639,22 @@
         "operationId": "BeneficiariosController_buscarTodos",
         "parameters": [
           {
-            "name": "take",
+            "name": "limite",
             "required": false,
             "in": "query",
-            "description": "Número de itens a serem retornados por página",
+            "description": "Número de itens por página (padrão: 10)",
             "schema": {
               "example": 10,
               "type": "number"
             }
           },
           {
-            "name": "skip",
+            "name": "pagina",
             "required": false,
             "in": "query",
-            "description": "Número de itens a serem ignorados na consulta",
+            "description": "Número da página atual (padrão: 1)",
             "schema": {
-              "example": 0,
+              "example": 1,
               "type": "number"
             }
           }

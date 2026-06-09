@@ -161,10 +161,13 @@ export class BeneficiariosService {
   }
 
   async buscarTodos(
-    take = 10,
-    skip = 0,
+    limite = 10,
+    pagina = 1,
   ): Promise<PaginacaoRespostaDto<Beneficiario>> {
     try {
+      const take = limite;
+      const skip = (pagina - 1) * limite;
+
       const [beneficiarios, total] = await this.repository.findAndCount({
         relations: ['pessoa', 'familia'],
         take,
@@ -175,8 +178,8 @@ export class BeneficiariosService {
       return new PaginacaoRespostaDto<Beneficiario>(
         beneficiarios,
         total,
-        take,
-        skip,
+        limite,
+        pagina,
       );
     } catch (erro) {
       const mensagemErro =
