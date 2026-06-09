@@ -2270,7 +2270,11 @@
                         ]
                       },
                       "novaFamilia": {
-                        "$ref": "#/components/schemas/CriarFamiliaDto"
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/CriarFamiliaDto"
+                          }
+                        ]
                       },
                       "contatos": {
                         "type": "array",
@@ -2467,7 +2471,11 @@
                         ]
                       },
                       "novaFamilia": {
-                        "$ref": "#/components/schemas/CriarFamiliaDto"
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/CriarFamiliaDto"
+                          }
+                        ]
                       },
                       "contatos": {
                         "type": "array",
@@ -2537,7 +2545,7 @@
                       }
                     ],
                     "novaFamilia": {
-                      "faixaRenda": "DE_1_A_3_SALARIOS_MINIMOS",
+                      "faixaRenda": "ATE_1_SALARIO",
                       "possuiBeneficioSocial": true,
                       "tipoMoradia": "ALUGADA",
                       "endereco": {
@@ -2546,7 +2554,7 @@
                         "numero": "123",
                         "bairro": "Centro",
                         "cidade": "Cidade",
-                        "estado": "SP"
+                        "uf": "SP"
                       }
                     },
                     "nivelEscolaridade": "ENSINO_FUNDAMENTAL_COMPLETO"
@@ -2571,7 +2579,7 @@
                         "valor": "11999998888"
                       }
                     ],
-                    "nivelEscolaridade": "ENSINO_FUNDAMENTAL_COMPLETO"
+                    "nivelEscolaridade": "ENSINO_MEDIO_COMPLETO"
                   }
                 },
                 "pessoa_nova_nova_familia": {
@@ -2593,7 +2601,7 @@
                       }
                     ],
                     "novaFamilia": {
-                      "faixaRenda": "DE_1_A_3_SALARIOS_MINIMOS",
+                      "faixaRenda": "ATE_1_SALARIO",
                       "possuiBeneficioSocial": true,
                       "tipoMoradia": "ALUGADA",
                       "endereco": {
@@ -2602,10 +2610,10 @@
                         "numero": "123",
                         "bairro": "Centro",
                         "cidade": "Cidade",
-                        "estado": "SP"
+                        "uf": "SP"
                       }
                     },
-                    "nivelEscolaridade": "ENSINO_FUNDAMENTAL_COMPLETO"
+                    "nivelEscolaridade": "ENSINO_MEDIO_COMPLETO"
                   }
                 }
               }
@@ -2865,7 +2873,7 @@
                   "summary": "Criar nova família",
                   "value": {
                     "novaFamilia": {
-                      "faixaRenda": "DE_1_A_3_SALARIOS_MINIMOS",
+                      "faixaRenda": "ATE_1_SALARIO",
                       "possuiBeneficioSocial": true,
                       "tipoMoradia": "ALUGADA",
                       "endereco": {
@@ -4592,6 +4600,133 @@
           "lesson"
         ]
       },
+      "CriarEnderecoDto": {
+        "type": "object",
+        "properties": {
+          "logradouro": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100,
+            "example": "Avenida Brasil"
+          },
+          "numero": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20,
+            "example": "123"
+          },
+          "complemento": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 3,
+            "maxLength": 50,
+            "example": "Apto 45"
+          },
+          "bairro": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80,
+            "example": "Centro"
+          },
+          "cep": {
+            "type": "string",
+            "pattern": "/^\\d{8}$/",
+            "example": "12345678"
+          },
+          "cidade": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80,
+            "example": "São Paulo"
+          },
+          "uf": {
+            "enum": [
+              "AC",
+              "AL",
+              "AP",
+              "AM",
+              "BA",
+              "CE",
+              "DF",
+              "ES",
+              "GO",
+              "MA",
+              "MT",
+              "MS",
+              "MG",
+              "PA",
+              "PB",
+              "PR",
+              "PE",
+              "PI",
+              "RJ",
+              "RN",
+              "RS",
+              "RO",
+              "RR",
+              "SC",
+              "SP",
+              "SE",
+              "TO"
+            ],
+            "type": "string",
+            "example": "SP"
+          }
+        },
+        "required": [
+          "logradouro",
+          "numero",
+          "bairro",
+          "cep",
+          "cidade",
+          "uf"
+        ]
+      },
+      "CriarFamiliaDto": {
+        "type": "object",
+        "properties": {
+          "faixaRenda": {
+            "enum": [
+              "ATE_1_SALARIO",
+              "DE_1_A_3_SALARIOS",
+              "ACIMA_3_SALARIOS"
+            ],
+            "type": "string",
+            "description": "A faixa de renda da família",
+            "example": "ATE_1_SALARIO"
+          },
+          "possuiBeneficioSocial": {
+            "type": "boolean",
+            "description": "Indica se a família participa de programas sociais (ex: Bolsa Família, Auxílio Gás)",
+            "example": true
+          },
+          "tipoMoradia": {
+            "enum": [
+              "PROPRIA",
+              "ALUGADA",
+              "CEDIDA",
+              "OCUPACAO_IRREGULAR"
+            ],
+            "type": "string",
+            "description": "O tipo de moradia da família",
+            "example": "ALUGADA"
+          },
+          "endereco": {
+            "description": "Dados do endereço da família",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CriarEnderecoDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "faixaRenda",
+          "possuiBeneficioSocial",
+          "tipoMoradia",
+          "endereco"
+        ]
+      },
       "PessoaRespostaDto": {
         "type": "object",
         "properties": {
@@ -4982,7 +5117,7 @@
             ],
             "type": "string",
             "description": "A faixa de renda da família",
-            "example": "DE_1_A_3_SALARIOS_MINIMOS"
+            "example": "ATE_1_SALARIO"
           },
           "possuiBeneficioSocial": {
             "type": "boolean",

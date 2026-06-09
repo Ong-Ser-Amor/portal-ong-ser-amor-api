@@ -17,7 +17,7 @@ export class CriarFamiliaDto {
   @ApiProperty({
     enum: FaixaRenda,
     description: 'A faixa de renda da família',
-    example: 'DE_1_A_3_SALARIOS_MINIMOS',
+    example: FaixaRenda.ATE_1_SALARIO,
   })
   @IsEnum(FaixaRenda, {
     message: 'A faixa de renda fornecida é inválida.',

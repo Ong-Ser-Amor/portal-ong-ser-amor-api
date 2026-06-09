@@ -17,6 +17,7 @@ import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiBody,
+  ApiExtraModels,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
@@ -24,10 +25,14 @@ import {
   ApiOperation,
   ApiQuery,
   ApiTags,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { TipoContato } from 'src/contatos/enums/tipo-contato.enum';
 import { ApiPaginacaoResposta } from 'src/dtos/api-paginacao-resposta.decorator';
 import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
+import { CriarFamiliaDto } from 'src/familias/dto/criar-familia.dto';
+import { FaixaRenda } from 'src/familias/enums/faixa-renda.enum';
+import { TipoMoradia } from 'src/familias/enums/tipo-moradia.enum';
 
 import { BeneficiariosService } from './beneficiarios.service';
 import { AtualizarBeneficiarioDto } from './dto/atualizar-beneficiario.dto';
@@ -41,6 +46,7 @@ import {
 } from './enums/beneficiario.enum';
 
 @ApiTags('Beneficiarios')
+@ApiExtraModels(CriarFamiliaDto)
 @Controller('beneficiarios')
 export class BeneficiariosController {
   constructor(private readonly beneficiariosService: BeneficiariosService) {}
@@ -108,7 +114,9 @@ export class BeneficiariosController {
               type: 'string',
               enum: Object.values(NivelEscolaridade),
             },
-            novaFamilia: { $ref: '#/components/schemas/CriarFamiliaDto' },
+            novaFamilia: {
+              allOf: [{ $ref: getSchemaPath(CriarFamiliaDto) }],
+            },
             contatos: {
               type: 'array',
               items: {
@@ -212,7 +220,9 @@ export class BeneficiariosController {
               type: 'string',
               enum: Object.values(NivelEscolaridade),
             },
-            novaFamilia: { $ref: '#/components/schemas/CriarFamiliaDto' },
+            novaFamilia: {
+              allOf: [{ $ref: getSchemaPath(CriarFamiliaDto) }],
+            },
             contatos: {
               type: 'array',
               items: {
@@ -246,13 +256,13 @@ export class BeneficiariosController {
           emancipado: false,
           podeSairSozinho: true,
           responsavelId: '10',
-          estadoCivil: 'SOLTEIRO',
-          vinculoEmpregaticio: 'DESEMPREGADO',
+          estadoCivil: EstadoCivil.SOLTEIRO,
+          vinculoEmpregaticio: VinculoEmpregaticio.DESEMPREGADO,
           quantidadeFilhos: 2,
-          nivelEscolaridade: 'ENSINO_FUNDAMENTAL_COMPLETO',
+          nivelEscolaridade: NivelEscolaridade.ENSINO_FUNDAMENTAL_COMPLETO,
           contatos: [
             {
-              tipoContato: 'CELULAR',
+              tipoContato: TipoContato.CELULAR,
               valor: '11999998888',
             },
           ],
@@ -265,29 +275,29 @@ export class BeneficiariosController {
           emancipado: false,
           podeSairSozinho: true,
           responsavelId: '10',
-          estadoCivil: 'SOLTEIRO',
-          vinculoEmpregaticio: 'DESEMPREGADO',
+          estadoCivil: EstadoCivil.SOLTEIRO,
+          vinculoEmpregaticio: VinculoEmpregaticio.DESEMPREGADO,
           quantidadeFilhos: 2,
           contatos: [
             {
-              tipoContato: 'CELULAR',
+              tipoContato: TipoContato.CELULAR,
               valor: '11999998888',
             },
           ],
           novaFamilia: {
-            faixaRenda: 'DE_1_A_3_SALARIOS_MINIMOS',
+            faixaRenda: FaixaRenda.ATE_1_SALARIO,
             possuiBeneficioSocial: true,
-            tipoMoradia: 'ALUGADA',
+            tipoMoradia: TipoMoradia.ALUGADA,
             endereco: {
               cep: '12345678',
               logradouro: 'Rua A',
               numero: '123',
               bairro: 'Centro',
               cidade: 'Cidade',
-              estado: 'SP',
+              uf: 'SP',
             },
           },
-          nivelEscolaridade: 'ENSINO_FUNDAMENTAL_COMPLETO',
+          nivelEscolaridade: NivelEscolaridade.ENSINO_FUNDAMENTAL_COMPLETO,
         },
       },
       pessoa_nova_familia_existente: {
@@ -300,16 +310,16 @@ export class BeneficiariosController {
           emancipado: false,
           podeSairSozinho: true,
           responsavelId: '10',
-          estadoCivil: 'SOLTEIRO',
-          vinculoEmpregaticio: 'DESEMPREGADO',
+          estadoCivil: EstadoCivil.SOLTEIRO,
+          vinculoEmpregaticio: VinculoEmpregaticio.DESEMPREGADO,
           quantidadeFilhos: 2,
           contatos: [
             {
-              tipoContato: 'CELULAR',
+              tipoContato: TipoContato.CELULAR,
               valor: '11999998888',
             },
           ],
-          nivelEscolaridade: 'ENSINO_FUNDAMENTAL_COMPLETO',
+          nivelEscolaridade: NivelEscolaridade.ENSINO_MEDIO_COMPLETO,
         },
       },
       pessoa_nova_nova_familia: {
@@ -321,29 +331,29 @@ export class BeneficiariosController {
           emancipado: false,
           podeSairSozinho: true,
           responsavelId: '10',
-          estadoCivil: 'SOLTEIRO',
-          vinculoEmpregaticio: 'DESEMPREGADO',
+          estadoCivil: EstadoCivil.SOLTEIRO,
+          vinculoEmpregaticio: VinculoEmpregaticio.DESEMPREGADO,
           quantidadeFilhos: 2,
           contatos: [
             {
-              tipoContato: 'CELULAR',
+              tipoContato: TipoContato.CELULAR,
               valor: '11999998888',
             },
           ],
           novaFamilia: {
-            faixaRenda: 'DE_1_A_3_SALARIOS_MINIMOS',
+            faixaRenda: FaixaRenda.ATE_1_SALARIO,
             possuiBeneficioSocial: true,
-            tipoMoradia: 'ALUGADA',
+            tipoMoradia: TipoMoradia.ALUGADA,
             endereco: {
               cep: '12345678',
               logradouro: 'Rua A',
               numero: '123',
               bairro: 'Centro',
               cidade: 'Cidade',
-              estado: 'SP',
+              uf: 'SP',
             },
           },
-          nivelEscolaridade: 'ENSINO_FUNDAMENTAL_COMPLETO',
+          nivelEscolaridade: NivelEscolaridade.ENSINO_MEDIO_COMPLETO,
         },
       },
     },
@@ -483,7 +493,7 @@ export class BeneficiariosController {
         summary: 'Criar nova família',
         value: {
           novaFamilia: {
-            faixaRenda: 'DE_1_A_3_SALARIOS_MINIMOS',
+            faixaRenda: FaixaRenda.ATE_1_SALARIO,
             possuiBeneficioSocial: true,
             tipoMoradia: 'ALUGADA',
             endereco: {
