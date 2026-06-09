@@ -3735,22 +3735,22 @@
         "operationId": "CursosController_buscarTodos",
         "parameters": [
           {
-            "name": "take",
+            "name": "limite",
             "required": false,
             "in": "query",
-            "description": "Número de itens a serem retornados (padrão: 10)",
+            "description": "Número de itens por página (padrão: 10)",
             "schema": {
               "example": 10,
               "type": "number"
             }
           },
           {
-            "name": "skip",
+            "name": "pagina",
             "required": false,
             "in": "query",
-            "description": "Número de itens a serem pulados para paginação (padrão: 0)",
+            "description": "Número da página atual (padrão: 1)",
             "schema": {
-              "example": 0,
+              "example": 1,
               "type": "number"
             }
           }

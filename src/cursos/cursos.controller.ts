@@ -57,25 +57,28 @@ export class CursosController {
   @ApiOperation({ summary: 'Buscar uma lista paginada de cursos' })
   @ApiPaginacaoResposta(CursoRespostaDto)
   @ApiQuery({
-    name: 'take',
+    name: 'limite',
     required: false,
-    description: 'Número de itens a serem retornados (padrão: 10)',
+    description: 'Número de itens por página (padrão: 10)',
     example: 10,
   })
   @ApiQuery({
-    name: 'skip',
+    name: 'pagina',
     required: false,
-    description: 'Número de itens a serem pulados para paginação (padrão: 0)',
-    example: 0,
+    description: 'Número da página atual (padrão: 1)',
+    example: 1,
   })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar os cursos.',
   })
   async buscarTodos(
-    @Query('take', new DefaultValuePipe(10), ParseIntPipe) take: number,
-    @Query('skip', new DefaultValuePipe(0), ParseIntPipe) skip: number,
+    @Query('limite', new DefaultValuePipe(10), ParseIntPipe) limite: number,
+    @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
   ): Promise<PaginacaoRespostaDto<CursoRespostaDto>> {
-    const cursosPaginados = await this.cursosService.buscarTodos(take, skip);
+    const cursosPaginados = await this.cursosService.buscarTodos(
+      limite,
+      pagina,
+    );
 
     const cursosDtos = cursosPaginados.dados.map(
       (curso) => new CursoRespostaDto(curso),

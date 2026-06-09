@@ -40,15 +40,21 @@ export class CursosService {
     }
   }
 
-  async buscarTodos(take = 10, skip = 0): Promise<PaginacaoRespostaDto<Curso>> {
+  async buscarTodos(
+    limite = 10,
+    pagina = 1,
+  ): Promise<PaginacaoRespostaDto<Curso>> {
     try {
+      const take = limite;
+      const skip = (pagina - 1) * limite;
+
       const [cursos, total] = await this.repository.findAndCount({
         order: { nome: 'ASC' },
         take,
         skip,
       });
 
-      return new PaginacaoRespostaDto<Curso>(cursos, total, take, skip);
+      return new PaginacaoRespostaDto<Curso>(cursos, total, limite, pagina);
     } catch (error) {
       const mensagemErro =
         error instanceof Error
