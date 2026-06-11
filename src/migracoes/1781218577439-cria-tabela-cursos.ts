@@ -1,15 +1,10 @@
-import {
-  MigrationInterface,
-  QueryRunner,
-  Table,
-  TableForeignKey,
-} from 'typeorm';
+import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class CriaTabelaPlanosCurso1781047461114 implements MigrationInterface {
+export class CriaTabelaCursos1781218577439 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'planos_curso',
+        name: 'cursos',
         columns: [
           {
             name: 'id',
@@ -17,11 +12,6 @@ export class CriaTabelaPlanosCurso1781047461114 implements MigrationInterface {
             isPrimary: true,
             isGenerated: true,
             generationStrategy: 'identity',
-          },
-          {
-            name: 'curso_id',
-            type: 'bigint',
-            isNullable: false,
           },
           {
             name: 'nome',
@@ -32,14 +22,14 @@ export class CriaTabelaPlanosCurso1781047461114 implements MigrationInterface {
           {
             name: 'criado_em',
             type: 'timestamp',
-            default: 'now()',
             isNullable: false,
+            default: 'now()',
           },
           {
             name: 'atualizado_em',
             type: 'timestamp',
-            default: 'now()',
             isNullable: false,
+            default: 'now()',
           },
           {
             name: 'deletado_em',
@@ -50,24 +40,16 @@ export class CriaTabelaPlanosCurso1781047461114 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createForeignKey(
-      'planos_curso',
-      new TableForeignKey({
-        name: 'FK_planos_curso_curso_id',
-        columnNames: ['curso_id'],
-        referencedTableName: 'cursos',
-        referencedColumnNames: ['id'],
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-      }),
-    );
+    // Cria o Índice Único (Sem acento, minúsculo, ignorando os deletados)
+    await queryRunner.query(`
+      CREATE UNIQUE INDEX "UQ_cursos_nome"
+      ON "cursos" (LOWER(f_unaccent("nome")))
+      WHERE "deletado_em" IS NULL;
+    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey(
-      'planos_curso',
-      'FK_planos_curso_curso_id',
-    );
-    await queryRunner.dropTable('planos_curso');
+    await queryRunner.query(`DROP INDEX "UQ_cursos_nome"`);
+    await queryRunner.dropTable('cursos');
   }
 }

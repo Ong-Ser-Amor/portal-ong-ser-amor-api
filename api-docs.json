@@ -3910,6 +3910,215 @@
           "Cursos"
         ]
       }
+    },
+    "/planos-curso": {
+      "post": {
+        "operationId": "PlanosCursoController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriarPlanoCursoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "O plano de curso foi criado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanoCursoRespostaDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Já existe um plano de curso cadastrado com este nome."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao criar o plano de curso."
+          }
+        },
+        "summary": "Criar um novo plano de curso",
+        "tags": [
+          "Planos de Curso"
+        ]
+      },
+      "get": {
+        "operationId": "PlanosCursoController_buscarTodos",
+        "parameters": [
+          {
+            "name": "limite",
+            "required": false,
+            "in": "query",
+            "description": "Número de itens por página (padrão: 10)",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pagina",
+            "required": false,
+            "in": "query",
+            "description": "Número da página atual (padrão: 1)",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta paginada recebida com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginacaoRespostaDto"
+                    },
+                    {
+                      "properties": {
+                        "dados": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PlanoCursoRespostaDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar os planos de curso."
+          }
+        },
+        "summary": "Buscar uma lista paginada de planos de curso",
+        "tags": [
+          "Planos de Curso"
+        ]
+      }
+    },
+    "/planos-curso/{id}": {
+      "get": {
+        "operationId": "PlanosCursoController_buscarPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O plano de curso foi encontrado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanoCursoRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plano de curso com o ID especificado não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar o plano de curso."
+          }
+        },
+        "summary": "Buscar um plano de curso pelo ID",
+        "tags": [
+          "Planos de Curso"
+        ]
+      },
+      "patch": {
+        "operationId": "PlanosCursoController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarPlanoCursoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O plano de curso foi atualizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanoCursoRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plano de curso com o ID especificado não encontrado."
+          },
+          "409": {
+            "description": "Já existe um plano de curso cadastrado com este nome."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar o plano de curso."
+          }
+        },
+        "summary": "Atualizar um plano de curso pelo ID",
+        "tags": [
+          "Planos de Curso"
+        ]
+      },
+      "delete": {
+        "operationId": "PlanosCursoController_remover",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "O plano de curso foi removido com sucesso."
+          },
+          "404": {
+            "description": "Plano de curso com o ID especificado não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao remover o plano de curso."
+          }
+        },
+        "summary": "Deletar um plano de curso pelo ID",
+        "tags": [
+          "Planos de Curso"
+        ]
+      }
     }
   },
   "info": {
@@ -5482,6 +5691,59 @@
             "minLength": 3,
             "maxLength": 100,
             "example": "Avenida Brasil"
+          }
+        }
+      },
+      "CriarPlanoCursoDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100,
+            "example": "Introdução à Lógica de Programação"
+          },
+          "cursoId": {
+            "type": "string",
+            "example": "1"
+          }
+        },
+        "required": [
+          "nome",
+          "cursoId"
+        ]
+      },
+      "PlanoCursoRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "cursoId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome",
+          "cursoId"
+        ]
+      },
+      "AtualizarPlanoCursoDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100,
+            "example": "Introdução à Lógica de Programação"
+          },
+          "cursoId": {
+            "type": "string",
+            "example": "1"
           }
         }
       }

@@ -128,18 +128,26 @@ export class CursosService {
     nome: string,
     cursoIgnoradoId?: string,
   ): Promise<void> {
+    // aplica trim no nome do curso
+    const nomeNormalizado = nome.trim();
     const query = this.repository
       .createQueryBuilder('curso')
-      .where('LOWER(curso.nome) = LOWER(:nome)', { nome });
+      // normaliza o nome do curso para comparação (remove acentos e converte para minúsculas)
+      .where(
+        'LOWER(f_unaccent(curso.nome)) = LOWER(f_unaccent(:nomeNormalizado))',
+        {
+          nomeNormalizado,
+        },
+      );
 
     // Se estiver atualizando, ignora o próprio curso para não dar falso positivo
     if (cursoIgnoradoId) {
       query.andWhere('curso.id != :cursoIgnoradoId', { cursoIgnoradoId });
     }
 
-    const existe = await query.getExists();
+    const cursoExistente = await query.getExists();
 
-    if (existe) {
+    if (cursoExistente) {
       throw new ConflictException(
         `Já existe um curso cadastrado com o nome '${nome}'.`,
       );
