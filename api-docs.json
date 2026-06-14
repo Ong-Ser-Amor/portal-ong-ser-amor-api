@@ -5952,10 +5952,6 @@
             "minLength": 3,
             "maxLength": 100,
             "example": "Introdução à Lógica de Programação"
-          },
-          "cursoId": {
-            "type": "string",
-            "example": "1"
           }
         }
       },
