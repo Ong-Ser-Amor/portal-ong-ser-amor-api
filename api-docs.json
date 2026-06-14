@@ -4119,6 +4119,218 @@
           "Planos de Curso"
         ]
       }
+    },
+    "/turmas": {
+      "post": {
+        "operationId": "TurmasController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriarTurmaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "A turma foi criada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurmaRespostaDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Já existe uma turma cadastrada com este nome para o plano de curso."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao criar a turma."
+          }
+        },
+        "summary": "Criar uma nova turma",
+        "tags": [
+          "Turmas"
+        ]
+      },
+      "get": {
+        "operationId": "TurmasController_buscarTodos",
+        "parameters": [
+          {
+            "name": "limite",
+            "required": false,
+            "in": "query",
+            "description": "Número de itens por página (padrão: 10)",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pagina",
+            "required": false,
+            "in": "query",
+            "description": "Número da página atual (padrão: 1)",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta paginada recebida com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginacaoRespostaDto"
+                    },
+                    {
+                      "properties": {
+                        "dados": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/TurmaRespostaDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar as turmas."
+          }
+        },
+        "summary": "Buscar uma lista paginada de turmas",
+        "tags": [
+          "Turmas"
+        ]
+      }
+    },
+    "/turmas/{id}": {
+      "get": {
+        "operationId": "TurmasController_buscarPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A turma foi encontrada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurmaRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Turma com o ID especificado não foi encontrada."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar a turma."
+          }
+        },
+        "summary": "Buscar uma turma por ID",
+        "tags": [
+          "Turmas"
+        ]
+      },
+      "patch": {
+        "operationId": "TurmasController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarTurmaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A turma foi atualizada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurmaRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A data final não pode ser anterior à data de início da turma."
+          },
+          "404": {
+            "description": "Turma com o ID especificado não foi encontrada."
+          },
+          "409": {
+            "description": "Já existe uma turma cadastrada com este nome para o plano de curso."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar a turma."
+          }
+        },
+        "summary": "Atualizar uma turma pelo ID",
+        "tags": [
+          "Turmas"
+        ]
+      },
+      "delete": {
+        "operationId": "TurmasController_remover",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "A turma foi removida com sucesso."
+          },
+          "404": {
+            "description": "Turma com o ID especificado não encontrada."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao remover a turma."
+          }
+        },
+        "summary": "Deletar uma turma pelo ID",
+        "tags": [
+          "Turmas"
+        ]
+      }
     }
   },
   "info": {
@@ -5744,6 +5956,133 @@
           "cursoId": {
             "type": "string",
             "example": "1"
+          }
+        }
+      },
+      "CriarTurmaDto": {
+        "type": "object",
+        "properties": {
+          "planoCursoId": {
+            "type": "string",
+            "example": "1"
+          },
+          "nome": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100,
+            "example": "Turma de Lógica de Programação"
+          },
+          "cargaHoraria": {
+            "type": "number",
+            "minimum": 1,
+            "example": 40
+          },
+          "dataInicio": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01"
+          },
+          "dataFim": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-12-31"
+          },
+          "status": {
+            "enum": [
+              "EM_FORMACAO",
+              "EM_ANDAMENTO",
+              "FINALIZADA",
+              "CANCELADA"
+            ],
+            "type": "string",
+            "example": "EM_FORMACAO"
+          }
+        },
+        "required": [
+          "planoCursoId",
+          "nome",
+          "cargaHoraria",
+          "dataInicio",
+          "dataFim",
+          "status"
+        ]
+      },
+      "TurmaRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "cargaHoraria": {
+            "type": "number"
+          },
+          "dataInicio": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "dataFim": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "EM_FORMACAO",
+              "EM_ANDAMENTO",
+              "FINALIZADA",
+              "CANCELADA"
+            ],
+            "type": "string"
+          },
+          "planoCursoId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome",
+          "cargaHoraria",
+          "dataInicio",
+          "dataFim",
+          "status",
+          "planoCursoId"
+        ]
+      },
+      "AtualizarTurmaDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100,
+            "example": "Turma de Lógica de Programação"
+          },
+          "cargaHoraria": {
+            "type": "number",
+            "minimum": 1,
+            "example": 40
+          },
+          "dataInicio": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01"
+          },
+          "dataFim": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-12-31"
+          },
+          "status": {
+            "enum": [
+              "EM_FORMACAO",
+              "EM_ANDAMENTO",
+              "FINALIZADA",
+              "CANCELADA"
+            ],
+            "type": "string",
+            "example": "EM_FORMACAO"
           }
         }
       }
