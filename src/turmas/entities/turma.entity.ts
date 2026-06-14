@@ -1,4 +1,4 @@
-import { PlanosCurso } from 'src/planos-curso/entities/planos-curso.entity';
+import { PlanoCurso } from 'src/planos-curso/entities/plano-curso.entity';
 import {
   Column,
   CreateDateColumn,
@@ -20,9 +20,9 @@ export class Turma {
   @Column({ name: 'plano_curso_id', type: 'bigint' })
   planoCursoId: string;
 
-  @ManyToOne(() => PlanosCurso)
+  @ManyToOne(() => PlanoCurso)
   @JoinColumn({ name: 'plano_curso_id' })
-  planoCurso: PlanosCurso;
+  planoCurso: PlanoCurso;
 
   @Column({ type: 'varchar', length: 100 })
   nome: string;

@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 
 @Entity('planos_curso')
-export class PlanosCurso {
+export class PlanoCurso {
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   id: string;
 
@@ -34,7 +34,7 @@ export class PlanosCurso {
   @DeleteDateColumn({ name: 'deletado_em', type: 'timestamp', nullable: true })
   deletadoEm: Date | null;
 
-  constructor(partial: Partial<PlanosCurso>) {
+  constructor(partial: Partial<PlanoCurso>) {
     Object.assign(this, partial);
   }
 }

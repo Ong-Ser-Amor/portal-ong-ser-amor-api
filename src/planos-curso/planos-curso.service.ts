@@ -11,18 +11,18 @@ import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { AtualizarPlanoCursoDto } from './dto/atualizar-planos-curso.dto';
 import { CriarPlanoCursoDto } from './dto/criar-plano-curso.dto';
-import { PlanosCurso } from './entities/planos-curso.entity';
+import { PlanoCurso } from './entities/plano-curso.entity';
 
 @Injectable()
 export class PlanosCursoService {
   private readonly logger = new Logger(PlanosCursoService.name);
 
   constructor(
-    @InjectRepository(PlanosCurso)
-    private readonly repository: Repository<PlanosCurso>,
+    @InjectRepository(PlanoCurso)
+    private readonly repository: Repository<PlanoCurso>,
   ) {}
 
-  async criar(criarPlanoCursoDto: CriarPlanoCursoDto): Promise<PlanosCurso> {
+  async criar(criarPlanoCursoDto: CriarPlanoCursoDto): Promise<PlanoCurso> {
     await this.verificarDuplicidadeNome(
       criarPlanoCursoDto.nome,
       criarPlanoCursoDto.cursoId,
@@ -45,7 +45,7 @@ export class PlanosCursoService {
   async buscarTodos(
     limite = 10,
     pagina = 1,
-  ): Promise<PaginacaoRespostaDto<PlanosCurso>> {
+  ): Promise<PaginacaoRespostaDto<PlanoCurso>> {
     try {
       const take = limite;
       const skip = (pagina - 1) * limite;
@@ -56,7 +56,7 @@ export class PlanosCursoService {
         skip,
       });
 
-      return new PaginacaoRespostaDto<PlanosCurso>(
+      return new PaginacaoRespostaDto<PlanoCurso>(
         planosCurso,
         total,
         limite,
@@ -73,7 +73,7 @@ export class PlanosCursoService {
     }
   }
 
-  async buscarPorId(id: string): Promise<PlanosCurso> {
+  async buscarPorId(id: string): Promise<PlanoCurso> {
     try {
       return await this.repository.findOneByOrFail({ id });
     } catch (erro) {
@@ -100,7 +100,7 @@ export class PlanosCursoService {
   async atualizar(
     id: string,
     atualizarPlanoCursoDto: AtualizarPlanoCursoDto,
-  ): Promise<PlanosCurso> {
+  ): Promise<PlanoCurso> {
     const planoCurso = await this.buscarPorId(id);
 
     if (
