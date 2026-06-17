@@ -69,7 +69,7 @@ export class CriaTabelaTurmasProfessores1781736129306
         name: 'FK_turmas_professores_id_professor',
         columnNames: ['professor_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'professores',
+        referencedTableName: 'voluntarios',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       }),
