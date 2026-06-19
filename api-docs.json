@@ -4331,6 +4331,94 @@
           "Turmas"
         ]
       }
+    },
+    "/turmas/{id}/professores": {
+      "post": {
+        "operationId": "TurmasController_vincularProfessor",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VincularProfessorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O professor foi vinculado à turma com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurmaProfessorRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Turma ou professor com o ID especificado não foram encontrados."
+          },
+          "409": {
+            "description": "O professor já está vinculado a esta turma."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao vincular o professor."
+          }
+        },
+        "summary": "Vincular um professor a uma turma",
+        "tags": [
+          "Turmas"
+        ]
+      }
+    },
+    "/turmas/{id}/professores/{professorId}": {
+      "delete": {
+        "operationId": "TurmasController_desvincularProfessor",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "professorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "O professor foi desvinculado da turma com sucesso."
+          },
+          "404": {
+            "description": "Turma ou professor com o ID especificado não foram encontrados, ou o professor não está vinculado a esta turma."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao desvincular o professor."
+          }
+        },
+        "summary": "Desvincular um professor de uma turma",
+        "tags": [
+          "Turmas"
+        ]
+      }
     }
   },
   "info": {
@@ -6003,6 +6091,21 @@
           "status"
         ]
       },
+      "ProfessorResumoRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome"
+        ]
+      },
       "TurmaRespostaDto": {
         "type": "object",
         "properties": {
@@ -6011,6 +6114,9 @@
           },
           "nome": {
             "type": "string"
+          },
+          "planoCurso": {
+            "$ref": "#/components/schemas/PlanoCursoRespostaDto"
           },
           "cargaHoraria": {
             "type": "number"
@@ -6032,8 +6138,11 @@
             ],
             "type": "string"
           },
-          "planoCursoId": {
-            "type": "string"
+          "professores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProfessorResumoRespostaDto"
+            }
           }
         },
         "required": [
@@ -6042,8 +6151,7 @@
           "cargaHoraria",
           "dataInicio",
           "dataFim",
-          "status",
-          "planoCursoId"
+          "status"
         ]
       },
       "AtualizarTurmaDto": {
@@ -6081,6 +6189,38 @@
             "example": "EM_FORMACAO"
           }
         }
+      },
+      "VincularProfessorDto": {
+        "type": "object",
+        "properties": {
+          "professorId": {
+            "type": "string",
+            "example": "1",
+            "description": "ID do voluntário que atuará como professor"
+          }
+        },
+        "required": [
+          "professorId"
+        ]
+      },
+      "TurmaProfessorRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "turmaId": {
+            "type": "string"
+          },
+          "professorId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "turmaId",
+          "professorId"
+        ]
       }
     }
   }

@@ -6,10 +6,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
+import { TurmaProfessor } from './turma-professor';
 import { StatusTurma } from '../enums/status-turma.enum';
 
 @Entity('turmas')
@@ -38,6 +40,9 @@ export class Turma {
 
   @Column({ type: 'varchar', length: 20, enum: StatusTurma })
   status: StatusTurma;
+
+  @OneToMany(() => TurmaProfessor, (turmaProfessor) => turmaProfessor.turma)
+  turmasProfessores: TurmaProfessor[];
 
   @CreateDateColumn({ name: 'criado_em', type: 'timestamp' })
   criadoEm: Date;

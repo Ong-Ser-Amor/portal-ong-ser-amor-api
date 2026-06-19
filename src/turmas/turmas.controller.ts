@@ -29,7 +29,9 @@ import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
 
 import { AtualizarTurmaDto } from './dto/atualizar-turma.dto';
 import { CriarTurmaDto } from './dto/criar-turma.dto';
+import { TurmaProfessorRespostaDto } from './dto/turma-professor-resposta.dto';
 import { TurmaRespostaDto } from './dto/turma-resposta.dto';
+import { VincularProfessorDto } from './dto/vincular-professor.dto';
 import { TurmasService } from './turmas.service';
 
 @ApiTags('Turmas')
@@ -150,5 +152,52 @@ export class TurmasController {
   })
   async remover(@Param('id') id: string): Promise<void> {
     await this.turmasService.remover(id);
+  }
+
+  @Post(':id/professores')
+  @ApiOperation({ summary: 'Vincular um professor a uma turma' })
+  @ApiOkResponse({
+    description: 'O professor foi vinculado à turma com sucesso.',
+    type: TurmaProfessorRespostaDto,
+  })
+  @ApiNotFoundResponse({
+    description:
+      'Turma ou professor com o ID especificado não foram encontrados.',
+  })
+  @ApiConflictResponse({
+    description: 'O professor já está vinculado a esta turma.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Ocorreu um erro inesperado ao vincular o professor.',
+  })
+  async vincularProfessor(
+    @Param('id') turmaId: string,
+    @Body() vincularProfessorDto: VincularProfessorDto,
+  ) {
+    const vinculo = await this.turmasService.vincularProfessor(
+      turmaId,
+      vincularProfessorDto,
+    );
+    return new TurmaProfessorRespostaDto(vinculo);
+  }
+
+  @Delete(':id/professores/:professorId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Desvincular um professor de uma turma' })
+  @ApiNoContentResponse({
+    description: 'O professor foi desvinculado da turma com sucesso.',
+  })
+  @ApiNotFoundResponse({
+    description:
+      'Turma ou professor com o ID especificado não foram encontrados, ou o professor não está vinculado a esta turma.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Ocorreu um erro inesperado ao desvincular o professor.',
+  })
+  async desvincularProfessor(
+    @Param('id') turmaId: string,
+    @Param('professorId') professorId: string,
+  ): Promise<void> {
+    return await this.turmasService.desvincularProfessor(turmaId, professorId);
   }
 }

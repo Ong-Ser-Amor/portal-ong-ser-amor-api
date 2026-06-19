@@ -12,6 +12,8 @@ import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { AtualizarTurmaDto } from './dto/atualizar-turma.dto';
 import { CriarTurmaDto } from './dto/criar-turma.dto';
+import { VincularProfessorDto } from './dto/vincular-professor.dto';
+import { TurmaProfessor } from './entities/turma-professor';
 import { Turma } from './entities/turma.entity';
 
 @Injectable()
@@ -21,6 +23,8 @@ export class TurmasService {
   constructor(
     @InjectRepository(Turma)
     private readonly repository: Repository<Turma>,
+    @InjectRepository(TurmaProfessor)
+    private readonly turmaProfessorRepository: Repository<TurmaProfessor>,
   ) {}
 
   async criar(criarTurmaDto: CriarTurmaDto): Promise<Turma> {
@@ -71,7 +75,15 @@ export class TurmasService {
 
   async buscarPorId(id: string): Promise<Turma> {
     try {
-      return await this.repository.findOneByOrFail({ id });
+      return await this.repository.findOneOrFail({
+        where: { id },
+        relations: [
+          'planoCurso',
+          'turmasProfessores',
+          'turmasProfessores.professor',
+          'turmasProfessores.professor.pessoa',
+        ],
+      });
     } catch (erro) {
       if (erro instanceof EntityNotFoundError) {
         throw new NotFoundException(`Turma com ID ${id} não encontrada.`);
@@ -141,6 +153,82 @@ export class TurmasService {
       this.logger.error(`Erro ao remover turma: ${mensagemErro}`);
 
       throw new InternalServerErrorException('Erro ao remover turma.');
+    }
+  }
+
+  async vincularProfessor(
+    turmaId: string,
+    vincularProfessorDto: VincularProfessorDto,
+  ): Promise<TurmaProfessor> {
+    await this.buscarPorId(turmaId);
+
+    const vinculoExistente = await this.turmaProfessorRepository.existsBy({
+      turmaId,
+      professorId: vincularProfessorDto.professorId,
+    });
+
+    if (vinculoExistente) {
+      throw new ConflictException(
+        `O professor com ID ${vincularProfessorDto.professorId} já está vinculado à turma ${turmaId}.`,
+      );
+    }
+
+    try {
+      const novoVinculo = this.turmaProfessorRepository.create({
+        turmaId,
+        professorId: vincularProfessorDto.professorId,
+      });
+      return await this.turmaProfessorRepository.save(novoVinculo);
+    } catch (erro) {
+      // Converte o erro unknown para um tipo seguro que contenha um 'code' opcional
+      // para que o TypeScript permita acessar essa propriedade sem apresentar erro de linter
+      const erroBanco = erro as { code?: string };
+
+      if (erroBanco?.code === '23503') {
+        throw new NotFoundException(
+          `Voluntário (Professor) com ID ${vincularProfessorDto.professorId} não encontrado.`,
+        );
+      }
+
+      const mensagemErro =
+        erro instanceof Error
+          ? erro.message
+          : `Ocorreu um erro inesperado: ${String(erro)}`;
+      this.logger.error(`Erro ao vincular professor à turma: ${mensagemErro}`);
+
+      throw new InternalServerErrorException(
+        'Erro ao vincular professor à turma.',
+      );
+    }
+  }
+
+  async desvincularProfessor(
+    turmaId: string,
+    professorId: string,
+  ): Promise<void> {
+    try {
+      const resultado = await this.turmaProfessorRepository.softDelete({
+        turmaId,
+        professorId,
+      });
+
+      // Se affected for 0, significa que o vínculo não existia no banco
+      if (resultado.affected === 0) {
+        throw new NotFoundException(
+          'Vínculo entre este professor e esta turma não foi encontrado.',
+        );
+      }
+    } catch (erro) {
+      if (erro instanceof NotFoundException) {
+        throw erro;
+      }
+
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(`Erro ao desvincular professor: ${mensagemErro}`);
+
+      throw new InternalServerErrorException(
+        'Erro ao desvincular professor da turma.',
+      );
     }
   }
 
