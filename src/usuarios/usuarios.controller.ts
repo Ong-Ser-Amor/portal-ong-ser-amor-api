@@ -20,7 +20,6 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Publico } from 'src/decorators/publico.decorator';
 import { UsuarioDecorator } from 'src/decorators/usuario.decorator';
 
 import { AtualizarSenhaDto } from './dto/atualizar-senha.dto';
