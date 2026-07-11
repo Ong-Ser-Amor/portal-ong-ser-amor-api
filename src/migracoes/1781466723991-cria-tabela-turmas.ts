@@ -51,6 +51,24 @@ export class CriaTabelaTurmas1781466723991 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'criterio_avaliacao',
+            type: 'varchar',
+            length: '30',
+            isNullable: false,
+          },
+          {
+            name: 'frequencia_minima',
+            type: 'integer',
+            isNullable: true,
+          },
+          {
+            name: 'nota_minima',
+            type: 'decimal',
+            precision: 7,
+            scale: 2,
+            isNullable: true,
+          },
+          {
             name: 'criado_em',
             type: 'timestamp',
             default: 'now()',

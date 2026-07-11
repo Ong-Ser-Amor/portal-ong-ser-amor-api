@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 
 import { TurmaProfessor } from './turma-professor';
+import { CriterioAvaliacao } from '../enums/criterio-avaliacao.enum';
 import { StatusTurma } from '../enums/status-turma.enum';
 
 @Entity('turmas')
@@ -40,6 +41,30 @@ export class Turma {
 
   @Column({ type: 'varchar', length: 20, enum: StatusTurma })
   status: StatusTurma;
+
+  @Column({
+    name: 'criterio_avaliacao',
+    type: 'varchar',
+    length: 30,
+    enum: CriterioAvaliacao,
+  })
+  criterioAvaliacao: CriterioAvaliacao;
+
+  @Column({
+    name: 'frequencia_minima',
+    type: 'integer',
+    nullable: true,
+  })
+  frequenciaMinima: number | null;
+
+  @Column({
+    name: 'nota_minima',
+    type: 'decimal',
+    precision: 7,
+    scale: 2,
+    nullable: true,
+  })
+  notaMinima: string | null;
 
   @OneToMany(() => TurmaProfessor, (turmaProfessor) => turmaProfessor.turma)
   turmasProfessores: TurmaProfessor[];

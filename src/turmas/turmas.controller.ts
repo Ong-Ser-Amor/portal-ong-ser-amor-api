@@ -45,6 +45,10 @@ export class TurmasController {
     description: 'A turma foi criada com sucesso.',
     type: TurmaRespostaDto,
   })
+  @ApiBadRequestResponse({
+    description:
+      'Dados de envio inválidos ou inconsistência nas regras e limites de avaliação.',
+  })
   @ApiConflictResponse({
     description:
       'Já existe uma turma cadastrada com este nome para o plano de curso.',
@@ -121,7 +125,7 @@ export class TurmasController {
   })
   @ApiBadRequestResponse({
     description:
-      'A data final não pode ser anterior à data de início da turma.',
+      'A data final não pode ser anterior à data de início OU houve inconsistência nas regras de limites de avaliação.',
   })
   @ApiConflictResponse({
     description:

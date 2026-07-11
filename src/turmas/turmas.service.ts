@@ -15,6 +15,7 @@ import { CriarTurmaDto } from './dto/criar-turma.dto';
 import { VincularProfessorDto } from './dto/vincular-professor.dto';
 import { TurmaProfessor } from './entities/turma-professor';
 import { Turma } from './entities/turma.entity';
+import { CriterioAvaliacao } from './enums/criterio-avaliacao.enum';
 
 @Injectable()
 export class TurmasService {
@@ -28,6 +29,12 @@ export class TurmasService {
   ) {}
 
   async criar(criarTurmaDto: CriarTurmaDto): Promise<Turma> {
+    this.validarRegrasDeAvaliacao(
+      criarTurmaDto.criterioAvaliacao,
+      criarTurmaDto.frequenciaMinima,
+      criarTurmaDto.notaMinima,
+    );
+
     await this.verificarDuplicidadeNome(
       criarTurmaDto.nome,
       criarTurmaDto.planoCursoId,
@@ -111,12 +118,32 @@ export class TurmasService {
     const dataFimConsolidada = atualizarTurmaDto.dataFim ?? turmaAtual.dataFim;
 
     // Valida a regra de negócio com os dados consolidados
-    // (Garante a comparação de objetos Date do JS)
     if (new Date(dataFimConsolidada) < new Date(dataInicioConsolidada)) {
       throw new BadRequestException(
         'A data final não pode ser anterior à data de início da turma.',
       );
     }
+
+    // Consolida e valida os critérios de avaliação (evita misturar dados velhos com novos critérios)
+    const criterioConsolidado =
+      atualizarTurmaDto.criterioAvaliacao ?? turmaAtual.criterioAvaliacao;
+
+    // Se o DTO enviar explicitamente 'undefined', assumimos o valor atual do banco
+    const frequenciaConsolidada =
+      atualizarTurmaDto.frequenciaMinima !== undefined
+        ? atualizarTurmaDto.frequenciaMinima
+        : turmaAtual.frequenciaMinima;
+
+    const notaConsolidada =
+      atualizarTurmaDto.notaMinima !== undefined
+        ? atualizarTurmaDto.notaMinima
+        : turmaAtual.notaMinima;
+
+    this.validarRegrasDeAvaliacao(
+      criterioConsolidado,
+      frequenciaConsolidada,
+      notaConsolidada,
+    );
 
     if (atualizarTurmaDto.nome && atualizarTurmaDto.nome !== turmaAtual.nome) {
       await this.verificarDuplicidadeNome(
@@ -153,6 +180,52 @@ export class TurmasService {
       this.logger.error(`Erro ao remover turma: ${mensagemErro}`);
 
       throw new InternalServerErrorException('Erro ao remover turma.');
+    }
+  }
+
+  /**
+   * Valida se os campos de nota e frequência estão consistentes com o critério escolhido.
+   */
+  private validarRegrasDeAvaliacao(
+    criterio: CriterioAvaliacao,
+    frequencia: number | null | undefined,
+    nota: string | null | undefined,
+  ): void {
+    if (criterio === CriterioAvaliacao.SEM_CONTROLE) {
+      if (frequencia || nota) {
+        throw new BadRequestException(
+          'Turmas sem controle de avaliação não podem possuir limites de nota ou frequência mínima.',
+        );
+      }
+    }
+
+    if (criterio === CriterioAvaliacao.POR_PARTICIPACAO) {
+      if (!frequencia) {
+        throw new BadRequestException(
+          'O campo frequência mínima é obrigatório para turmas avaliadas por participação.',
+        );
+      }
+      if (nota) {
+        throw new BadRequestException(
+          'Turmas avaliadas por participação não devem possuir uma nota mínima de aprovação.',
+        );
+      }
+    }
+
+    if (criterio === CriterioAvaliacao.POR_NOTA_PRESENCA) {
+      if (!frequencia || !nota) {
+        throw new BadRequestException(
+          'Os campos de frequência mínima e nota mínima são obrigatórios para turmas com aprovação por nota e presença.',
+        );
+      }
+    }
+
+    if (criterio === CriterioAvaliacao.QUALITATIVA) {
+      if (nota) {
+        throw new BadRequestException(
+          'Turmas com avaliação qualitativa não devem possuir uma nota mínima numérica de aprovação.',
+        );
+      }
     }
   }
 

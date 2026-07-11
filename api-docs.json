@@ -4145,6 +4145,9 @@
               }
             }
           },
+          "400": {
+            "description": "Dados de envio inválidos ou inconsistência nas regras e limites de avaliação."
+          },
           "409": {
             "description": "Já existe uma turma cadastrada com este nome para o plano de curso."
           },
@@ -4286,7 +4289,7 @@
             }
           },
           "400": {
-            "description": "A data final não pode ser anterior à data de início da turma."
+            "description": "A data final não pode ser anterior à data de início OU houve inconsistência nas regras de limites de avaliação."
           },
           "404": {
             "description": "Turma com o ID especificado não foi encontrada."
@@ -6080,6 +6083,29 @@
             ],
             "type": "string",
             "example": "EM_FORMACAO"
+          },
+          "criterioAvaliacao": {
+            "enum": [
+              "SEM_CONTROLE",
+              "POR_PARTICIPACAO",
+              "POR_NOTA_PRESENCA",
+              "QUALITATIVA"
+            ],
+            "type": "string",
+            "example": "POR_NOTA_PRESENCA"
+          },
+          "frequenciaMinima": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "example": 75,
+            "description": "Porcentagem de presença mínima (0 a 100)"
+          },
+          "notaMinima": {
+            "type": "string",
+            "pattern": "/^\\d{1,5}(\\.\\d{1,2})?$/",
+            "example": "6.00",
+            "description": "Nota ou XP mínimo de aprovação. Aceita até 5 dígitos antes da vírgula e 2 decimais."
           }
         },
         "required": [
@@ -6088,7 +6114,8 @@
           "cargaHoraria",
           "dataInicio",
           "dataFim",
-          "status"
+          "status",
+          "criterioAvaliacao"
         ]
       },
       "ProfessorResumoRespostaDto": {
@@ -6138,6 +6165,23 @@
             ],
             "type": "string"
           },
+          "criterioAvaliacao": {
+            "enum": [
+              "SEM_CONTROLE",
+              "POR_PARTICIPACAO",
+              "POR_NOTA_PRESENCA",
+              "QUALITATIVA"
+            ],
+            "type": "string"
+          },
+          "frequenciaMinima": {
+            "type": "number",
+            "nullable": true
+          },
+          "notaMinima": {
+            "type": "string",
+            "nullable": true
+          },
           "professores": {
             "type": "array",
             "items": {
@@ -6151,7 +6195,8 @@
           "cargaHoraria",
           "dataInicio",
           "dataFim",
-          "status"
+          "status",
+          "criterioAvaliacao"
         ]
       },
       "AtualizarTurmaDto": {
@@ -6187,6 +6232,29 @@
             ],
             "type": "string",
             "example": "EM_FORMACAO"
+          },
+          "criterioAvaliacao": {
+            "enum": [
+              "SEM_CONTROLE",
+              "POR_PARTICIPACAO",
+              "POR_NOTA_PRESENCA",
+              "QUALITATIVA"
+            ],
+            "type": "string",
+            "example": "POR_NOTA_PRESENCA"
+          },
+          "frequenciaMinima": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "example": 75,
+            "description": "Porcentagem de presença mínima (0 a 100)"
+          },
+          "notaMinima": {
+            "type": "string",
+            "pattern": "/^\\d{1,5}(\\.\\d{1,2})?$/",
+            "example": "6.00",
+            "description": "Nota ou XP mínimo de aprovação. Aceita até 5 dígitos antes da vírgula e 2 decimais."
           }
         }
       },

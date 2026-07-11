@@ -3,6 +3,7 @@ import { PlanoCursoRespostaDto } from 'src/planos-curso/dto/plano-curso-resposta
 import { Voluntario } from 'src/voluntarios/entities/voluntario.entity';
 
 import { Turma } from '../entities/turma.entity';
+import { CriterioAvaliacao } from '../enums/criterio-avaliacao.enum';
 import { StatusTurma } from '../enums/status-turma.enum';
 
 class ProfessorResumoRespostaDto {
@@ -29,6 +30,9 @@ export class TurmaRespostaDto {
   dataInicio: Date;
   dataFim: Date;
   status: StatusTurma;
+  criterioAvaliacao: CriterioAvaliacao;
+  frequenciaMinima?: number | null;
+  notaMinima?: string | null;
   professores?: ProfessorResumoRespostaDto[];
 
   constructor(turma: Turma) {
@@ -41,6 +45,10 @@ export class TurmaRespostaDto {
     this.dataInicio = turma.dataInicio;
     this.dataFim = turma.dataFim;
     this.status = turma.status;
+
+    this.criterioAvaliacao = turma.criterioAvaliacao;
+    this.frequenciaMinima = turma.frequenciaMinima;
+    this.notaMinima = turma.notaMinima;
 
     if (turma.turmasProfessores) {
       this.professores = turma.turmasProfessores.map(

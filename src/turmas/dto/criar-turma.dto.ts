@@ -1,17 +1,21 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsDate,
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
+  Matches,
+  Max,
   MaxLength,
   Min,
   MinLength,
 } from 'class-validator';
 import { IsDateAfter } from 'src/utils/decorators/is-date-after.decorator';
 
+import { CriterioAvaliacao } from '../enums/criterio-avaliacao.enum';
 import { StatusTurma } from '../enums/status-turma.enum';
 
 export class CriarTurmaDto {
@@ -59,4 +63,39 @@ export class CriarTurmaDto {
     ).join(', ')}`,
   })
   status: StatusTurma;
+
+  @ApiProperty({
+    enum: CriterioAvaliacao,
+    example: CriterioAvaliacao.POR_NOTA_PRESENCA,
+  })
+  @IsEnum(CriterioAvaliacao, {
+    message: `O critério de avaliação deve ser um dos seguintes valores: ${Object.values(
+      CriterioAvaliacao,
+    ).join(', ')}`,
+  })
+  @IsNotEmpty({ message: 'O campo critério de avaliação é obrigatório' })
+  criterioAvaliacao: CriterioAvaliacao;
+
+  @ApiPropertyOptional({
+    example: 75,
+    description: 'Porcentagem de presença mínima (0 a 100)',
+  })
+  @IsOptional()
+  @IsInt({ message: 'A frequência mínima deve ser um número inteiro' })
+  @Min(0, { message: 'A frequência mínima não pode ser menor que 0%' })
+  @Max(100, { message: 'A frequência mínima não pode ser maior que 100%' })
+  frequenciaMinima?: number;
+
+  @ApiPropertyOptional({
+    example: '6.00',
+    description:
+      'Nota ou XP mínimo de aprovação. Aceita até 5 dígitos antes da vírgula e 2 decimais.',
+  })
+  @IsOptional()
+  @IsString({ message: 'A nota mínima deve ser enviada como texto (string)' })
+  @Matches(/^\d{1,5}(\.\d{1,2})?$/, {
+    message:
+      'A nota mínima deve ser um número decimal válido com até duas casas decimais separadas por ponto (Ex: 6.00 ou 2500.00)',
+  })
+  notaMinima?: string;
 }
