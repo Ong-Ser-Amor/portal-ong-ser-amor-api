@@ -4527,7 +4527,7 @@
     },
     "/turmas-matriculas/{id}": {
       "get": {
-        "operationId": "TurmasMatriculasController_findOne",
+        "operationId": "TurmasMatriculasController_buscarPorId",
         "parameters": [
           {
             "name": "id",

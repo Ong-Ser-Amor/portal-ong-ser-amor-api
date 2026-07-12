@@ -121,7 +121,9 @@ export class TurmasMatriculasController {
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar a matrícula.',
   })
-  async findOne(@Param('id') id: string): Promise<TurmaMatriculaRespostaDto> {
+  async buscarPorId(
+    @Param('id') id: string,
+  ): Promise<TurmaMatriculaRespostaDto> {
     const matricula = await this.turmasMatriculasService.buscarPorId(id);
     return new TurmaMatriculaRespostaDto(matricula);
   }
