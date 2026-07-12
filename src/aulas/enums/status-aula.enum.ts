@@ -1,0 +1,5 @@
+export enum StatusAula {
+  AGENDADA = 'AGENDADA',
+  REALIZADA = 'REALIZADA',
+  CANCELADA = 'CANCELADA',
+}

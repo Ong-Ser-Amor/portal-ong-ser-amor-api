@@ -4637,6 +4637,228 @@
           "Matrículas das Turmas"
         ]
       }
+    },
+    "/aulas": {
+      "post": {
+        "operationId": "AulasController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriarAulaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "A aula foi cadastrada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AulaRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A turma não está EM_ANDAMENTO ou a data enviada está fora do período letivo estabelecido."
+          },
+          "409": {
+            "description": "Já existe uma aula cadastrada nesta mesma data para a turma informada."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao cadastrar a aula."
+          }
+        },
+        "summary": "Cadastrar ou agendar uma nova aula para uma turma",
+        "tags": [
+          "Aulas"
+        ]
+      },
+      "get": {
+        "operationId": "AulasController_buscarTodas",
+        "parameters": [
+          {
+            "name": "limite",
+            "required": false,
+            "in": "query",
+            "description": "Número de itens por página (padrão: 10)",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pagina",
+            "required": false,
+            "in": "query",
+            "description": "Número da página atual (padrão: 1)",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "turmaId",
+            "required": false,
+            "in": "query",
+            "description": "Filtra opcionalmente as aulas pertencentes a uma turma específica",
+            "schema": {
+              "example": "1",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta paginada recebida com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginacaoRespostaDto"
+                    },
+                    {
+                      "properties": {
+                        "dados": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/AulaRespostaDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar a listagem de aulas."
+          }
+        },
+        "summary": "Buscar uma lista paginada de aulas registradas",
+        "tags": [
+          "Aulas"
+        ]
+      }
+    },
+    "/aulas/{id}": {
+      "get": {
+        "operationId": "AulasController_buscarPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A aula foi encontrada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AulaRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Aula com o ID especificado não foi encontrada."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar a aula."
+          }
+        },
+        "summary": "Buscar o registro de uma aula por ID",
+        "tags": [
+          "Aulas"
+        ]
+      },
+      "patch": {
+        "operationId": "AulasController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarAulaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O registro da aula foi atualizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AulaRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Tentativa de transição de status inválida para uma aula realizada OU a nova data está fora dos limites da turma."
+          },
+          "404": {
+            "description": "Aula com o ID especificado não foi encontrada."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar a aula."
+          }
+        },
+        "summary": "Atualizar dados ou o status de uma aula pelo ID",
+        "tags": [
+          "Aulas"
+        ]
+      },
+      "delete": {
+        "operationId": "AulasController_remover",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "A aula foi removida com sucesso (soft delete)."
+          },
+          "404": {
+            "description": "Aula com o ID especificado não foi encontrada."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao remover a aula."
+          }
+        },
+        "summary": "Remover logicamente uma aula do cronograma pelo ID",
+        "tags": [
+          "Aulas"
+        ]
+      }
     }
   },
   "info": {
@@ -6619,6 +6841,94 @@
             "nullable": true,
             "example": "Aluno se destacou durante o curso, demonstrando grande interesse e participação ativa nas atividades propostas.",
             "description": "Espaço livre para parecer pedagógico e observações qualitativas."
+          }
+        }
+      },
+      "CriarAulaDto": {
+        "type": "object",
+        "properties": {
+          "turmaId": {
+            "type": "string",
+            "example": "1"
+          },
+          "data": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-07-18",
+            "description": "Data de realização da aula no formato YYYY-MM-DD"
+          },
+          "tema": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 255,
+            "example": "Primeira aula",
+            "description": "Conteúdo programático, tema ou assunto abordado no encontro"
+          }
+        },
+        "required": [
+          "turmaId",
+          "data",
+          "tema"
+        ]
+      },
+      "AulaRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "turmaId": {
+            "type": "string"
+          },
+          "data": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "tema": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "AGENDADA",
+              "REALIZADA",
+              "CANCELADA"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "turmaId",
+          "data",
+          "tema",
+          "status"
+        ]
+      },
+      "AtualizarAulaDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-07-18",
+            "description": "Data de realização da aula no formato YYYY-MM-DD"
+          },
+          "tema": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 255,
+            "example": "Primeira aula",
+            "description": "Conteúdo programático, tema ou assunto abordado no encontro"
+          },
+          "status": {
+            "enum": [
+              "AGENDADA",
+              "REALIZADA",
+              "CANCELADA"
+            ],
+            "type": "string",
+            "example": "REALIZADA",
+            "description": "Atualiza a situação atual da aula no diário de classe."
           }
         }
       }

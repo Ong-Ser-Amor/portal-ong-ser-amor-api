@@ -27,6 +27,7 @@ import { CursosModule } from './cursos/cursos.module';
 import { PlanosCursoModule } from './planos-curso/planos-curso.module';
 import { TurmasModule } from './turmas/turmas.module';
 import { TurmasMatriculasModule } from './turmas-matriculas/turmas-matriculas.module';
+import { AulasModule } from './aulas/aulas.module';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { TurmasMatriculasModule } from './turmas-matriculas/turmas-matriculas.mo
     PlanosCursoModule,
     TurmasModule,
     TurmasMatriculasModule,
+    AulasModule,
   ],
   controllers: [AppController],
   providers: [AppService],
