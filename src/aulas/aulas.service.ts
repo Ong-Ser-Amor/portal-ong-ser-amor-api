@@ -194,13 +194,13 @@ export class AulasService {
 
       return resultado;
     } catch (erro) {
-      const msg = erro instanceof Error ? erro.message : String(erro);
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
       const dataLimiteStr =
         dataLimite instanceof Date
           ? dataLimite.toISOString().split('T')[0]
           : String(dataLimite);
       this.logger.error(
-        `Erro ao verificar aulas anteriores a ${dataLimiteStr} na turma ${turmaId}: ${msg}`,
+        `Erro ao verificar aulas anteriores a ${dataLimiteStr} na turma ${turmaId}: ${mensagemErro}`,
       );
       throw new InternalServerErrorException(
         'Erro ao validar calendário de aulas existentes.',
@@ -224,13 +224,13 @@ export class AulasService {
 
       return resultado;
     } catch (erro) {
-      const msg = erro instanceof Error ? erro.message : String(erro);
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
       const dataLimiteStr =
         dataLimite instanceof Date
           ? dataLimite.toISOString().split('T')[0]
           : String(dataLimite);
       this.logger.error(
-        `Erro ao verificar aulas posteriores a ${dataLimiteStr} na turma ${turmaId}: ${msg}`,
+        `Erro ao verificar aulas posteriores a ${dataLimiteStr} na turma ${turmaId}: ${mensagemErro}`,
       );
       throw new InternalServerErrorException(
         'Erro ao validar calendário de aulas existentes.',
