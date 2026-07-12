@@ -4422,6 +4422,221 @@
           "Turmas"
         ]
       }
+    },
+    "/turmas-matriculas": {
+      "post": {
+        "operationId": "TurmasMatriculasController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriarTurmaMatriculaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "A matrícula do beneficiário foi realizada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurmaMatriculaRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A turma selecionada já está finalizada ou foi cancelada no sistema."
+          },
+          "404": {
+            "description": "A turma ou o beneficiário informado não existem no sistema."
+          },
+          "409": {
+            "description": "Este beneficiário já se encontra matriculado ativamente na turma informada."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao processar a matrícula."
+          }
+        },
+        "summary": "Matricular um beneficiário em uma turma",
+        "tags": [
+          "Matrículas das Turmas"
+        ]
+      },
+      "get": {
+        "operationId": "TurmasMatriculasController_buscarTodas",
+        "parameters": [
+          {
+            "name": "limite",
+            "required": false,
+            "in": "query",
+            "description": "Número de itens por página (padrão: 10)",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pagina",
+            "required": false,
+            "in": "query",
+            "description": "Número da página atual (padrão: 1)",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta paginada recebida com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginacaoRespostaDto"
+                    },
+                    {
+                      "properties": {
+                        "dados": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/TurmaMatriculaRespostaDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar a listagem de matrículas."
+          }
+        },
+        "summary": "Buscar uma lista paginada de matrículas",
+        "tags": [
+          "Matrículas das Turmas"
+        ]
+      }
+    },
+    "/turmas-matriculas/{id}": {
+      "get": {
+        "operationId": "TurmasMatriculasController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O registro de matrícula foi encontrado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurmaMatriculaRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro de matrícula com o ID especificado não foi encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar a matrícula."
+          }
+        },
+        "summary": "Buscar o registro de uma matrícula por ID",
+        "tags": [
+          "Matrículas das Turmas"
+        ]
+      },
+      "patch": {
+        "operationId": "TurmasMatriculasController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarTurmaMatriculaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O registro de matrícula foi atualizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurmaMatriculaRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A turma associada está finalizada/cancelada OU houve quebra nas regras de consistência da nota e status."
+          },
+          "404": {
+            "description": "Registro de matrícula com o ID especificado não foi encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar a matrícula."
+          }
+        },
+        "summary": "Atualizar notas, pareceres ou status de uma matrícula",
+        "tags": [
+          "Matrículas das Turmas"
+        ]
+      },
+      "delete": {
+        "operationId": "TurmasMatriculasController_remover",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "A matrícula foi removida com sucesso (soft delete)."
+          },
+          "404": {
+            "description": "Registro de matrícula com o ID especificado não foi encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao remover a matrícula."
+          }
+        },
+        "summary": "Remover logicamente uma matrícula pelo ID",
+        "tags": [
+          "Matrículas das Turmas"
+        ]
+      }
     }
   },
   "info": {
@@ -6289,6 +6504,123 @@
           "turmaId",
           "professorId"
         ]
+      },
+      "CriarTurmaMatriculaDto": {
+        "type": "object",
+        "properties": {
+          "turmaId": {
+            "type": "string",
+            "example": "1",
+            "description": "Identificador único da turma (bigint no banco de dados)"
+          },
+          "beneficiarioId": {
+            "type": "string",
+            "example": "12",
+            "description": "Id do beneficiário (o aluno) que será vinculado à turma"
+          }
+        },
+        "required": [
+          "turmaId",
+          "beneficiarioId"
+        ]
+      },
+      "BeneficiarioResumoRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome"
+        ]
+      },
+      "TurmaMatriculaRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ATIVA",
+              "CONCLUIDA",
+              "EVADIDA"
+            ],
+            "type": "string"
+          },
+          "resultadoFinal": {
+            "nullable": true,
+            "enum": [
+              "APROVADO",
+              "REPROVADO"
+            ],
+            "type": "string"
+          },
+          "notaFinal": {
+            "type": "string",
+            "nullable": true
+          },
+          "parecerPedagogico": {
+            "type": "string",
+            "nullable": true
+          },
+          "turma": {
+            "$ref": "#/components/schemas/TurmaRespostaDto"
+          },
+          "beneficiario": {
+            "$ref": "#/components/schemas/BeneficiarioResumoRespostaDto"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "resultadoFinal",
+          "notaFinal",
+          "parecerPedagogico"
+        ]
+      },
+      "AtualizarTurmaMatriculaDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "ATIVA",
+              "CONCLUIDA",
+              "EVADIDA"
+            ],
+            "type": "string",
+            "example": "CONCLUIDA",
+            "description": "Atualiza a situação atual da matrícula do aluno na turma."
+          },
+          "resultadoFinal": {
+            "nullable": true,
+            "enum": [
+              "APROVADO",
+              "REPROVADO"
+            ],
+            "type": "string",
+            "example": "APROVADO",
+            "description": "Veredito pedagógico final do estudante. Deve ser nulo para turmas sem controle."
+          },
+          "notaFinal": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "/^\\d{1,5}(\\.\\d{1,2})?$/",
+            "example": "2550.00",
+            "description": "Nota final do aluno na turma, caso a turma possua critérios de avaliação por nota. Deve ser nulo para turmas sem controle."
+          },
+          "parecerPedagogico": {
+            "type": "string",
+            "nullable": true,
+            "example": "Aluno se destacou durante o curso, demonstrando grande interesse e participação ativa nas atividades propostas.",
+            "description": "Espaço livre para parecer pedagógico e observações qualitativas."
+          }
+        }
       }
     }
   }

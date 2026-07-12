@@ -261,13 +261,20 @@ export class ContatosService {
     pessoaId: string,
     manager?: EntityManager,
   ): Promise<boolean> {
+    this.logger.debug(
+      `Verificando se a pessoa ${pessoaId} possui algum contato do tipo CELULAR.`,
+    );
     const pcRepository = manager
       ? manager.getRepository(PessoaContato)
       : this.pessoaContatoRepository;
 
-    return await pcRepository.existsBy({
+    const resultado = await pcRepository.existsBy({
       pessoaId,
       contato: { tipoContato: TipoContato.CELULAR },
     });
+    this.logger.debug(
+      `Resultado da verificação de celular para pessoa ${pessoaId}: ${resultado}`,
+    );
+    return resultado;
   }
 }

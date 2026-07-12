@@ -26,6 +26,7 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
 import { CursosModule } from './cursos/cursos.module';
 import { PlanosCursoModule } from './planos-curso/planos-curso.module';
 import { TurmasModule } from './turmas/turmas.module';
+import { TurmasMatriculasModule } from './turmas-matriculas/turmas-matriculas.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { TurmasModule } from './turmas/turmas.module';
     CursosModule,
     PlanosCursoModule,
     TurmasModule,
+    TurmasMatriculasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

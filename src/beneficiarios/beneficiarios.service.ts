@@ -233,6 +233,34 @@ export class BeneficiariosService {
     }
   }
 
+  /**
+   * Verifica de forma leve se um beneficiário existe no sistema pelo ID.
+   * Lança NotFoundException se o registro não for encontrado.
+   */
+  async verificarExistenciaPorId(id: string): Promise<void> {
+    try {
+      const existe = await this.repository.existsBy({ id });
+
+      if (!existe) {
+        throw new NotFoundException(
+          `Beneficiário com ID ${id} não encontrado.`,
+        );
+      }
+    } catch (erro) {
+      if (erro instanceof NotFoundException) {
+        throw erro;
+      }
+
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro ao verificar existência do beneficiário: ${mensagemErro}`,
+      );
+      throw new InternalServerErrorException(
+        'Erro ao validar existência do beneficiário.',
+      );
+    }
+  }
+
   async atualizar(
     id: string,
     atualizarBeneficiarioDto: AtualizarBeneficiarioDto,
