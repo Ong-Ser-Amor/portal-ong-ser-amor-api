@@ -9,6 +9,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AulasService } from 'src/aulas/aulas.service';
 import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
 import { TurmasMatriculasService } from 'src/turmas-matriculas/turmas-matriculas.service';
 import { EntityNotFoundError, Repository } from 'typeorm';
@@ -30,6 +31,8 @@ export class TurmasService {
     private readonly repository: Repository<Turma>,
     @InjectRepository(TurmaProfessor)
     private readonly turmaProfessorRepository: Repository<TurmaProfessor>,
+    @Inject(forwardRef(() => AulasService))
+    private readonly aulasService: AulasService,
     @Inject(forwardRef(() => TurmasMatriculasService))
     private readonly matriculasService: TurmasMatriculasService,
   ) {}
@@ -128,6 +131,36 @@ export class TurmasService {
       if (possuiAlunosAtivos) {
         throw new BadRequestException(
           'Não é possível finalizar a turma pois ainda existem alunos com a matrícula no status ATIVA. Altere o status de todas as matrículas para CONCLUIDA ou EVADIDA antes de finalizar a turma.',
+        );
+      }
+    }
+
+    // BLOQUEIO: Valida se a alteração da data de início choca com aulas existentes
+    if (atualizarTurmaDto.dataInicio) {
+      const novaDataInicio = new Date(atualizarTurmaDto.dataInicio);
+      const possuiAulaAnterior = await this.aulasService.existeAulaAnteriorA(
+        id,
+        novaDataInicio,
+      );
+
+      if (possuiAulaAnterior) {
+        throw new BadRequestException(
+          'Não é possível postergar a data de início da turma, pois já existem aulas cadastradas em datas anteriores a esse novo limite.',
+        );
+      }
+    }
+
+    // BLOQUEIO: Valida se a alteração da data de encerramento choca com aulas existentes
+    if (atualizarTurmaDto.dataFim) {
+      const novaDataFim = new Date(atualizarTurmaDto.dataFim);
+      const possuiAulaPosterior = await this.aulasService.existeAulaPosteriorA(
+        id,
+        novaDataFim,
+      );
+
+      if (possuiAulaPosterior) {
+        throw new BadRequestException(
+          'Não é possível adiantar a data final da turma, pois já existem aulas cadastradas em datas posteriores a esse novo limite.',
         );
       }
     }

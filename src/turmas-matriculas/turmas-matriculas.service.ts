@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -30,7 +31,7 @@ export class TurmasMatriculasService {
     private readonly repository: Repository<TurmaMatricula>,
     @Inject(BeneficiariosService)
     private readonly beneficiariosService: BeneficiariosService,
-    @Inject(TurmasService)
+    @Inject(forwardRef(() => TurmasService))
     private readonly turmasService: TurmasService,
   ) {}
 

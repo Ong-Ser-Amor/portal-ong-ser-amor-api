@@ -1,5 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AulasModule } from 'src/aulas/aulas.module';
 import { TurmasMatriculasModule } from 'src/turmas-matriculas/turmas-matriculas.module';
 
 import { TurmaProfessor } from './entities/turma-professor';
@@ -10,6 +11,7 @@ import { TurmasService } from './turmas.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Turma, TurmaProfessor]),
+    forwardRef(() => AulasModule),
     forwardRef(() => TurmasMatriculasModule),
   ],
   controllers: [TurmasController],

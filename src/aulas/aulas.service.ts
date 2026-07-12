@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -25,7 +26,7 @@ export class AulasService {
   constructor(
     @InjectRepository(Aula)
     private readonly repository: Repository<Aula>,
-    @Inject(TurmasService)
+    @Inject(forwardRef(() => TurmasService))
     private readonly turmasService: TurmasService,
   ) {}
 
@@ -172,6 +173,67 @@ export class AulasService {
       this.logger.error(`Erro ao remover aula: ${mensajeErro}`);
       throw new InternalServerErrorException(
         'Erro ao remover o registro de aula.',
+      );
+    }
+  }
+
+  /**
+   * Verifica se existe alguma aula na turma com data anterior à nova data especificada.
+   */
+  async existeAulaAnteriorA(
+    turmaId: string,
+    dataLimite: Date,
+  ): Promise<boolean> {
+    try {
+      // O TypeORM converterá o Date para o formato correto na query do banco
+      const resultado = await this.repository
+        .createQueryBuilder('aula')
+        .where('aula.turmaId = :turmaId', { turmaId })
+        .andWhere('aula.data < :dataLimite', { dataLimite })
+        .getExists();
+
+      return resultado;
+    } catch (erro) {
+      const msg = erro instanceof Error ? erro.message : String(erro);
+      const dataLimiteStr =
+        dataLimite instanceof Date
+          ? dataLimite.toISOString().split('T')[0]
+          : String(dataLimite);
+      this.logger.error(
+        `Erro ao verificar aulas anteriores a ${dataLimiteStr} na turma ${turmaId}: ${msg}`,
+      );
+      throw new InternalServerErrorException(
+        'Erro ao validar calendário de aulas existentes.',
+      );
+    }
+  }
+
+  /**
+   * Verifica se existe alguma aula na turma com data posterior à nova data especificada.
+   */
+  async existeAulaPosteriorA(
+    turmaId: string,
+    dataLimite: Date,
+  ): Promise<boolean> {
+    try {
+      const resultado = await this.repository
+        .createQueryBuilder('aula')
+        .where('aula.turmaId = :turmaId', { turmaId })
+        .andWhere('aula.data > :dataLimite', { dataLimite })
+        .getExists();
+
+      return resultado;
+    } catch (erro) {
+      const msg = erro instanceof Error ? erro.message : String(erro);
+      const dataLimiteStr =
+        dataLimite instanceof Date
+          ? dataLimite.toISOString().split('T')[0]
+          : String(dataLimite);
+      this.logger.error(
+        `Erro ao verificar aulas posteriores a ${dataLimiteStr} na turma ${turmaId}: ${msg}`,
+      );
+      throw new InternalServerErrorException(
+        'Erro ao validar calendário de aulas existentes.',
       );
     }
   }
