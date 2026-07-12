@@ -145,15 +145,9 @@ export class TurmasMatriculasService {
   ): Promise<TurmaMatricula> {
     const matriculaAtual = await this.buscarPorId(id);
 
-    if (matriculaAtual.turma.status === StatusTurma.CANCELADA) {
+    if (matriculaAtual.turma.status !== StatusTurma.EM_ANDAMENTO) {
       throw new BadRequestException(
-        'Não é possível alterar dados de matrículas vinculadas a uma turma que foi cancelada.',
-      );
-    }
-
-    if (matriculaAtual.turma.status === StatusTurma.FINALIZADA) {
-      throw new BadRequestException(
-        'Esta turma já foi finalizada. Para alterar notas ou pareceres dos alunos, a coordenação precisa reabrir a turma primeiro.',
+        `Não é permitido modificar notas, pareceres ou dados cadastrais de matrículas quando a turma está com o status diferente de EM_ANDAMENTO. Status atual da turma: ${matriculaAtual.turma.status}`,
       );
     }
 

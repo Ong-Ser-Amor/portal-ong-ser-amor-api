@@ -140,7 +140,7 @@ export class TurmasMatriculasController {
   })
   @ApiBadRequestResponse({
     description:
-      'A turma associada está finalizada/cancelada OU houve quebra nas regras de consistência da nota e status.',
+      'A turma associada não está com o status EM_ANDAMENTO OU houve quebra nas regras de consistência de notas, pontuações e status da matrícula.',
   })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao atualizar a matrícula.',
