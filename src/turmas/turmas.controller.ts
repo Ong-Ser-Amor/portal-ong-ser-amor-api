@@ -125,7 +125,7 @@ export class TurmasController {
   })
   @ApiBadRequestResponse({
     description:
-      'A data final não pode ser anterior à data de início OU houve inconsistência nas regras de limites de avaliação.',
+      'A data final não pode ser anterior à data de início, houve inconsistência nos limites de avaliação ou a turma possui alunos ativos ao tentar finalizá-la.',
   })
   @ApiConflictResponse({
     description:

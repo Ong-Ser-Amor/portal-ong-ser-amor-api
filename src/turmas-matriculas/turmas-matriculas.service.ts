@@ -205,6 +205,26 @@ export class TurmasMatriculasService {
   }
 
   /**
+   * Verifica se existe alguma matrícula ativa para uma determinada turma.
+   */
+  async existeMatriculaAtivaNaTurma(turmaId: string): Promise<boolean> {
+    try {
+      return await this.repository.existsBy({
+        turmaId,
+        status: StatusMatricula.ATIVA,
+      });
+    } catch (erro) {
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro ao verificar matrículas ativas na turma ${turmaId}: ${mensagemErro}`,
+      );
+      throw new InternalServerErrorException(
+        'Erro ao validar situação das matrículas da turma.',
+      );
+    }
+  }
+
+  /**
    * Método privado para isolar e aplicar as restrições de encerramento da matrícula
    */
   private validarRegrasDeMatricula(

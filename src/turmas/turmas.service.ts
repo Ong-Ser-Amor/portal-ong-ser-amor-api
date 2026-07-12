@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -8,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
+import { TurmasMatriculasService } from 'src/turmas-matriculas/turmas-matriculas.service';
 import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { AtualizarTurmaDto } from './dto/atualizar-turma.dto';
@@ -16,6 +19,7 @@ import { VincularProfessorDto } from './dto/vincular-professor.dto';
 import { TurmaProfessor } from './entities/turma-professor';
 import { Turma } from './entities/turma.entity';
 import { CriterioAvaliacao } from './enums/criterio-avaliacao.enum';
+import { StatusTurma } from './enums/status-turma.enum';
 
 @Injectable()
 export class TurmasService {
@@ -26,6 +30,8 @@ export class TurmasService {
     private readonly repository: Repository<Turma>,
     @InjectRepository(TurmaProfessor)
     private readonly turmaProfessorRepository: Repository<TurmaProfessor>,
+    @Inject(forwardRef(() => TurmasMatriculasService))
+    private readonly matriculasService: TurmasMatriculasService,
   ) {}
 
   async criar(criarTurmaDto: CriarTurmaDto): Promise<Turma> {
@@ -111,6 +117,20 @@ export class TurmasService {
     atualizarTurmaDto: AtualizarTurmaDto,
   ): Promise<Turma> {
     const turmaAtual = await this.buscarPorId(id);
+
+    if (
+      atualizarTurmaDto.status === StatusTurma.FINALIZADA &&
+      turmaAtual.status !== StatusTurma.FINALIZADA
+    ) {
+      const possuiAlunosAtivos =
+        await this.matriculasService.existeMatriculaAtivaNaTurma(id);
+
+      if (possuiAlunosAtivos) {
+        throw new BadRequestException(
+          'Não é possível finalizar a turma pois ainda existem alunos com a matrícula no status ATIVA. Altere o status de todas as matrículas para CONCLUIDA ou EVADIDA antes de finalizar a turma.',
+        );
+      }
+    }
 
     // Consolida as datas: se o DTO trouxe uma nova, usa a nova; se não, mantém a do banco
     const dataInicioConsolidada =
