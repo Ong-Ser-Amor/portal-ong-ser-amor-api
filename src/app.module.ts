@@ -18,7 +18,6 @@ import { FamiliasModule } from './familias/familias.module';
 import { LocationsModule } from './locations/locations.module';
 import { PessoasModule } from './pessoas/pessoas.module';
 import { PlanosCursoModule } from './planos-curso/planos-curso.module';
-import { StudentsModule } from './students/students.module';
 import { TasksModule } from './tasks/tasks.module';
 import { TurmasModule } from './turmas/turmas.module';
 import { TurmasMatriculasModule } from './turmas-matriculas/turmas-matriculas.module';
@@ -61,7 +60,6 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
     FamiliasModule,
     LocationsModule,
     PessoasModule,
-    StudentsModule,
     TasksModule,
     UsersModule,
     UsuariosModule,
