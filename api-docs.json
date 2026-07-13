@@ -4859,6 +4859,90 @@
           "Matrículas das Turmas"
         ]
       }
+    },
+    "/chamadas/lote": {
+      "post": {
+        "operationId": "ChamadasController_salvarLote",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriarChamadaLoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O lote de chamadas foi processado e salvo com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChamadaRespostaDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A lista enviada está incompleta, contém alunos não ativos/não pertencentes à turma, a aula está CANCELADA ou houve inconsistência nas justificativas de falta."
+          },
+          "404": {
+            "description": "A aula informada pelo ID não foi encontrada no sistema."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao processar a lista de chamadas."
+          }
+        },
+        "summary": "Registrar ou atualizar a lista de chamada (presenças/faltas) de uma aula em lote",
+        "tags": [
+          "Chamadas (Presença)"
+        ]
+      }
+    },
+    "/chamadas/aula/{aulaId}": {
+      "get": {
+        "operationId": "ChamadasController_buscarPorAula",
+        "parameters": [
+          {
+            "name": "aulaId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A lista de chamadas da aula foi recuperada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChamadaRespostaDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "A aula especificada não possui registros de chamada ou não foi encontrada."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar as presenças da aula."
+          }
+        },
+        "summary": "Buscar a lista de chamadas preenchida de uma aula específica",
+        "tags": [
+          "Chamadas (Presença)"
+        ]
+      }
     }
   },
   "info": {
@@ -6931,6 +7015,130 @@
             "description": "Espaço livre para parecer pedagógico e observações qualitativas."
           }
         }
+      },
+      "RegistroPresencaDto": {
+        "type": "object",
+        "properties": {
+          "matriculaId": {
+            "type": "string",
+            "example": "5",
+            "description": "ID do registro de matrícula do beneficiário na turma (bigint)"
+          },
+          "presente": {
+            "type": "boolean",
+            "example": true,
+            "description": "Indica a presença do aluno. Use true para Presença e false para Falta."
+          },
+          "faltaJustificada": {
+            "type": "boolean",
+            "example": false,
+            "description": "Informa se a ausência do beneficiário possui justificativa comprovada.",
+            "default": false
+          },
+          "motivoJustificativa": {
+            "enum": [
+              "SAUDE",
+              "OUTROS"
+            ],
+            "type": "string",
+            "example": "SAUDE",
+            "description": "Categoria do motivo da falta. Deve ser preenchido apenas se o aluno faltou e justificou."
+          },
+          "observacao": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "Apresentou atestado médico assinado do posto de saúde.",
+            "description": "Anotações pedagógicas, justificativas textuais ou observações de comportamento do dia."
+          }
+        },
+        "required": [
+          "matriculaId",
+          "presente"
+        ]
+      },
+      "CriarChamadaLoteDto": {
+        "type": "object",
+        "properties": {
+          "aulaId": {
+            "type": "string",
+            "example": "15",
+            "description": "Identificador único da aula à qual este lote de chamadas pertence (bigint)"
+          },
+          "registros": {
+            "description": "Lista contendo a marcação de presença/falta de cada aluno matriculado na turma.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegistroPresencaDto"
+            }
+          }
+        },
+        "required": [
+          "aulaId",
+          "registros"
+        ]
+      },
+      "MatriculaResumoRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "beneficiarioId": {
+            "type": "string"
+          },
+          "nomeAluno": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "beneficiarioId",
+          "nomeAluno"
+        ]
+      },
+      "ChamadaRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "aulaId": {
+            "type": "string"
+          },
+          "matriculaId": {
+            "type": "string"
+          },
+          "presente": {
+            "type": "boolean"
+          },
+          "faltaJustificada": {
+            "type": "boolean"
+          },
+          "motivoJustificativa": {
+            "nullable": true,
+            "enum": [
+              "SAUDE",
+              "OUTROS"
+            ],
+            "type": "string"
+          },
+          "observacao": {
+            "type": "string",
+            "nullable": true
+          },
+          "matricula": {
+            "$ref": "#/components/schemas/MatriculaResumoRespostaDto"
+          }
+        },
+        "required": [
+          "id",
+          "aulaId",
+          "matriculaId",
+          "presente",
+          "faltaJustificada",
+          "motivoJustificativa",
+          "observacao"
+        ]
       }
     }
   }

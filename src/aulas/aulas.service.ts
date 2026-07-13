@@ -12,7 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
 import { StatusTurma } from 'src/turmas/enums/status-turma.enum';
 import { TurmasService } from 'src/turmas/turmas.service';
-import { EntityNotFoundError, Repository } from 'typeorm';
+import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
 import { AtualizarAulaDto } from './dto/atualizar-aula.dto';
 import { CriarAulaDto } from './dto/criar-aula.dto';
@@ -117,7 +117,11 @@ export class AulasService {
   async atualizar(
     id: string,
     atualizarAulaDto: AtualizarAulaDto,
+    gerenciadorTransacao?: EntityManager,
   ): Promise<Aula> {
+    // Define qual manager usar (o da transação ativa ou o padrão do repositório)
+    const manager = gerenciadorTransacao || this.repository.manager;
+
     const aulaAtual = await this.buscarPorId(id);
 
     // Valida as condições para alteração do status da aula, caso o status seja alterado para REALIZADA
@@ -154,7 +158,7 @@ export class AulasService {
 
     try {
       this.repository.merge(aulaAtual, atualizarAulaDto);
-      return await this.repository.save(aulaAtual);
+      return await manager.save(Aula, aulaAtual);
     } catch (erro) {
       const mensajeErro = erro instanceof Error ? erro.message : String(erro);
       this.logger.error(`Erro ao atualizar registro de aula: ${mensajeErro}`);

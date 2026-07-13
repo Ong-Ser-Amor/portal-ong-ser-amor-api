@@ -220,6 +220,35 @@ export class TurmasMatriculasService {
   }
 
   /**
+   * Busca e retorna apenas os IDs das matrículas que estão atualmente ATIVAS em uma turma específica.
+   * Valida previamente se a turma informada existe no sistema antes de listar os estudantes.
+   */
+  async buscarIdsMatriculasAtivasPorTurma(turmaId: string): Promise<string[]> {
+    await this.turmasService.buscarPorId(turmaId);
+
+    try {
+      const matriculas = await this.repository.find({
+        select: ['id'],
+        where: {
+          turmaId,
+          status: StatusMatricula.ATIVA,
+        },
+      });
+
+      // Transforma o array de objetos [{ id: '1' }] em um array de strings puro ['1']
+      return matriculas.map((matricula) => matricula.id);
+    } catch (erro) {
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro ao buscar lista de IDs de matrículas ativas para a turma ${turmaId}: ${mensagemErro}`,
+      );
+      throw new InternalServerErrorException(
+        'Erro interno ao validar a lista de estudantes ativos da turma.',
+      );
+    }
+  }
+
+  /**
    * Método privado para isolar e aplicar as restrições de encerramento da matrícula
    */
   private validarRegrasDeMatricula(
