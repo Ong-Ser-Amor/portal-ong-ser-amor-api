@@ -14,8 +14,6 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiPaginatedResponse } from 'src/dtos/api-paginated-response.decorator';
 import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
-import { LessonResponseDto } from 'src/lessons/dto/lesson-response.dto';
-import { LessonsService } from 'src/lessons/lessons.service';
 import { StudentResponseDto } from 'src/students/dto/student-response.dto';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 
@@ -29,10 +27,7 @@ import { UpdateCourseClassDto } from './dto/update-course-class.dto';
 @Controller('course-classes')
 @ApiTags('Course Classes')
 export class CourseClassesController {
-  constructor(
-    private readonly courseClassesService: CourseClassesService,
-    private readonly lessonsService: LessonsService,
-  ) {}
+  constructor(private readonly courseClassesService: CourseClassesService) {}
 
   @Post()
   @ApiOperation({
@@ -85,40 +80,6 @@ export class CourseClassesController {
   ): Promise<CourseClassResponseDto> {
     return new CourseClassResponseDto(
       await this.courseClassesService.findOne(id),
-    );
-  }
-
-  @Get(':id/lessons')
-  @ApiOperation({ summary: 'Get all lessons from a course class' })
-  @ApiPaginatedResponse(LessonResponseDto)
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Course class not found',
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Internal server error',
-  })
-  async getLessons(
-    @Param('id', ParseIntPipe) id: number,
-    @Query('take', ParseIntPipe) take: number = 10,
-    @Query('page', ParseIntPipe) page: number = 1,
-  ): Promise<PaginatedResponseDto<LessonResponseDto>> {
-    const lessons = await this.lessonsService.findByCourseClassId(
-      id,
-      take,
-      page,
-    );
-
-    const lessonDtos = lessons.data.map(
-      (lesson) => new LessonResponseDto(lesson),
-    );
-
-    return new PaginatedResponseDto<LessonResponseDto>(
-      lessonDtos,
-      lessons.meta.totalItems,
-      lessons.meta.itemsPerPage,
-      lessons.meta.currentPage,
     );
   }
 

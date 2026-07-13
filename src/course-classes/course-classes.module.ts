@@ -1,7 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CoursesModule } from 'src/courses/courses.module';
-import { LessonsModule } from 'src/lessons/lessons.module';
 import { StudentsModule } from 'src/students/students.module';
 import { UsersModule } from 'src/users/users.module';
 
@@ -15,7 +14,6 @@ import { CourseClass } from './entities/course-class.entity';
     forwardRef(() => CoursesModule),
     UsersModule,
     StudentsModule,
-    forwardRef(() => LessonsModule),
   ],
   controllers: [CourseClassesController],
   providers: [CourseClassesService],
