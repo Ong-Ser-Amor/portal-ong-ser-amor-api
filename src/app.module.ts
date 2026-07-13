@@ -12,7 +12,6 @@ import { AutenticacaoModule } from './autenticacao/autenticacao.module';
 import { BeneficiariosModule } from './beneficiarios/beneficiarios.module';
 import { ChamadasModule } from './chamadas/chamadas.module';
 import { ContatosModule } from './contatos/contatos.module';
-import { CoursesModule } from './courses/courses.module';
 import { CursosModule } from './cursos/cursos.module';
 import { EnderecosModule } from './enderecos/enderecos.module';
 import { FamiliasModule } from './familias/familias.module';
@@ -58,7 +57,6 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
     AssetCategoriesModule,
     BeneficiariosModule,
     ContatosModule,
-    CoursesModule,
     EnderecosModule,
     FamiliasModule,
     LocationsModule,
