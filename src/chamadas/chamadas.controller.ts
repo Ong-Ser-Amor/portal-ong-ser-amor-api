@@ -20,7 +20,7 @@ import { ChamadasService } from './chamadas.service';
 import { ChamadaRespostaDto } from './dto/chamada-resposta.dto';
 import { CriarChamadaLoteDto } from './dto/criar-chamada.dto';
 
-@ApiTags('Chamadas (Presença)')
+@ApiTags('Chamadas (presença nas aulas)')
 @Controller('chamadas')
 export class ChamadasController {
   constructor(private readonly chamadasService: ChamadasService) {}

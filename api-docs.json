@@ -4688,7 +4688,7 @@
         },
         "summary": "Registrar ou atualizar a lista de chamada (presenças/faltas) de uma aula em lote",
         "tags": [
-          "Chamadas (Presença)"
+          "Chamadas (presença nas aulas)"
         ]
       }
     },
@@ -4728,7 +4728,7 @@
         },
         "summary": "Buscar a lista de chamadas preenchida de uma aula específica",
         "tags": [
-          "Chamadas (Presença)"
+          "Chamadas (presença nas aulas)"
         ]
       }
     },
