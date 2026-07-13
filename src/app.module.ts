@@ -7,28 +7,27 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AreasModule } from './areas/areas.module';
 import { AssetCategoriesModule } from './asset-categories/asset-categories.module';
-import { AttendancesModule } from './attendances/attendances.module';
+import { AulasModule } from './aulas/aulas.module';
 import { AutenticacaoModule } from './autenticacao/autenticacao.module';
 import { BeneficiariosModule } from './beneficiarios/beneficiarios.module';
+import { ChamadasModule } from './chamadas/chamadas.module';
 import { ContatosModule } from './contatos/contatos.module';
 import { CourseClassesModule } from './course-classes/course-classes.module';
 import { CoursesModule } from './courses/courses.module';
+import { CursosModule } from './cursos/cursos.module';
 import { EnderecosModule } from './enderecos/enderecos.module';
 import { FamiliasModule } from './familias/familias.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { LocationsModule } from './locations/locations.module';
 import { PessoasModule } from './pessoas/pessoas.module';
+import { PlanosCursoModule } from './planos-curso/planos-curso.module';
 import { StudentsModule } from './students/students.module';
 import { TasksModule } from './tasks/tasks.module';
+import { TurmasModule } from './turmas/turmas.module';
+import { TurmasMatriculasModule } from './turmas-matriculas/turmas-matriculas.module';
 import { UsersModule } from './users/users.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { VoluntariosModule } from './voluntarios/voluntarios.module';
-import { CursosModule } from './cursos/cursos.module';
-import { PlanosCursoModule } from './planos-curso/planos-curso.module';
-import { TurmasModule } from './turmas/turmas.module';
-import { TurmasMatriculasModule } from './turmas-matriculas/turmas-matriculas.module';
-import { AulasModule } from './aulas/aulas.module';
-import { ChamadasModule } from './chamadas/chamadas.module';
 
 @Module({
   imports: [
@@ -59,7 +58,6 @@ import { ChamadasModule } from './chamadas/chamadas.module';
     ScheduleModule.forRoot(),
     AreasModule,
     AssetCategoriesModule,
-    AttendancesModule,
     BeneficiariosModule,
     ContatosModule,
     CoursesModule,

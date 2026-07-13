@@ -1,4 +1,3 @@
-import { Attendance } from 'src/attendances/entities/attendance.entity';
 import { CourseClass } from 'src/course-classes/entities/course-class.entity';
 import {
   Column,
@@ -8,7 +7,6 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -42,9 +40,6 @@ export class Lesson {
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt: Date | null;
-
-  @OneToMany(() => Attendance, (attendance) => attendance.lesson)
-  attendances: Attendance[];
 
   constructor(partial: Partial<Lesson>) {
     Object.assign(this, partial);
