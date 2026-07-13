@@ -21,7 +21,6 @@ import { PlanosCursoModule } from './planos-curso/planos-curso.module';
 import { TasksModule } from './tasks/tasks.module';
 import { TurmasModule } from './turmas/turmas.module';
 import { TurmasMatriculasModule } from './turmas-matriculas/turmas-matriculas.module';
-import { UsersModule } from './users/users.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { VoluntariosModule } from './voluntarios/voluntarios.module';
 
@@ -61,7 +60,6 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
     LocationsModule,
     PessoasModule,
     TasksModule,
-    UsersModule,
     UsuariosModule,
     VoluntariosModule,
     AutenticacaoModule,
