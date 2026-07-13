@@ -13,7 +13,6 @@ export const mockStudent: Student = {
   createdAt: new Date('2025-09-17T15:00:00.000Z'),
   updatedAt: new Date('2025-09-17T15:00:00.000Z'),
   deletedAt: null,
-  courseClasses: [],
 };
 
 export const mockStudentList: Student[] = [

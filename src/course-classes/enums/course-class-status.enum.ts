@@ -1,6 +1,0 @@
-export enum CourseClassStatus {
-  EM_FORMACAO = 'EM_FORMACAO',
-  EM_ANDAMENTO = 'EM_ANDAMENTO',
-  FINALIZADA = 'FINALIZADA',
-  CANCELADA = 'CANCELADA',
-}

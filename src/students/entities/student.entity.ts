@@ -1,4 +1,3 @@
-import { CourseClass } from 'src/course-classes/entities/course-class.entity';
 import {
   Column,
   CreateDateColumn,
@@ -32,9 +31,6 @@ export class Student {
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt: Date | null;
-
-  @ManyToMany(() => CourseClass, (courseClass) => courseClass.students)
-  courseClasses: CourseClass[];
 
   constructor(partial: Partial<Student>) {
     Object.assign(this, partial);

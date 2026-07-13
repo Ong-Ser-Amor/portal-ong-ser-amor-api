@@ -8,7 +8,6 @@ export const mockCreateCourseDto: CreateCourseDto = {
 export const mockCourse: Course = {
   id: 1,
   name: 'Mock Course',
-  courseClasses: [],
   createdAt: new Date('2025-09-17T15:00:00.000Z'),
   updatedAt: new Date('2025-09-17T15:00:00.000Z'),
   deletedAt: null,

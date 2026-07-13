@@ -6,7 +6,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CourseClassStatus } from 'src/course-classes/enums/course-class-status.enum';
 import { PaginatedResponseDto } from 'src/dtos/paginated-response.dto';
 import { EntityNotFoundError, Repository } from 'typeorm';
 
@@ -49,13 +48,6 @@ export class CoursesService {
           'course.activeClassesCount',
           'course.courseClasses',
           'activeCourseClass',
-          (qb) =>
-            qb.where('activeCourseClass.status IN (:...statuses)', {
-              statuses: [
-                CourseClassStatus.EM_FORMACAO,
-                CourseClassStatus.EM_ANDAMENTO,
-              ],
-            }),
         )
         .orderBy('course.name', 'ASC')
         .take(take)

@@ -14,7 +14,6 @@ export const mockUser: User = {
   name: 'Mock User',
   email: 'mock@example.com',
   passwordHash: 'hashedPassword',
-  courseClasses: [],
   createdAt: new Date('2025-09-17T15:00:00.000Z'),
   updatedAt: new Date('2025-09-17T15:00:00.000Z'),
   deletedAt: null,
