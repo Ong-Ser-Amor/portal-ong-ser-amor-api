@@ -15,5 +15,6 @@ import { Chamada } from './entities/chamada.entity';
   ],
   controllers: [ChamadasController],
   providers: [ChamadasService],
+  exports: [ChamadasService],
 })
 export class ChamadasModule {}

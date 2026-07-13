@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AulasService } from 'src/aulas/aulas.service';
 import { StatusAula } from 'src/aulas/enums/status-aula.enum';
 import { TurmasMatriculasService } from 'src/turmas-matriculas/turmas-matriculas.service';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 
 import {
   CriarChamadaLoteDto,
@@ -147,6 +147,32 @@ export class ChamadasService {
       this.logger.error(`Erro ao buscar chamadas da aula ${aulaId}: ${msg}`);
       throw new InternalServerErrorException(
         'Erro ao buscar a lista de presenças da aula.',
+      );
+    }
+  }
+
+  /**
+   * Verifica se já existem registros de presença cadastrados para uma determinada aula.
+   * Aceita um EntityManager opcional para rodar de forma segura dentro de transações de outros módulos.
+   */
+  async existeChamadaParaAula(
+    aulaId: string,
+    gerenciadorTransacao?: EntityManager,
+  ): Promise<boolean> {
+    // Escolhe o gerenciador correto (o da transação ativa ou o padrão da service)
+    const manager = gerenciadorTransacao || this.repository.manager;
+
+    try {
+      return await manager.exists(Chamada, {
+        where: { aulaId },
+      });
+    } catch (erro) {
+      const msg = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro ao verificar existência de chamada para a aula ${aulaId}: ${msg}`,
+      );
+      throw new InternalServerErrorException(
+        'Erro ao validar histórico de presenças da aula.',
       );
     }
   }

@@ -9,6 +9,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ChamadasService } from 'src/chamadas/chamadas.service';
 import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
 import { StatusTurma } from 'src/turmas/enums/status-turma.enum';
 import { TurmasService } from 'src/turmas/turmas.service';
@@ -26,6 +27,8 @@ export class AulasService {
   constructor(
     @InjectRepository(Aula)
     private readonly repository: Repository<Aula>,
+    @Inject(forwardRef(() => ChamadasService))
+    private readonly chamadasService: ChamadasService,
     @Inject(forwardRef(() => TurmasService))
     private readonly turmasService: TurmasService,
   ) {}
@@ -124,18 +127,31 @@ export class AulasService {
 
     const aulaAtual = await this.buscarPorId(id);
 
-    // Valida as condições para alteração do status da aula, caso o status seja alterado para REALIZADA
-    if (aulaAtual.status === StatusAula.REALIZADA && atualizarAulaDto.status) {
+    const possuiChamadaSalva = await this.chamadasService.existeChamadaParaAula(
+      id,
+      manager,
+    );
+
+    if (possuiChamadaSalva) {
       if (atualizarAulaDto.status === StatusAula.AGENDADA) {
         throw new BadRequestException(
-          'Uma aula com chamada já realizada não pode retornar ao status de AGENDADA.',
+          'Esta aula já possui registros de presença lançados e não pode retornar ao status de AGENDADA.',
         );
       }
       if (atualizarAulaDto.status === StatusAula.CANCELADA) {
         throw new BadRequestException(
-          'Uma aula com chamada já realizada não pode ser alterada para CANCELADA.',
+          'Não é possível CANCELAR uma aula que já possui registros de chamada salvos no sistema.',
         );
       }
+    }
+
+    if (
+      atualizarAulaDto.status === StatusAula.REALIZADA &&
+      !possuiChamadaSalva
+    ) {
+      throw new BadRequestException(
+        'Não é possível marcar uma aula como REALIZADA sem antes registrar o lote de chamadas dos alunos.',
+      );
     }
 
     if (atualizarAulaDto.data) {
@@ -170,6 +186,16 @@ export class AulasService {
 
   async remover(id: string): Promise<void> {
     await this.buscarPorId(id);
+
+    const possuiChamadaSalva =
+      await this.chamadasService.existeChamadaParaAula(id);
+
+    if (possuiChamadaSalva) {
+      throw new BadRequestException(
+        'Esta aula não pode ser removida do cronograma pois já possui histórico de chamadas vinculado.',
+      );
+    }
+
     try {
       await this.repository.softDelete(id);
     } catch (erro) {
