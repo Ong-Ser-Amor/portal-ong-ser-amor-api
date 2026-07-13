@@ -123,7 +123,7 @@ export class AulasController {
   @Patch(':id')
   @ApiOperation({ summary: 'Atualizar dados ou o status de uma aula pelo ID' })
   @ApiOkResponse({
-    description: 'O registro da aula foi atualizado com sucesso.',
+    description: 'O registro da aula foi updated com sucesso.',
     type: AulaRespostaDto,
   })
   @ApiNotFoundResponse({
@@ -131,7 +131,7 @@ export class AulasController {
   })
   @ApiBadRequestResponse({
     description:
-      'Tentativa de transição de status inválida para uma aula realizada OU a nova data está fora dos limites da turma.',
+      'A nova data ultrapassa os limites do curso, a data é duplicada, tentou-se reverter uma aula com chamada para AGENDADA/CANCELADA, ou marcar como REALIZADA sem lista de presença salva.',
   })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao atualizar a aula.',
@@ -151,6 +151,10 @@ export class AulasController {
   })
   @ApiNoContentResponse({
     description: 'A aula foi removida com sucesso (soft delete).',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Esta aula não pode ser removida pois possui um lote de chamadas ativo e vinculado a ela.',
   })
   @ApiNotFoundResponse({
     description: 'Aula com o ID especificado não foi encontrada.',

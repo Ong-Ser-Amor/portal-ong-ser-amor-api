@@ -4592,7 +4592,7 @@
         },
         "responses": {
           "200": {
-            "description": "O registro da aula foi atualizado com sucesso.",
+            "description": "O registro da aula foi updated com sucesso.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4602,7 +4602,7 @@
             }
           },
           "400": {
-            "description": "Tentativa de transição de status inválida para uma aula realizada OU a nova data está fora dos limites da turma."
+            "description": "A nova data ultrapassa os limites do curso, a data é duplicada, tentou-se reverter uma aula com chamada para AGENDADA/CANCELADA, ou marcar como REALIZADA sem lista de presença salva."
           },
           "404": {
             "description": "Aula com o ID especificado não foi encontrada."
@@ -4631,6 +4631,9 @@
         "responses": {
           "204": {
             "description": "A aula foi removida com sucesso (soft delete)."
+          },
+          "400": {
+            "description": "Esta aula não pode ser removida pois possui um lote de chamadas ativo e vinculado a ela."
           },
           "404": {
             "description": "Aula com o ID especificado não foi encontrada."
