@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { CHAVE_ROTA_PUBLICA } from 'src/decorators/publico.decorator';
+import { CHAVE_ROTA_PUBLICA } from 'src/shared/decorators/publico.decorator';
 
 import { PayloadJwtDto } from '../dto/payload-jwt.dto';
 

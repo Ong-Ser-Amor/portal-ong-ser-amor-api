@@ -23,8 +23,8 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { ApiPaginacaoResposta } from 'src/dtos/api-paginacao-resposta.decorator';
-import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
+import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
+import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 
 import { CursosService } from './cursos.service';
 import { AtualizarCursoDto } from './dto/atualizar-curso.dto';

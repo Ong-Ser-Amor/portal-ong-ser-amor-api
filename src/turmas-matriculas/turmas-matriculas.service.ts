@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BeneficiariosService } from 'src/beneficiarios/beneficiarios.service';
-import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
+import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { CriterioAvaliacao } from 'src/turmas/enums/criterio-avaliacao.enum';
 import { StatusTurma } from 'src/turmas/enums/status-turma.enum';
 import { TurmasService } from 'src/turmas/turmas.service';

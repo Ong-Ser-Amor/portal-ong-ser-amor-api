@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AulasService } from 'src/aulas/aulas.service';
-import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
+import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { TurmasMatriculasService } from 'src/turmas-matriculas/turmas-matriculas.service';
 import { EntityNotFoundError, Repository } from 'typeorm';
 

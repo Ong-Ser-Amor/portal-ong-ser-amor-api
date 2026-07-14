@@ -25,8 +25,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { ApiPaginacaoResposta } from '../dtos/api-paginacao-resposta.decorator';
-import { PaginacaoRespostaDto } from '../dtos/paginacao-resposta.dto';
+import { ApiPaginacaoResposta } from '../shared/decorators/api-paginacao-resposta.decorator';
+import { PaginacaoRespostaDto } from '../shared/dtos/paginacao-resposta.dto';
 import { AtualizarVoluntarioDto } from './dto/atualizar-voluntario.dto';
 import { CriarVoluntarioDto } from './dto/criar-voluntario.dto';
 import { VoluntarioRespostaDto } from './dto/voluntario-resposta.dto';

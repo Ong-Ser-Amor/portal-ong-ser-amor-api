@@ -28,8 +28,8 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { TipoContato } from 'src/contatos/enums/tipo-contato.enum';
-import { ApiPaginacaoResposta } from 'src/dtos/api-paginacao-resposta.decorator';
-import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
+import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
+import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { CriarFamiliaDto } from 'src/familias/dto/criar-familia.dto';
 import { FaixaRenda } from 'src/familias/enums/faixa-renda.enum';
 import { TipoMoradia } from 'src/familias/enums/tipo-moradia.enum';

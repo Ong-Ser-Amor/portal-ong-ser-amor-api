@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
+import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { AtualizarPlanoCursoDto } from './dto/atualizar-planos-curso.dto';

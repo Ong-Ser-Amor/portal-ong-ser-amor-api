@@ -7,7 +7,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Publico } from 'src/decorators/publico.decorator';
+import { Publico } from 'src/shared/decorators/publico.decorator';
 
 import { AutenticacaoService } from './autenticacao.service';
 import { LoginRespostaDto } from './dto/login-resposta.dto';

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsuariosService } from 'src/usuarios/usuarios.service';
-import { compararSenha } from 'src/utils/senha';
+import { compararSenha } from 'src/shared/utils/senha';
 
 import { LoginDto } from './dto/login.dto';
 import { PayloadJwtDto } from './dto/payload-jwt.dto';

@@ -8,7 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginacaoRespostaDto } from 'src/dtos/paginacao-resposta.dto';
+import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { CriarPessoaDto } from 'src/pessoas/dto/criar-pessoa.dto';
 import { PessoasService } from 'src/pessoas/pessoas.service';
 import { DataSource, EntityNotFoundError, Repository } from 'typeorm';

@@ -13,7 +13,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
-import { IsDateAfter } from 'src/utils/decorators/is-date-after.decorator';
+import { IsDateAfter } from 'src/shared/decorators/is-date-after.decorator';
 
 import { CriterioAvaliacao } from '../enums/criterio-avaliacao.enum';
 import { StatusTurma } from '../enums/status-turma.enum';
