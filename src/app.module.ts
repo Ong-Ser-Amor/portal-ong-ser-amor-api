@@ -14,7 +14,6 @@ import { ContatosModule } from './contatos/contatos.module';
 import { CursosModule } from './cursos/cursos.module';
 import { EnderecosModule } from './enderecos/enderecos.module';
 import { FamiliasModule } from './familias/familias.module';
-import { LocationsModule } from './locations/locations.module';
 import { PessoasModule } from './pessoas/pessoas.module';
 import { PlanosCursoModule } from './planos-curso/planos-curso.module';
 import { TasksModule } from './tasks/tasks.module';
@@ -55,7 +54,6 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
     ContatosModule,
     EnderecosModule,
     FamiliasModule,
-    LocationsModule,
     PessoasModule,
     TasksModule,
     UsuariosModule,
