@@ -38,7 +38,7 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         autoLoadEntities: true,
         synchronize: false,
-        migrations: [__dirname + '/migracoes/**/*{.ts,.js}'],
+        migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
         migrationsRun: true,
         ssl:
           configService.get<string>('NODE_ENV') === 'production'
