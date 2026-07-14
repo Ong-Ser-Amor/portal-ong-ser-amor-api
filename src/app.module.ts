@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AssetCategoriesModule } from './asset-categories/asset-categories.module';
 import { AulasModule } from './aulas/aulas.module';
 import { AutenticacaoModule } from './autenticacao/autenticacao.module';
 import { BeneficiariosModule } from './beneficiarios/beneficiarios.module';
@@ -49,7 +48,6 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
       inject: [ConfigService],
     }),
     ScheduleModule.forRoot(),
-    AssetCategoriesModule,
     BeneficiariosModule,
     ContatosModule,
     EnderecosModule,
