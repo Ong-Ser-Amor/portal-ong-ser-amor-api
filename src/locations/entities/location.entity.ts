@@ -1,4 +1,3 @@
-import { Area } from 'src/areas/entities/area.entity';
 import {
   Column,
   CreateDateColumn,
@@ -39,9 +38,6 @@ export class Location {
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deleted_at: Date | null;
-
-  @OneToMany(() => Area, (area: Area) => area.location)
-  areas: Area[];
 
   constructor(partial: Partial<Location>) {
     Object.assign(this, partial);
