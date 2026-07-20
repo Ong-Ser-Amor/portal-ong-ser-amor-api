@@ -2847,6 +2847,211 @@
           "Matrículas das Turmas"
         ]
       }
+    },
+    "/turmas-atividades": {
+      "post": {
+        "operationId": "TurmasAtividadesController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriarTurmaAtividadeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "A atividade foi cadastrada com sucesso e as pendências de entrega de todos os alunos ativos foram inicializadas.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurmaAtividadeRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Houve quebra nas regras de consistência de datas (fora do limite da turma) ou tentativa de atribuir nota em turmas com critérios qualitativos/livres."
+          },
+          "404": {
+            "description": "A turma informada no id não existe no sistema."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao processar a criação da atividade em lote."
+          }
+        },
+        "summary": "Cadastrar uma nova atividade para uma turma",
+        "tags": [
+          "Atividades das Turmas"
+        ]
+      }
+    },
+    "/turmas-atividades/turmas/{turmaId}": {
+      "get": {
+        "operationId": "TurmasAtividadesController_buscarAtividadesPorTurma",
+        "parameters": [
+          {
+            "name": "turmaId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A lista de atividades da turma foi recuperada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TurmaAtividadeRespostaDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "A turma informada no id não existe no sistema."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar as atividades da turma."
+          }
+        },
+        "summary": "Buscar todas as atividades de uma turma específica",
+        "tags": [
+          "Atividades das Turmas"
+        ]
+      }
+    },
+    "/turmas-atividades/{atividadeId}/entregas": {
+      "get": {
+        "operationId": "TurmasAtividadesController_buscarEntregasPorAtividade",
+        "parameters": [
+          {
+            "name": "atividadeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A lista de entregas dos alunos da atividade foi encontrada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TurmaAtividadeEntregaRespostaDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "A atividade com o ID especificado não foi encontrada."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao carregar o painel de entregas."
+          }
+        },
+        "summary": "Buscar todas as entregas e notas de alunos por atividade",
+        "tags": [
+          "Atividades das Turmas"
+        ]
+      }
+    },
+    "/turmas-atividades/entregas/lote": {
+      "patch": {
+        "operationId": "TurmasAtividadesController_registrarEmLote",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrarEntregasLoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "O lote de avaliações e notas dos estudantes foi processado e salvo com sucesso."
+          },
+          "400": {
+            "description": "Tentativa de lançar nota em atividade não avaliativa ou a nota informada ultrapassou o limite máximo da atividade."
+          },
+          "404": {
+            "description": "Um ou mais IDs de registros de entregas informados na lista não foram localizados."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ou falha de transação ao processar o lote de notas."
+          }
+        },
+        "summary": "Registrar notas e status de entregas de alunos em lote",
+        "tags": [
+          "Atividades das Turmas"
+        ]
+      }
+    },
+    "/turmas-atividades/{id}": {
+      "patch": {
+        "operationId": "TurmasAtividadesController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarTurmaAtividadeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A atividade foi atualizada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurmaAtividadeRespostaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Houve quebra nas regras de consistência de datas, tentativa de atribuir nota em turmas com critérios não avaliativos ou tentativa de reduzir a nota máxima com notas já lançadas acima do novo limite."
+          },
+          "404": {
+            "description": "Atividade com o ID especificado não foi encontrada."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar a atividade."
+          }
+        },
+        "summary": "Atualizar dados de uma atividade cadastrada",
+        "tags": [
+          "Atividades das Turmas"
+        ]
+      }
     }
   },
   "info": {
@@ -4363,6 +4568,263 @@
             "nullable": true,
             "example": "Aluno se destacou durante o curso, demonstrando grande interesse e participação ativa nas atividades propostas.",
             "description": "Espaço livre para parecer pedagógico e observações qualitativas."
+          }
+        }
+      },
+      "CriarTurmaAtividadeDto": {
+        "type": "object",
+        "properties": {
+          "turmaId": {
+            "type": "string",
+            "example": "1"
+          },
+          "titulo": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 150,
+            "example": "Exercício de Lógica de Programação"
+          },
+          "descricao": {
+            "type": "string",
+            "example": "Criar um algoritimo que some dois números inteiros e retorne o resultado."
+          },
+          "tipoAtividade": {
+            "enum": [
+              "EXERCICIO",
+              "PROJETO",
+              "PROVA",
+              "OUTRA"
+            ],
+            "type": "string",
+            "example": "EXERCICIO"
+          },
+          "valeNota": {
+            "type": "boolean",
+            "example": true,
+            "description": "Indica se a atividade vale nota ou pontuação.\n    ATENÇÃO: Só pode ser 'true' se o critério de avaliação da turma correspondente for 'POR_NOTA_PRESENCA'.\n    Para turmas com critérios 'SEM_CONTROLE', 'POR_PARTICIPACAO' ou 'QUALITATIVA', envie obrigatoriamente como 'false'."
+          },
+          "notaMaxima": {
+            "type": "string",
+            "pattern": "/^\\d{1,5}(\\.\\d{1,2})?$/",
+            "example": "10.00",
+            "description": "Nota ou XP máximo da atividade. Aceita até 5 dígitos antes da vírgula e 2 decimais (precisão 7,2).\n    REGRAS DE NEGÓCIO:\n    - Obrigatório se 'valeNota' for 'true' (exige critério 'POR_NOTA_PRESENCA' na turma).\n    - Deve ser nulo (não enviado) se 'valeNota' for 'false' ou se a turma possuir critérios que não avaliam notas numéricas."
+          },
+          "dataAtribuicao": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-07-15"
+          },
+          "prazoEntrega": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-07-22"
+          }
+        },
+        "required": [
+          "turmaId",
+          "titulo",
+          "tipoAtividade",
+          "valeNota",
+          "dataAtribuicao",
+          "prazoEntrega"
+        ]
+      },
+      "TurmaAtividadeRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "turmaId": {
+            "type": "string"
+          },
+          "titulo": {
+            "type": "string"
+          },
+          "descricao": {
+            "type": "string",
+            "nullable": true
+          },
+          "tipoAtividade": {
+            "enum": [
+              "EXERCICIO",
+              "PROJETO",
+              "PROVA",
+              "OUTRA"
+            ],
+            "type": "string"
+          },
+          "valeNota": {
+            "type": "boolean"
+          },
+          "notaMaxima": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataAtribuicao": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "prazoEntrega": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "turmaId",
+          "titulo",
+          "descricao",
+          "tipoAtividade",
+          "valeNota",
+          "notaMaxima",
+          "dataAtribuicao",
+          "prazoEntrega"
+        ]
+      },
+      "TurmaAtividadeEntregaRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "atividadeId": {
+            "type": "string"
+          },
+          "matriculaId": {
+            "type": "string"
+          },
+          "statusEntrega": {
+            "type": "string",
+            "enum": [
+              "PENDENTE",
+              "ENTREGUE",
+              "ENTREGUE_COM_ATRASO",
+              "NAO_ENTREGUE"
+            ]
+          },
+          "notaObtida": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataEntrega": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "observacao": {
+            "type": "string",
+            "nullable": true
+          },
+          "atividade": {
+            "$ref": "#/components/schemas/TurmaAtividadeRespostaDto"
+          },
+          "matricula": {
+            "$ref": "#/components/schemas/MatriculaResumoRespostaDto"
+          }
+        },
+        "required": [
+          "id",
+          "atividadeId",
+          "matriculaId",
+          "statusEntrega",
+          "notaObtida",
+          "dataEntrega",
+          "observacao"
+        ]
+      },
+      "EntregaAtividadeDto": {
+        "type": "object",
+        "properties": {
+          "entregaId": {
+            "type": "string",
+            "example": "1",
+            "description": "ID do registro da entrega na tabela turmas_atividades_entregas"
+          },
+          "statusEntrega": {
+            "enum": [
+              "PENDENTE",
+              "ENTREGUE",
+              "ENTREGUE_COM_ATRASO",
+              "NAO_ENTREGUE"
+            ],
+            "type": "string",
+            "example": "ENTREGUE"
+          },
+          "notaObtida": {
+            "type": "string",
+            "pattern": "/^\\d{1,5}(\\.\\d{1,2})?$/",
+            "example": "8.50",
+            "description": "Nota ou XP obtido pelo aluno. Aceita até 5 dígitos inteiros e 2 decimais."
+          },
+          "observacao": {
+            "type": "string",
+            "example": "Entregou o projeto completo com excelente código."
+          }
+        },
+        "required": [
+          "entregaId",
+          "statusEntrega"
+        ]
+      },
+      "RegistrarEntregasLoteDto": {
+        "type": "object",
+        "properties": {
+          "entregas": {
+            "description": "Lista contendo os lançamentos de notas e status de cada aluno.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntregaAtividadeDto"
+            }
+          }
+        },
+        "required": [
+          "entregas"
+        ]
+      },
+      "AtualizarTurmaAtividadeDto": {
+        "type": "object",
+        "properties": {
+          "titulo": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 150,
+            "example": "Exercício de Lógica de Programação"
+          },
+          "descricao": {
+            "type": "string",
+            "example": "Criar um algoritimo que some dois números inteiros e retorne o resultado."
+          },
+          "tipoAtividade": {
+            "enum": [
+              "EXERCICIO",
+              "PROJETO",
+              "PROVA",
+              "OUTRA"
+            ],
+            "type": "string",
+            "example": "EXERCICIO"
+          },
+          "valeNota": {
+            "type": "boolean",
+            "example": true,
+            "description": "Indica se a atividade vale nota ou pontuação.\n    ATENÇÃO: Só pode ser 'true' se o critério de avaliação da turma correspondente for 'POR_NOTA_PRESENCA'.\n    Para turmas com critérios 'SEM_CONTROLE', 'POR_PARTICIPACAO' ou 'QUALITATIVA', envie obrigatoriamente como 'false'."
+          },
+          "notaMaxima": {
+            "type": "string",
+            "pattern": "/^\\d{1,5}(\\.\\d{1,2})?$/",
+            "example": "10.00",
+            "description": "Nota ou XP máximo da atividade. Aceita até 5 dígitos antes da vírgula e 2 decimais (precisão 7,2).\n    REGRAS DE NEGÓCIO:\n    - Obrigatório se 'valeNota' for 'true' (exige critério 'POR_NOTA_PRESENCA' na turma).\n    - Deve ser nulo (não enviado) se 'valeNota' for 'false' ou se a turma possuir critérios que não avaliam notas numéricas."
+          },
+          "dataAtribuicao": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-07-15"
+          },
+          "prazoEntrega": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-07-22"
           }
         }
       }

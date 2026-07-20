@@ -20,6 +20,7 @@ import { TurmasModule } from './turmas/turmas.module';
 import { TurmasMatriculasModule } from './turmas-matriculas/turmas-matriculas.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { VoluntariosModule } from './voluntarios/voluntarios.module';
+import { TurmasAtividadesModule } from './turmas-atividades/turmas-atividades.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { VoluntariosModule } from './voluntarios/voluntarios.module';
     TurmasMatriculasModule,
     AulasModule,
     ChamadasModule,
+    TurmasAtividadesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
