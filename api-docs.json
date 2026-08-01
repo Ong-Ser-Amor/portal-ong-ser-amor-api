@@ -63,8 +63,7 @@
                           "AUTONOMO",
                           "DESEMPREGADO",
                           "EMPREGADO_CLT",
-                          "INFORMAL",
-                          "OUTRO"
+                          "INFORMAL"
                         ]
                       },
                       "quantidadeFilhos": {
@@ -150,8 +149,7 @@
                           "AUTONOMO",
                           "DESEMPREGADO",
                           "EMPREGADO_CLT",
-                          "INFORMAL",
-                          "OUTRO"
+                          "INFORMAL"
                         ]
                       },
                       "quantidadeFilhos": {
@@ -251,8 +249,7 @@
                           "AUTONOMO",
                           "DESEMPREGADO",
                           "EMPREGADO_CLT",
-                          "INFORMAL",
-                          "OUTRO"
+                          "INFORMAL"
                         ]
                       },
                       "quantidadeFilhos": {
@@ -351,8 +348,7 @@
                           "AUTONOMO",
                           "DESEMPREGADO",
                           "EMPREGADO_CLT",
-                          "INFORMAL",
-                          "OUTRO"
+                          "INFORMAL"
                         ]
                       },
                       "quantidadeFilhos": {
@@ -3271,8 +3267,7 @@
               "AUTONOMO",
               "DESEMPREGADO",
               "EMPREGADO_CLT",
-              "INFORMAL",
-              "OUTRO"
+              "INFORMAL"
             ],
             "type": "string",
             "example": "DESEMPREGADO"
@@ -3431,8 +3426,7 @@
               "AUTONOMO",
               "DESEMPREGADO",
               "EMPREGADO_CLT",
-              "INFORMAL",
-              "OUTRO"
+              "INFORMAL"
             ],
             "type": "string",
             "example": "DESEMPREGADO"

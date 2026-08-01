@@ -22,5 +22,4 @@ export enum VinculoEmpregaticio {
   DESEMPREGADO = 'DESEMPREGADO',
   EMPREGADO_CLT = 'EMPREGADO_CLT',
   INFORMAL = 'INFORMAL',
-  OUTRO = 'OUTRO',
 }
