@@ -90,12 +90,24 @@ export class TurmasMatriculasService {
   }
 
   async buscarTodas(
-    limite = 10,
     pagina = 1,
+    itensPorPagina = 10,
   ): Promise<PaginacaoRespostaDto<TurmaMatricula>> {
     try {
-      const take = limite;
-      const skip = (pagina - 1) * limite;
+      if (pagina < 1) {
+        throw new BadRequestException(
+          'O número da página deve ser maior ou igual a 1.',
+        );
+      }
+
+      if (itensPorPagina < 1) {
+        throw new BadRequestException(
+          'O número de itens por página deve ser maior ou igual a 1.',
+        );
+      }
+
+      const take = itensPorPagina;
+      const skip = (pagina - 1) * itensPorPagina;
 
       const [matriculas, total] = await this.repository.findAndCount({
         relations: ['turma', 'beneficiario', 'beneficiario.pessoa'],
@@ -106,10 +118,14 @@ export class TurmasMatriculasService {
       return new PaginacaoRespostaDto<TurmaMatricula>(
         matriculas,
         total,
-        limite,
+        itensPorPagina,
         pagina,
       );
     } catch (erro) {
+      if (erro instanceof BadRequestException) {
+        throw erro;
+      }
+
       const mensagemErro = erro instanceof Error ? erro.message : String(erro);
       this.logger.error(
         `Erro ao buscar listagem de matrículas: ${mensagemErro}`,

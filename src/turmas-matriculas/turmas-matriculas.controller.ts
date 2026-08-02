@@ -72,28 +72,33 @@ export class TurmasMatriculasController {
   @ApiOperation({ summary: 'Buscar uma lista paginada de matrículas' })
   @ApiPaginacaoResposta(TurmaMatriculaRespostaDto)
   @ApiQuery({
-    name: 'limite',
-    required: false,
-    description: 'Número de itens por página (padrão: 10)',
-    example: 10,
-  })
-  @ApiQuery({
     name: 'pagina',
     required: false,
     description: 'Número da página atual (padrão: 1)',
     example: 1,
+  })
+  @ApiQuery({
+    name: 'itensPorPagina',
+    required: false,
+    description: 'Número de itens por página (padrão: 10)',
+    example: 10,
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
   })
   @ApiInternalServerErrorResponse({
     description:
       'Ocorreu um erro inesperado ao buscar a listagem de matrículas.',
   })
   async buscarTodas(
-    @Query('limite', new DefaultValuePipe(10), ParseIntPipe) limite: number,
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
+    @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
+    itensPorPagina: number,
   ): Promise<PaginacaoRespostaDto<TurmaMatriculaRespostaDto>> {
     const matriculas = await this.turmasMatriculasService.buscarTodas(
-      limite,
       pagina,
+      itensPorPagina,
     );
 
     const matriculasMapeadasComPaginacao = matriculas.dados.map(
