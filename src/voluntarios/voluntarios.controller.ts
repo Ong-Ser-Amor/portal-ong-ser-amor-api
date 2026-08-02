@@ -13,8 +13,9 @@ import {
   Query,
 } from '@nestjs/common';
 import {
-  ApiConflictResponse,
+  ApiBadRequestResponse,
   ApiBody,
+  ApiConflictResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
@@ -137,27 +138,32 @@ export class VoluntariosController {
   @ApiOperation({ summary: 'Buscar uma lista paginada de voluntários' })
   @ApiPaginacaoResposta(VoluntarioRespostaDto)
   @ApiQuery({
-    name: 'limite',
-    required: false,
-    example: 10,
-    description: 'Número de itens por página (padrão: 10)',
-  })
-  @ApiQuery({
     name: 'pagina',
     required: false,
     example: 1,
     description: 'Número da página atual (padrão: 1)',
   })
+  @ApiQuery({
+    name: 'itensPorPagina',
+    required: false,
+    example: 10,
+    description: 'Número de itens por página (padrão: 10)',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
+  })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar os voluntários.',
   })
   async buscarTodos(
-    @Query('limite', new DefaultValuePipe(10), ParseIntPipe) limite: number,
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
+    @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
+    itensPorPagina: number,
   ): Promise<PaginacaoRespostaDto<VoluntarioRespostaDto>> {
     const voluntariosPaginados = await this.voluntariosService.buscarTodos(
-      limite,
       pagina,
+      itensPorPagina,
     );
 
     const voluntariosDtos = voluntariosPaginados.dados.map(
