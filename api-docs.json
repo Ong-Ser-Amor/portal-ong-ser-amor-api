@@ -3294,6 +3294,11 @@
       "PaginacaoMetaDto": {
         "type": "object",
         "properties": {
+          "paginaAtual": {
+            "type": "number",
+            "description": "Página atual",
+            "example": 1
+          },
           "itensPorPagina": {
             "type": "number",
             "description": "Número de itens por página",
@@ -3304,11 +3309,6 @@
             "description": "Total de itens",
             "example": 100
           },
-          "paginaAtual": {
-            "type": "number",
-            "description": "Página atual",
-            "example": 1
-          },
           "totalPaginas": {
             "type": "number",
             "description": "Total de páginas",
@@ -3316,9 +3316,9 @@
           }
         },
         "required": [
+          "paginaAtual",
           "itensPorPagina",
           "totalItens",
-          "paginaAtual",
           "totalPaginas"
         ]
       },

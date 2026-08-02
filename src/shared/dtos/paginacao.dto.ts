@@ -2,6 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class PaginacaoMetaDto {
   @ApiProperty({
+    description: 'Página atual',
+    example: 1,
+  })
+  paginaAtual: number;
+
+  @ApiProperty({
     description: 'Número de itens por página',
     example: 10,
   })
@@ -14,26 +20,20 @@ export class PaginacaoMetaDto {
   totalItens: number;
 
   @ApiProperty({
-    description: 'Página atual',
-    example: 1,
-  })
-  paginaAtual: number;
-
-  @ApiProperty({
     description: 'Total de páginas',
     example: 10,
   })
   totalPaginas: number;
 
   constructor(
+    paginaAtual: number,
     itensPorPagina: number,
     totalItens: number,
-    paginaAtual: number,
     totalPaginas: number,
   ) {
+    this.paginaAtual = paginaAtual;
     this.itensPorPagina = itensPorPagina;
     this.totalItens = totalItens;
-    this.paginaAtual = paginaAtual;
     this.totalPaginas = totalPaginas;
   }
 }

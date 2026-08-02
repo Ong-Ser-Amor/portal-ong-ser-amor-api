@@ -25,9 +25,9 @@ export class PaginacaoRespostaDto<T> {
     const totalPaginas = Math.ceil(total / itensPorPagina);
 
     this.meta = new PaginacaoMetaDto(
+      paginaAtual,
       itensPorPagina,
       total,
-      paginaAtual,
       totalPaginas,
     );
 
