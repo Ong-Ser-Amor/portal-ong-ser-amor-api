@@ -64,12 +64,24 @@ export class TurmasService {
   }
 
   async buscarTodos(
-    limite = 10,
     pagina = 1,
+    itensPorPagina = 10,
   ): Promise<PaginacaoRespostaDto<Turma>> {
     try {
-      const take = limite;
-      const skip = (pagina - 1) * limite;
+      if (pagina < 1) {
+        throw new BadRequestException(
+          'O número da página deve ser maior ou igual a 1.',
+        );
+      }
+
+      if (itensPorPagina < 1) {
+        throw new BadRequestException(
+          'O número de itens por página deve ser maior ou igual a 1.',
+        );
+      }
+
+      const take = itensPorPagina;
+      const skip = (pagina - 1) * itensPorPagina;
 
       const [turmas, total] = await this.repository.findAndCount({
         order: { nome: 'ASC' },
@@ -77,8 +89,17 @@ export class TurmasService {
         skip,
       });
 
-      return new PaginacaoRespostaDto<Turma>(turmas, total, limite, pagina);
+      return new PaginacaoRespostaDto<Turma>(
+        turmas,
+        total,
+        itensPorPagina,
+        pagina,
+      );
     } catch (erro) {
+      if (erro instanceof BadRequestException) {
+        throw erro;
+      }
+
       const mensagemErro =
         erro instanceof Error
           ? erro.message
