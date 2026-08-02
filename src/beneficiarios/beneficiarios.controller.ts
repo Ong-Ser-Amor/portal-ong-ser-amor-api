@@ -28,11 +28,11 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { TipoContato } from 'src/contatos/enums/tipo-contato.enum';
-import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
-import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { CriarFamiliaDto } from 'src/familias/dto/criar-familia.dto';
 import { FaixaRenda } from 'src/familias/enums/faixa-renda.enum';
 import { TipoMoradia } from 'src/familias/enums/tipo-moradia.enum';
+import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
+import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 
 import { BeneficiariosService } from './beneficiarios.service';
 import { AtualizarBeneficiarioDto } from './dto/atualizar-beneficiario.dto';
@@ -289,10 +289,11 @@ export class BeneficiariosController {
             possuiBeneficioSocial: true,
             tipoMoradia: TipoMoradia.ALUGADA,
             endereco: {
-              cep: '12345678',
               logradouro: 'Rua A',
               numero: '123',
+              complemento: 'Casa 1',
               bairro: 'Centro',
+              cep: '12345678',
               cidade: 'Cidade',
               uf: 'SP',
             },
@@ -345,6 +346,7 @@ export class BeneficiariosController {
             possuiBeneficioSocial: true,
             tipoMoradia: TipoMoradia.ALUGADA,
             endereco: {
+              complemento: 'Casa 1',
               cep: '12345678',
               logradouro: 'Rua A',
               numero: '123',

@@ -446,10 +446,11 @@
                       "possuiBeneficioSocial": true,
                       "tipoMoradia": "ALUGADA",
                       "endereco": {
-                        "cep": "12345678",
                         "logradouro": "Rua A",
                         "numero": "123",
+                        "complemento": "Casa 1",
                         "bairro": "Centro",
+                        "cep": "12345678",
                         "cidade": "Cidade",
                         "uf": "SP"
                       }
@@ -502,6 +503,7 @@
                       "possuiBeneficioSocial": true,
                       "tipoMoradia": "ALUGADA",
                       "endereco": {
+                        "complemento": "Casa 1",
                         "cep": "12345678",
                         "logradouro": "Rua A",
                         "numero": "123",
