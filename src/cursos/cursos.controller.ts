@@ -13,6 +13,7 @@ import {
   Query,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
@@ -48,36 +49,43 @@ export class CursosController {
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao criar o curso.',
   })
-  async criar(@Body() criarCursoDto: CriarCursoDto): Promise<CursoRespostaDto> {
-    const curso = await this.cursosService.criar(criarCursoDto);
-    return new CursoRespostaDto(curso);
+  async criar(
+    @Body() criarCursoDto: CriarCursoDto,
+  ): Promise<CursoRespostaDto> {
+    const cursoCriado = await this.cursosService.criar(criarCursoDto);
+    return new CursoRespostaDto(cursoCriado);
   }
 
   @Get()
   @ApiOperation({ summary: 'Buscar uma lista paginada de cursos' })
   @ApiPaginacaoResposta(CursoRespostaDto)
   @ApiQuery({
-    name: 'limite',
-    required: false,
-    description: 'Número de itens por página (padrão: 10)',
-    example: 10,
-  })
-  @ApiQuery({
     name: 'pagina',
     required: false,
     description: 'Número da página atual (padrão: 1)',
     example: 1,
   })
+  @ApiQuery({
+    name: 'itensPorPagina',
+    required: false,
+    description: 'Número de itens por página (padrão: 10)',
+    example: 10,
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
+  })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar os cursos.',
   })
   async buscarTodos(
-    @Query('limite', new DefaultValuePipe(10), ParseIntPipe) limite: number,
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
+    @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
+    itensPorPagina: number,
   ): Promise<PaginacaoRespostaDto<CursoRespostaDto>> {
     const cursosPaginados = await this.cursosService.buscarTodos(
-      limite,
       pagina,
+      itensPorPagina,
     );
 
     const cursosDtos = cursosPaginados.dados.map(
