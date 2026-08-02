@@ -65,16 +65,16 @@ export class AulasController {
   @ApiOperation({ summary: 'Buscar uma lista paginada de aulas registradas' })
   @ApiPaginacaoResposta(AulaRespostaDto)
   @ApiQuery({
-    name: 'limite',
-    required: false,
-    description: 'Número de itens por página (padrão: 10)',
-    example: 10,
-  })
-  @ApiQuery({
     name: 'pagina',
     required: false,
     description: 'Número da página atual (padrão: 1)',
     example: 1,
+  })
+  @ApiQuery({
+    name: 'itensPorPagina',
+    required: false,
+    description: 'Número de itens por página (padrão: 10)',
+    example: 10,
   })
   @ApiQuery({
     name: 'turmaId',
@@ -83,15 +83,24 @@ export class AulasController {
       'Filtra opcionalmente as aulas pertencentes a uma turma específica',
     example: '1',
   })
+  @ApiBadRequestResponse({
+    description:
+      'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
+  })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar a listagem de aulas.',
   })
   async buscarTodas(
-    @Query('limite', new DefaultValuePipe(10), ParseIntPipe) limite: number,
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
+    @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
+    itensPorPagina: number,
     @Query('turmaId') turmaId?: string,
   ): Promise<PaginacaoRespostaDto<AulaRespostaDto>> {
-    const aulas = await this.aulasService.buscarTodas(limite, pagina, turmaId);
+    const aulas = await this.aulasService.buscarTodas(
+      pagina,
+      itensPorPagina,
+      turmaId,
+    );
 
     const aulasMapeadas = aulas.dados.map((aula) => new AulaRespostaDto(aula));
 

@@ -2369,22 +2369,22 @@
         "operationId": "AulasController_buscarTodas",
         "parameters": [
           {
-            "name": "limite",
-            "required": false,
-            "in": "query",
-            "description": "Número de itens por página (padrão: 10)",
-            "schema": {
-              "example": 10,
-              "type": "number"
-            }
-          },
-          {
             "name": "pagina",
             "required": false,
             "in": "query",
             "description": "Número da página atual (padrão: 1)",
             "schema": {
               "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "itensPorPagina",
+            "required": false,
+            "in": "query",
+            "description": "Número de itens por página (padrão: 10)",
+            "schema": {
+              "example": 10,
               "type": "number"
             }
           },
@@ -2423,6 +2423,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1."
           },
           "500": {
             "description": "Ocorreu um erro inesperado ao buscar a listagem de aulas."

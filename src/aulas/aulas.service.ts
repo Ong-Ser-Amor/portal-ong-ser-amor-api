@@ -70,13 +70,25 @@ export class AulasService {
   }
 
   async buscarTodas(
-    limite = 10,
     pagina = 1,
+    itensPorPagina = 10,
     turmaId?: string,
   ): Promise<PaginacaoRespostaDto<Aula>> {
     try {
-      const take = limite;
-      const skip = (pagina - 1) * limite;
+      if (pagina < 1) {
+        throw new BadRequestException(
+          'O número da página deve ser maior ou igual a 1.',
+        );
+      }
+
+      if (itensPorPagina < 1) {
+        throw new BadRequestException(
+          'O número de itens por página deve ser maior ou igual a 1.',
+        );
+      }
+
+      const take = itensPorPagina;
+      const skip = (pagina - 1) * itensPorPagina;
 
       const whereCondition = turmaId ? { turmaId } : {};
 
@@ -87,8 +99,17 @@ export class AulasService {
         skip,
       });
 
-      return new PaginacaoRespostaDto<Aula>(aulas, total, limite, pagina);
+      return new PaginacaoRespostaDto<Aula>(
+        aulas,
+        total,
+        itensPorPagina,
+        pagina,
+      );
     } catch (erro) {
+      if (erro instanceof BadRequestException) {
+        throw erro;
+      }
+
       const mensajeErro = erro instanceof Error ? erro.message : String(erro);
       this.logger.error(`Erro ao buscar listagem de aulas: ${mensajeErro}`);
       throw new InternalServerErrorException(
