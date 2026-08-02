@@ -11,10 +11,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { ContatosService } from 'src/contatos/contatos.service';
 import { CriarContatoDto } from 'src/contatos/dto/criar-contato.dto';
-import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { FamiliasService } from 'src/familias/familias.service';
 import { CriarPessoaDto } from 'src/pessoas/dto/criar-pessoa.dto';
 import { PessoasService } from 'src/pessoas/pessoas.service';
+import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { calcularIdade } from 'src/shared/utils/calculadora-idade';
 import {
   DataSource,
