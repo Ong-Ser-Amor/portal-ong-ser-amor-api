@@ -385,27 +385,32 @@ export class BeneficiariosController {
   @ApiOperation({ summary: 'Buscar uma lista paginada de beneficiários' })
   @ApiPaginacaoResposta(BeneficiarioRespostaDto)
   @ApiQuery({
-    name: 'limite',
-    required: false,
-    example: 10,
-    description: 'Número de itens por página (padrão: 10)',
-  })
-  @ApiQuery({
     name: 'pagina',
     required: false,
     example: 1,
     description: 'Número da página atual (padrão: 1)',
   })
+  @ApiQuery({
+    name: 'itensPorPagina',
+    required: false,
+    example: 10,
+    description: 'Número de itens por página (padrão: 10)',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
+  })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar os beneficiários.',
   })
   async buscarTodos(
-    @Query('limite', new DefaultValuePipe(10), ParseIntPipe) limite: number,
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
+    @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
+    itensPorPagina: number,
   ): Promise<PaginacaoRespostaDto<BeneficiarioRespostaDto>> {
     const beneficiarios = await this.beneficiariosService.buscarTodos(
-      limite,
       pagina,
+      itensPorPagina,
     );
 
     const beneficiariosDtos = beneficiarios.dados.map(
