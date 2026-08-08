@@ -29,7 +29,7 @@ export class CriaTabelaEnderecos1775412446288 implements MigrationInterface {
             name: 'numero',
             type: 'varchar',
             length: '20',
-            isNullable: false,
+            isNullable: true,
           },
           {
             name: 'complemento',

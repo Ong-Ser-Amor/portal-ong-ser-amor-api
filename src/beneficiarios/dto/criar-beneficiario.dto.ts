@@ -1,6 +1,8 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsDate,
@@ -26,7 +28,7 @@ import {
 
 export class ContatoAninhadoDto extends OmitType(CriarContatoDto, [
   'pessoaId',
-] as const) {}
+] as const) { }
 
 export class CriarBeneficiarioDto {
   // --- Dados referentes à entidade Pessoa ---
@@ -61,7 +63,10 @@ export class CriarBeneficiarioDto {
   @IsNotEmpty({ message: 'O campo dataNascimento não pode ser vazio' })
   dataNascimento?: Date;
 
-  @ApiProperty({ example: false })
+  @ApiProperty({
+    example: false,
+    required: false,
+  })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
   @IsOptional()
   @IsBoolean({ message: 'O campo emancipado deve ser booleano' })
@@ -75,7 +80,9 @@ export class CriarBeneficiarioDto {
 
   @ApiProperty({
     example: '10',
-    description: 'ID da pessoa responsável',
+    description:
+      'ID da pessoa responsável. Obrigatório para menores de 18 anos não emancipados (o responsável indicado deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). Opcional para adultos ou menores emancipados.',
+    required: false,
   })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
   @IsOptional()
@@ -149,10 +156,19 @@ export class CriarBeneficiarioDto {
   @Min(0, { message: 'A quantidade de filhos não pode ser negativa.' })
   quantidadeFilhos?: number;
 
-  @ApiProperty({ type: [ContatoAninhadoDto], required: false })
+  @ApiProperty({
+    type: [ContatoAninhadoDto],
+    description:
+      'Lista de contatos da pessoa (mínimo 1, máximo 3 contatos). Obrigatório para beneficiários adultos ou menores emancipados. Opcional para menores de idade não emancipados.',
+    required: false,
+  })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
   @IsOptional()
   @IsArray()
+  @ArrayMinSize(1, { message: 'É obrigatório cadastrar pelo menos 1 contato.' })
+  @ArrayMaxSize(3, {
+    message: 'É permitido cadastrar no máximo 3 contatos por pessoa.',
+  })
   @ValidateNested({ each: true })
   @Type(() => ContatoAninhadoDto)
   contatos?: ContatoAninhadoDto[];

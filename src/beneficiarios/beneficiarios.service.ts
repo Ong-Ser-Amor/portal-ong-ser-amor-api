@@ -11,8 +11,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { ContatosService } from 'src/contatos/contatos.service';
 import { CriarContatoDto } from 'src/contatos/dto/criar-contato.dto';
+import { ContatoValidadorInput } from 'src/contatos/utils/validar-regras-contatos.util';
 import { FamiliasService } from 'src/familias/familias.service';
+import { AtualizarPessoaDto } from 'src/pessoas/dto/atualizar-pessoa.dto';
 import { CriarPessoaDto } from 'src/pessoas/dto/criar-pessoa.dto';
+import { Pessoa } from 'src/pessoas/entities/pessoa.entity';
 import { PessoasService } from 'src/pessoas/pessoas.service';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { calcularIdade } from 'src/shared/utils/calculadora-idade';
@@ -20,6 +23,8 @@ import {
   DataSource,
   EntityManager,
   EntityNotFoundError,
+  FindOptionsWhere,
+  ILike,
   Repository,
 } from 'typeorm';
 
@@ -42,7 +47,7 @@ export class BeneficiariosService {
     @Inject(forwardRef(() => FamiliasService))
     private readonly familiasService: FamiliasService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async criar(
     criarBeneficiarioDto: CriarBeneficiarioDto,
@@ -52,12 +57,9 @@ export class BeneficiariosService {
     await queryRunner.startTransaction();
 
     try {
-      let pessoaId = criarBeneficiarioDto.pessoaId;
-      let dataNascConsolidada = criarBeneficiarioDto.dataNascimento;
-      let emancipadoConsolidado = criarBeneficiarioDto.emancipado;
-      let responsavelConsolidado = criarBeneficiarioDto.responsavelId;
+      let pessoa: Pessoa;
 
-      if (!pessoaId) {
+      if (!criarBeneficiarioDto.pessoaId) {
         // Cenario A: Id da pessoa não fornecido (pessoa não existe).
         const dadosPessoa: CriarPessoaDto = {
           nome: criarBeneficiarioDto.nome,
@@ -68,53 +70,71 @@ export class BeneficiariosService {
           emancipado: criarBeneficiarioDto.emancipado,
         };
 
-        const novaPessoa = await this.pessoasService.criar(
+        pessoa = await this.pessoasService.criar(
           dadosPessoa,
           queryRunner.manager,
         );
-        pessoaId = novaPessoa.id;
-
-        if (
-          criarBeneficiarioDto.contatos &&
-          criarBeneficiarioDto.contatos.length > 0
-        ) {
-          const contatosParaSalvar: CriarContatoDto[] =
-            criarBeneficiarioDto.contatos.map((contato) => ({
-              ...contato,
-              pessoaId,
-            }));
-          await this.contatosService.criarVarios(
-            contatosParaSalvar,
-            queryRunner.manager,
-          );
-        }
       } else {
-        // Cenario B: Pessoa já existe. Buscamos para ter a Data de Nascimento real!
-        const pessoaExistente = await this.pessoasService.buscarPorId(
-          pessoaId,
+        // Cenario B: Id da pessoa fornecido (pessoa já existe).
+        // Se vier qualquer dado parcial de pessoa no DTO, atualiza no banco.
+        const dadosPessoaParaAtualizar: AtualizarPessoaDto = {};
+        if (criarBeneficiarioDto.nome !== undefined) {
+          dadosPessoaParaAtualizar.nome = criarBeneficiarioDto.nome;
+        }
+        if (criarBeneficiarioDto.cpf !== undefined) {
+          dadosPessoaParaAtualizar.cpf = criarBeneficiarioDto.cpf;
+        }
+        if (criarBeneficiarioDto.dataNascimento !== undefined) {
+          dadosPessoaParaAtualizar.dataNascimento =
+            criarBeneficiarioDto.dataNascimento;
+        }
+        if (criarBeneficiarioDto.podeSairSozinho !== undefined) {
+          dadosPessoaParaAtualizar.podeSairSozinho =
+            criarBeneficiarioDto.podeSairSozinho;
+        }
+        if (criarBeneficiarioDto.responsavelId !== undefined) {
+          dadosPessoaParaAtualizar.responsavelId =
+            criarBeneficiarioDto.responsavelId;
+        }
+        if (criarBeneficiarioDto.emancipado !== undefined) {
+          dadosPessoaParaAtualizar.emancipado = criarBeneficiarioDto.emancipado;
+        }
+
+        pessoa = await this.pessoasService.atualizar(
+          criarBeneficiarioDto.pessoaId,
+          dadosPessoaParaAtualizar,
           queryRunner.manager,
         );
+      }
 
-        // Consolida os dados para a validação
-        dataNascConsolidada = pessoaExistente.dataNascimento;
-        emancipadoConsolidado =
-          criarBeneficiarioDto.emancipado ?? pessoaExistente.emancipado;
-        responsavelConsolidado =
-          criarBeneficiarioDto.responsavelId !== undefined
-            ? criarBeneficiarioDto.responsavelId
-            : pessoaExistente.responsavelId;
+      if (
+        criarBeneficiarioDto.contatos &&
+        criarBeneficiarioDto.contatos.length > 0
+      ) {
+        const contatosParaSalvar: CriarContatoDto[] =
+          criarBeneficiarioDto.contatos.map((contato) => ({
+            ...contato,
+            pessoaId: pessoa.id,
+          }));
+        await this.contatosService.criarVarios(
+          contatosParaSalvar,
+          queryRunner.manager,
+        );
       }
 
       await this.validarRegrasMenoridade(
-        dataNascConsolidada,
-        emancipadoConsolidado,
-        responsavelConsolidado,
+        pessoa.dataNascimento,
+        pessoa.emancipado,
+        pessoa.responsavelId,
+        pessoa.id,
+        criarBeneficiarioDto.contatos,
         queryRunner.manager,
+        !criarBeneficiarioDto.pessoaId,
       );
 
       const beneficioExistente = await queryRunner.manager.findOne(
         Beneficiario,
-        { where: { pessoaId } },
+        { where: { pessoaId: pessoa.id } },
       );
 
       if (beneficioExistente) {
@@ -134,7 +154,7 @@ export class BeneficiariosService {
       }
 
       const beneficiario = new Beneficiario({
-        pessoaId,
+        pessoaId: pessoa.id,
         familiaId: familiaIdFinal,
         nivelEscolaridade: criarBeneficiarioDto.nivelEscolaridade,
         estadoCivil: criarBeneficiarioDto.estadoCivil,
@@ -148,7 +168,7 @@ export class BeneficiariosService {
         Beneficiario,
         {
           where: { id: beneficiarioSalvo.id },
-          relations: ['pessoa', 'familia'],
+          relations: ['pessoa', 'familia', 'familia.endereco'],
         },
       );
 
@@ -181,6 +201,8 @@ export class BeneficiariosService {
   async buscarTodos(
     pagina = 1,
     itensPorPagina = 10,
+    nome?: string,
+    cpf?: string,
   ): Promise<PaginacaoRespostaDto<Beneficiario>> {
     try {
       if (pagina < 1) {
@@ -198,8 +220,22 @@ export class BeneficiariosService {
       const take = itensPorPagina;
       const skip = (pagina - 1) * itensPorPagina;
 
+      const whereClause: FindOptionsWhere<Beneficiario> = {};
+
+      if (nome || cpf) {
+        whereClause.pessoa = {};
+        if (nome) {
+          whereClause.pessoa.nome = ILike(`%${nome.trim()}%`);
+        }
+        if (cpf) {
+          const cpfLimpo = cpf.replace(/\D/g, '');
+          whereClause.pessoa.cpf = ILike(`%${cpfLimpo}%`);
+        }
+      }
+
       const [beneficiarios, total] = await this.repository.findAndCount({
-        relations: ['pessoa', 'familia'],
+        where: whereClause,
+        relations: ['pessoa', 'familia', 'familia.endereco'],
         take,
         skip,
         order: { pessoa: { nome: 'ASC' } },
@@ -230,7 +266,7 @@ export class BeneficiariosService {
     try {
       return await this.repository.findOneOrFail({
         where: { id },
-        relations: ['pessoa', 'familia'],
+        relations: ['pessoa', 'familia', 'familia.endereco'],
       });
     } catch (erro) {
       if (erro instanceof EntityNotFoundError) {
@@ -504,44 +540,66 @@ export class BeneficiariosService {
   }
 
   /**
-   * Valida se a pessoa atende aos requisitos legais de idade e emancipação.
+   * Valida se a pessoa atende aos requisitos legais de idade, emancipação e obrigatoriedade de contatos.
    * Lança exceções (BadRequest) se as regras forem violadas.
    */
   private async validarRegrasMenoridade(
     dataNascimento: Date,
     emancipado?: boolean,
     responsavelId?: string | null,
+    pessoaId?: string,
+    contatosDto?: ContatoValidadorInput[],
     manager?: EntityManager,
+    isNovaPessoa = false,
   ): Promise<void> {
     const idade = calcularIdade(dataNascimento);
 
-    if (idade < 18) {
-      if (emancipado) {
-        if (idade < 16) {
-          throw new BadRequestException(
-            'Apenas maiores de 16 anos podem ser emancipados.',
-          );
-        }
-      } else {
-        if (!responsavelId) {
-          throw new BadRequestException(
-            'O beneficiário é menor de idade e não é emancipado. É obrigatório informar o responsável (responsavelId) no cadastro da pessoa.',
-          );
+    if (idade < 16 && emancipado) {
+      throw new BadRequestException(
+        'Apenas maiores de 16 anos podem ser emancipados.',
+      );
+    }
+
+    const ehAdultoOuEmancipado = idade >= 18 || Boolean(emancipado);
+
+    if (ehAdultoOuEmancipado) {
+      const possuiContatosNoDto = Boolean(
+        contatosDto && contatosDto.length > 0,
+      );
+
+      if (!possuiContatosNoDto) {
+        let possuiContatosSalvos = false;
+        if (!isNovaPessoa && pessoaId) {
+          const contatosExistentes =
+            await this.contatosService.buscarPorPessoaId(pessoaId, manager);
+          possuiContatosSalvos = contatosExistentes.length > 0;
         }
 
-        // Verifica no ContatosService se o responsável tem celular cadastrado,
-        // para garantir um meio de contato em caso de emergências.
-        const responsavelTemCelular =
-          await this.contatosService.possuiCelularCadastrado(
-            responsavelId,
-            manager,
-          );
-
-        if (!responsavelTemCelular) {
+        if (!possuiContatosSalvos) {
           throw new BadRequestException(
-            'O responsável selecionado não possui um telemóvel (CELULAR) registado. Cadastre o contato do responsável primeiro para garantir contacto em emergências.',
+            'O cadastro de contatos é obrigatório para beneficiários adultos ou menores emancipados.',
           );
         }
+      }
+    } else {
+      if (!responsavelId) {
+        throw new BadRequestException(
+          'O beneficiário é menor de idade e não é emancipado. É obrigatório informar o responsável (responsavelId) no cadastro da pessoa.',
+        );
+      }
+
+      // Verifica no ContatosService se o responsável tem celular cadastrado,
+      // para garantir um meio de contato em caso de emergências.
+      const responsavelTemCelular =
+        await this.contatosService.possuiCelularCadastrado(
+          responsavelId,
+          manager,
+        );
+
+      if (!responsavelTemCelular) {
+        throw new BadRequestException(
+          'O responsável selecionado não possui um telemóvel (CELULAR) registado. Cadastre o contato do responsável primeiro para garantir contacto em emergências.',
+        );
       }
     }
   }

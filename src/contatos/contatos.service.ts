@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   forwardRef,
   Inject,
@@ -16,6 +17,7 @@ import { AtualizarContatoDto } from './dto/atualizar-contato.dto';
 import { CriarContatoDto } from './dto/criar-contato.dto';
 import { Contato } from './entities/contato.entity';
 import { TipoContato } from './enums/tipo-contato.enum';
+import { validarRegrasContatos } from './utils/validar-regras-contatos.util';
 
 @Injectable()
 export class ContatosService {
@@ -33,6 +35,7 @@ export class ContatosService {
   async criar(
     criarContatoDto: CriarContatoDto,
     manager?: EntityManager,
+    pularValidacaoRegras = false,
   ): Promise<Contato> {
     const contatoRepository = manager
       ? manager.getRepository(Contato)
@@ -42,6 +45,28 @@ export class ContatosService {
       : this.pessoaContatoRepository;
 
     await this.pessoasService.buscarPorId(criarContatoDto.pessoaId, manager);
+
+    if (!pularValidacaoRegras) {
+      const contatosExistentes = await pcRepository.find({
+        where: { pessoaId: criarContatoDto.pessoaId },
+        relations: { contato: true },
+      });
+
+      const contatosConsolidados = [
+        ...contatosExistentes
+          .filter((pc) => Boolean(pc.contato))
+          .map((pc) => ({
+            tipoContato: pc.contato.tipoContato,
+            ehPrincipal: pc.ehPrincipal,
+          })),
+        {
+          tipoContato: criarContatoDto.tipoContato,
+          ehPrincipal: criarContatoDto.ehPrincipal ?? false,
+        },
+      ];
+
+      validarRegrasContatos(contatosConsolidados);
+    }
 
     const contatoExistente = await this.verificarDuplicidade(
       criarContatoDto.pessoaId,
@@ -58,6 +83,13 @@ export class ContatosService {
     }
 
     try {
+      if (criarContatoDto.ehPrincipal) {
+        await pcRepository.update(
+          { pessoaId: criarContatoDto.pessoaId },
+          { ehPrincipal: false },
+        );
+      }
+
       const contato = contatoRepository.create({
         tipoContato: criarContatoDto.tipoContato,
         valor: criarContatoDto.valor,
@@ -69,11 +101,15 @@ export class ContatosService {
       const vinculo = pcRepository.create({
         pessoaId: criarContatoDto.pessoaId,
         contatoId: contatoSalvo.id,
+        ehPrincipal: criarContatoDto.ehPrincipal ?? false,
       });
       await pcRepository.save(vinculo);
 
       return contatoSalvo;
     } catch (erro) {
+      if (erro instanceof BadRequestException || erro instanceof ConflictException) {
+        throw erro;
+      }
       const mensagemErro =
         erro instanceof Error ? erro.message : 'Erro desconhecido';
       this.logger.error(`Erro ao criar contato: ${mensagemErro}`);
@@ -88,18 +124,16 @@ export class ContatosService {
     contatos: CriarContatoDto[],
     manager?: EntityManager,
   ): Promise<Contato[]> {
+    validarRegrasContatos(contatos);
+
     try {
-      // Usa Promise.all para executar a criação (e as validações de duplicidade)
-      // de todos os contatos simultaneamente (em paralelo), otimizando a performance.
       return await Promise.all(
-        contatos.map((contatoDto) => this.criar(contatoDto, manager)),
+        contatos.map((contatoDto) => this.criar(contatoDto, manager, true)),
       );
     } catch (erro) {
       this.logger.error(
         `Erro ao criar múltiplos contatos: ${erro instanceof Error ? erro.message : String(erro)}`,
       );
-      // Se um falhar (ex: duplicidade), a Promise.all rejeita e o erro sobe,
-      // o que acionará o rollback na transação do BeneficiáriosService.
       throw erro;
     }
   }
@@ -121,17 +155,24 @@ export class ContatosService {
     }
   }
 
-  async buscarPorPessoaId(pessoaId: string): Promise<Contato[]> {
-    await this.pessoasService.buscarPorId(pessoaId);
+  async buscarPorPessoaId(
+    pessoaId: string,
+    manager?: EntityManager,
+  ): Promise<Contato[]> {
+    const pcRepo = manager
+      ? manager.getRepository(PessoaContato)
+      : this.pessoaContatoRepository;
+
+    await this.pessoasService.buscarPorId(pessoaId, manager);
     try {
-      const pessoasContatos = await this.pessoaContatoRepository.find({
+      const pessoasContatos = await pcRepo.find({
         where: { pessoaId },
         relations: { contato: true },
       });
 
       return pessoasContatos
-        .map((pc) => pc.contato)
-        .filter((contato): contato is Contato => Boolean(contato));
+        .filter((pc): pc is PessoaContato & { contato: Contato } => Boolean(pc.contato))
+        .map((pc) => Object.assign(pc.contato, { ehPrincipal: pc.ehPrincipal }));
     } catch (erro) {
       if (erro instanceof EntityNotFoundError) {
         throw new NotFoundException(`Pessoa não encontrada.`);
@@ -156,12 +197,13 @@ export class ContatosService {
     const contatoRepo = manager
       ? manager.getRepository(Contato)
       : this.repository;
+    const pcRepo = manager
+      ? manager.getRepository(PessoaContato)
+      : this.pessoaContatoRepository;
 
     const contatoAtual = await this.buscarPorId(id);
 
-    // Como atualizarContatoDto usa OmitType(..., ['pessoaId']), não temos como ler o pessoaId dele.
-    // Precisamos buscar de quem é este contato através da tabela intermediária.
-    const vinculo = await this.pessoaContatoRepository.findOne({
+    const vinculo = await pcRepo.findOne({
       where: { contatoId: id },
     });
 
@@ -174,13 +216,15 @@ export class ContatosService {
     const tipoConsolidado =
       atualizarContatoDto.tipoContato ?? contatoAtual.tipoContato;
     const valorConsolidado = atualizarContatoDto.valor ?? contatoAtual.valor;
+    const ehPrincipalConsolidado =
+      atualizarContatoDto.ehPrincipal ?? vinculo.ehPrincipal;
 
     if (atualizarContatoDto.tipoContato || atualizarContatoDto.valor) {
       const existeDuplicidade = await this.verificarDuplicidade(
         vinculo.pessoaId,
         tipoConsolidado,
         valorConsolidado,
-        id, // Ignora o ID atual para permitir update
+        id,
         manager,
       );
 
@@ -191,10 +235,48 @@ export class ContatosService {
       }
     }
 
+    // Valida as regras de negócio do conjunto de contatos após atualização
+    const contatosPessoa = await pcRepo.find({
+      where: { pessoaId: vinculo.pessoaId },
+      relations: { contato: true },
+    });
+
+    const contatosConsolidados = contatosPessoa
+      .filter((pc) => Boolean(pc.contato))
+      .map((pc) => {
+        if (pc.contatoId === id) {
+          return {
+            tipoContato: tipoConsolidado,
+            ehPrincipal: ehPrincipalConsolidado,
+          };
+        }
+        return {
+          tipoContato: pc.contato.tipoContato,
+          ehPrincipal: atualizarContatoDto.ehPrincipal === true ? false : pc.ehPrincipal,
+        };
+      });
+
+    validarRegrasContatos(contatosConsolidados);
+
     try {
+      if (atualizarContatoDto.ehPrincipal === true) {
+        await pcRepo.update(
+          { pessoaId: vinculo.pessoaId },
+          { ehPrincipal: false },
+        );
+        vinculo.ehPrincipal = true;
+        await pcRepo.save(vinculo);
+      } else if (atualizarContatoDto.ehPrincipal === false) {
+        vinculo.ehPrincipal = false;
+        await pcRepo.save(vinculo);
+      }
+
       contatoRepo.merge(contatoAtual, atualizarContatoDto);
       return await contatoRepo.save(contatoAtual);
     } catch (erro) {
+      if (erro instanceof BadRequestException || erro instanceof ConflictException) {
+        throw erro;
+      }
       const mensagemErro =
         erro instanceof Error ? erro.message : 'Erro desconhecido';
       this.logger.error(`Erro ao atualizar contato: ${mensagemErro}`);
@@ -205,11 +287,31 @@ export class ContatosService {
   async remover(id: string): Promise<void> {
     await this.buscarPorId(id);
 
+    const vinculo = await this.pessoaContatoRepository.findOne({
+      where: { contatoId: id },
+    });
+
+    if (vinculo) {
+      const restantes = await this.pessoaContatoRepository.find({
+        where: { pessoaId: vinculo.pessoaId },
+        relations: { contato: true },
+      });
+
+      const contatosAposRemocao = restantes
+        .filter((pc) => pc.contatoId !== id && Boolean(pc.contato))
+        .map((pc) => ({
+          tipoContato: pc.contato.tipoContato,
+          ehPrincipal: pc.ehPrincipal,
+        }));
+
+      validarRegrasContatos(contatosAposRemocao);
+    }
+
     try {
       await this.pessoaContatoRepository.softDelete({ contatoId: id });
       await this.repository.softDelete(id);
     } catch (erro) {
-      if (erro instanceof NotFoundException) {
+      if (erro instanceof NotFoundException || erro instanceof BadRequestException) {
         throw erro;
       }
 

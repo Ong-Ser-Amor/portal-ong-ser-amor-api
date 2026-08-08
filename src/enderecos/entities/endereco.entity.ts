@@ -17,8 +17,8 @@ export class Endereco {
   @Column({ type: 'varchar', length: 100 })
   logradouro: string;
 
-  @Column({ type: 'varchar', length: 20 })
-  numero: string;
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  numero: string | null;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   complemento: string | null;

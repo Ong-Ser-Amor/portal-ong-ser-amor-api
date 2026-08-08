@@ -23,16 +23,16 @@ export class CriarEnderecoDto {
   })
   logradouro: string;
 
-  @ApiProperty({ example: '123' })
+  @ApiPropertyOptional({ example: '123', required: false })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MinLength(1, {
     message: 'O número deve conter pelo menos 1 caractere',
   })
   @MaxLength(20, {
     message: 'O número deve conter no máximo 20 caracteres',
   })
-  numero: string;
+  numero: string | null;
 
   @ApiPropertyOptional({ example: 'Apto 45', required: false })
   @IsString()

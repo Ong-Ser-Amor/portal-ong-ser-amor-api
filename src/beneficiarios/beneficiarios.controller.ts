@@ -87,6 +87,7 @@ export class BeneficiariosController {
                     enum: Object.values(TipoContato),
                   },
                   valor: { type: 'string' },
+                  ehPrincipal: { type: 'boolean', example: true },
                 },
               },
             },
@@ -127,6 +128,7 @@ export class BeneficiariosController {
                     enum: Object.values(TipoContato),
                   },
                   valor: { type: 'string' },
+                  ehPrincipal: { type: 'boolean', example: true },
                 },
               },
             },
@@ -176,6 +178,7 @@ export class BeneficiariosController {
                     enum: Object.values(TipoContato),
                   },
                   valor: { type: 'string' },
+                  ehPrincipal: { type: 'boolean', example: true },
                 },
               },
             },
@@ -233,6 +236,7 @@ export class BeneficiariosController {
                     enum: Object.values(TipoContato),
                   },
                   valor: { type: 'string' },
+                  ehPrincipal: { type: 'boolean', example: true },
                 },
               },
             },
@@ -264,6 +268,7 @@ export class BeneficiariosController {
             {
               tipoContato: TipoContato.CELULAR,
               valor: '11999998888',
+              ehPrincipal: true,
             },
           ],
         },
@@ -282,6 +287,7 @@ export class BeneficiariosController {
             {
               tipoContato: TipoContato.CELULAR,
               valor: '11999998888',
+              ehPrincipal: true,
             },
           ],
           novaFamilia: {
@@ -318,6 +324,7 @@ export class BeneficiariosController {
             {
               tipoContato: TipoContato.CELULAR,
               valor: '11999998888',
+              ehPrincipal: true,
             },
           ],
           nivelEscolaridade: NivelEscolaridade.ENSINO_MEDIO_COMPLETO,
@@ -339,6 +346,7 @@ export class BeneficiariosController {
             {
               tipoContato: TipoContato.CELULAR,
               valor: '11999998888',
+              ehPrincipal: true,
             },
           ],
           novaFamilia: {
@@ -361,7 +369,14 @@ export class BeneficiariosController {
     },
   })
   @Post()
-  @ApiOperation({ summary: 'Criar um novo beneficiário' })
+  @ApiOperation({
+    summary: 'Criar um novo beneficiário',
+    description:
+      'Cadastra um novo beneficiário vinculando uma pessoa (nova ou existente) e sua família.\n\n' +
+      '**Regras por Idade e Emancipação:**\n' +
+      '- **Menor de idade não emancipado (< 18 anos)**: O campo `responsavelId` é **obrigatório** (a pessoa responsável informada deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). A lista de `contatos` própria do menor é opcional.\n' +
+      '- **Adulto (≥ 18 anos) ou Menor Emancipado (≥ 16 anos)**: A lista de `contatos` é **obrigatória** (mínimo 1 contato, com exatamente 1 contato marcado como `ehPrincipal: true`). O campo `responsavelId` é opcional.',
+  })
   @ApiCreatedResponse({
     description: 'O beneficiário foi criado com sucesso.',
     type: BeneficiarioRespostaDto,
@@ -396,6 +411,18 @@ export class BeneficiariosController {
     example: 10,
     description: 'Número de itens por página (padrão: 10)',
   })
+  @ApiQuery({
+    name: 'nome',
+    required: false,
+    example: 'João',
+    description: 'Filtra beneficiários por parte do nome da pessoa',
+  })
+  @ApiQuery({
+    name: 'cpf',
+    required: false,
+    example: '12345678900',
+    description: 'Filtra beneficiários por CPF da pessoa',
+  })
   @ApiBadRequestResponse({
     description:
       'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
@@ -407,10 +434,14 @@ export class BeneficiariosController {
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
     @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
     itensPorPagina: number,
+    @Query('nome') nome?: string,
+    @Query('cpf') cpf?: string,
   ): Promise<PaginacaoRespostaDto<BeneficiarioRespostaDto>> {
     const beneficiarios = await this.beneficiariosService.buscarTodos(
       pagina,
       itensPorPagina,
+      nome,
+      cpf,
     );
 
     const beneficiariosDtos = beneficiarios.dados.map(

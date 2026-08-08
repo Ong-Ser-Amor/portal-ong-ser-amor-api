@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { FamiliaRespostaDto } from 'src/familias/dto/familia-resposta.dto';
 
 import { PessoaRespostaDto } from '../../pessoas/dto/pessoa-resposta.dto';
 import { Beneficiario } from '../entities/beneficiario.entity';
@@ -15,8 +16,8 @@ export class BeneficiarioRespostaDto {
   @ApiProperty({ type: PessoaRespostaDto })
   pessoa: PessoaRespostaDto;
 
-  @ApiProperty({ example: 'fam-456' })
-  familiaId: string;
+  @ApiProperty({ type: FamiliaRespostaDto })
+  familia: FamiliaRespostaDto;
 
   @ApiProperty({
     enum: NivelEscolaridade,
@@ -44,7 +45,7 @@ export class BeneficiarioRespostaDto {
   constructor(beneficiario: Beneficiario) {
     this.id = beneficiario.id;
     this.pessoa = new PessoaRespostaDto(beneficiario.pessoa);
-    this.familiaId = beneficiario.familiaId;
+    this.familia = new FamiliaRespostaDto(beneficiario.familia);
     this.nivelEscolaridade = beneficiario.nivelEscolaridade;
     this.estadoCivil = beneficiario.estadoCivil;
     this.vinculoEmpregaticio = beneficiario.vinculoEmpregaticio;

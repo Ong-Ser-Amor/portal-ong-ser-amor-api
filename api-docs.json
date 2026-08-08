@@ -17,6 +17,7 @@
     },
     "/beneficiarios": {
       "post": {
+        "description": "Cadastra um novo beneficiário vinculando uma pessoa (nova ou existente) e sua família.\n\n**Regras por Idade e Emancipação:**\n- **Menor de idade não emancipado (< 18 anos)**: O campo `responsavelId` é **obrigatório** (a pessoa responsável informada deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). A lista de `contatos` própria do menor é opcional.\n- **Adulto (≥ 18 anos) ou Menor Emancipado (≥ 16 anos)**: A lista de `contatos` é **obrigatória** (mínimo 1 contato, com exatamente 1 contato marcado como `ehPrincipal: true`). O campo `responsavelId` é opcional.",
         "operationId": "BeneficiariosController_criar",
         "parameters": [],
         "requestBody": {
@@ -101,6 +102,10 @@
                             },
                             "valor": {
                               "type": "string"
+                            },
+                            "ehPrincipal": {
+                              "type": "boolean",
+                              "example": true
                             }
                           }
                         }
@@ -190,6 +195,10 @@
                             },
                             "valor": {
                               "type": "string"
+                            },
+                            "ehPrincipal": {
+                              "type": "boolean",
+                              "example": true
                             }
                           }
                         }
@@ -287,6 +296,10 @@
                             },
                             "valor": {
                               "type": "string"
+                            },
+                            "ehPrincipal": {
+                              "type": "boolean",
+                              "example": true
                             }
                           }
                         }
@@ -389,6 +402,10 @@
                             },
                             "valor": {
                               "type": "string"
+                            },
+                            "ehPrincipal": {
+                              "type": "boolean",
+                              "example": true
                             }
                           }
                         }
@@ -420,7 +437,8 @@
                     "contatos": [
                       {
                         "tipoContato": "CELULAR",
-                        "valor": "11999998888"
+                        "valor": "11999998888",
+                        "ehPrincipal": true
                       }
                     ]
                   }
@@ -438,7 +456,8 @@
                     "contatos": [
                       {
                         "tipoContato": "CELULAR",
-                        "valor": "11999998888"
+                        "valor": "11999998888",
+                        "ehPrincipal": true
                       }
                     ],
                     "novaFamilia": {
@@ -474,7 +493,8 @@
                     "contatos": [
                       {
                         "tipoContato": "CELULAR",
-                        "valor": "11999998888"
+                        "valor": "11999998888",
+                        "ehPrincipal": true
                       }
                     ],
                     "nivelEscolaridade": "ENSINO_MEDIO_COMPLETO"
@@ -495,7 +515,8 @@
                     "contatos": [
                       {
                         "tipoContato": "CELULAR",
-                        "valor": "11999998888"
+                        "valor": "11999998888",
+                        "ehPrincipal": true
                       }
                     ],
                     "novaFamilia": {
@@ -563,6 +584,26 @@
             "schema": {
               "example": 10,
               "type": "number"
+            }
+          },
+          {
+            "name": "nome",
+            "required": false,
+            "in": "query",
+            "description": "Filtra beneficiários por parte do nome da pessoa",
+            "schema": {
+              "example": "João",
+              "type": "string"
+            }
+          },
+          {
+            "name": "cpf",
+            "required": false,
+            "in": "query",
+            "description": "Filtra beneficiários por CPF da pessoa",
+            "schema": {
+              "example": "12345678900",
+              "type": "string"
             }
           }
         ],
@@ -3094,6 +3135,7 @@
           },
           "numero": {
             "type": "string",
+            "nullable": true,
             "minLength": 1,
             "maxLength": 20,
             "example": "123"
@@ -3158,7 +3200,6 @@
         },
         "required": [
           "logradouro",
-          "numero",
           "bairro",
           "cep",
           "cidade",
@@ -3234,6 +3275,10 @@
             "type": "boolean",
             "example": true
           },
+          "emancipado": {
+            "type": "boolean",
+            "example": false
+          },
           "responsavelId": {
             "type": "string",
             "example": "123456"
@@ -3243,7 +3288,116 @@
           "id",
           "nome",
           "cpf",
-          "dataNascimento"
+          "dataNascimento",
+          "emancipado"
+        ]
+      },
+      "EnderecoRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "logradouro": {
+            "type": "string"
+          },
+          "numero": {
+            "type": "string",
+            "nullable": true
+          },
+          "complemento": {
+            "type": "string",
+            "nullable": true
+          },
+          "bairro": {
+            "type": "string"
+          },
+          "cep": {
+            "type": "string"
+          },
+          "cidade": {
+            "type": "string"
+          },
+          "uf": {
+            "enum": [
+              "AC",
+              "AL",
+              "AP",
+              "AM",
+              "BA",
+              "CE",
+              "DF",
+              "ES",
+              "GO",
+              "MA",
+              "MT",
+              "MS",
+              "MG",
+              "PA",
+              "PB",
+              "PR",
+              "PE",
+              "PI",
+              "RJ",
+              "RN",
+              "RS",
+              "RO",
+              "RR",
+              "SC",
+              "SP",
+              "SE",
+              "TO"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "logradouro",
+          "numero",
+          "complemento",
+          "bairro",
+          "cep",
+          "cidade",
+          "uf"
+        ]
+      },
+      "FamiliaRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "faixaRenda": {
+            "enum": [
+              "ATE_1_SALARIO",
+              "DE_1_A_3_SALARIOS",
+              "ACIMA_3_SALARIOS"
+            ],
+            "type": "string"
+          },
+          "possuiBeneficioSocial": {
+            "type": "boolean"
+          },
+          "tipoMoradia": {
+            "enum": [
+              "PROPRIA",
+              "ALUGADA",
+              "CEDIDA",
+              "OCUPACAO_IRREGULAR"
+            ],
+            "type": "string"
+          },
+          "endereco": {
+            "$ref": "#/components/schemas/EnderecoRespostaDto"
+          }
+        },
+        "required": [
+          "id",
+          "faixaRenda",
+          "possuiBeneficioSocial",
+          "tipoMoradia",
+          "endereco"
         ]
       },
       "BeneficiarioRespostaDto": {
@@ -3256,9 +3410,8 @@
           "pessoa": {
             "$ref": "#/components/schemas/PessoaRespostaDto"
           },
-          "familiaId": {
-            "type": "string",
-            "example": "fam-456"
+          "familia": {
+            "$ref": "#/components/schemas/FamiliaRespostaDto"
           },
           "nivelEscolaridade": {
             "enum": [
@@ -3304,7 +3457,7 @@
         "required": [
           "id",
           "pessoa",
-          "familiaId",
+          "familia",
           "nivelEscolaridade",
           "quantidadeFilhos"
         ]
@@ -3376,6 +3529,10 @@
             "type": "string",
             "example": "EMAIL"
           },
+          "ehPrincipal": {
+            "type": "boolean",
+            "example": true
+          },
           "valor": {
             "type": "string",
             "format": "email",
@@ -3417,7 +3574,7 @@
           "responsavelId": {
             "type": "string",
             "example": "10",
-            "description": "ID da pessoa responsável"
+            "description": "ID da pessoa responsável. Obrigatório para menores de 18 anos não emancipados (o responsável indicado deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). Opcional para adultos ou menores emancipados."
           },
           "nivelEscolaridade": {
             "enum": [
@@ -3460,6 +3617,9 @@
             "example": 2
           },
           "contatos": {
+            "minItems": 1,
+            "maxItems": 3,
+            "description": "Lista de contatos da pessoa (mínimo 1, máximo 3 contatos). Obrigatório para beneficiários adultos ou menores emancipados. Opcional para menores de idade não emancipados.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ContatoAninhadoDto"
@@ -3618,44 +3778,6 @@
           }
         }
       },
-      "FamiliaRespostaDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "faixaRenda": {
-            "type": "string",
-            "enum": [
-              "ATE_1_SALARIO",
-              "DE_1_A_3_SALARIOS",
-              "ACIMA_3_SALARIOS"
-            ]
-          },
-          "possuiBeneficioSocial": {
-            "type": "boolean"
-          },
-          "tipoMoradia": {
-            "type": "string",
-            "enum": [
-              "PROPRIA",
-              "ALUGADA",
-              "CEDIDA",
-              "OCUPACAO_IRREGULAR"
-            ]
-          },
-          "enderecoId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "faixaRenda",
-          "possuiBeneficioSocial",
-          "tipoMoradia",
-          "enderecoId"
-        ]
-      },
       "AtualizarEnderecoDto": {
         "type": "object",
         "properties": {
@@ -3667,6 +3789,7 @@
           },
           "numero": {
             "type": "string",
+            "nullable": true,
             "minLength": 1,
             "maxLength": 20,
             "example": "123"
@@ -3729,75 +3852,6 @@
             "example": "SP"
           }
         }
-      },
-      "EnderecoRespostaDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "logradouro": {
-            "type": "string"
-          },
-          "numero": {
-            "type": "string"
-          },
-          "complemento": {
-            "type": "string",
-            "nullable": true
-          },
-          "bairro": {
-            "type": "string"
-          },
-          "cep": {
-            "type": "string"
-          },
-          "cidade": {
-            "type": "string"
-          },
-          "uf": {
-            "type": "string",
-            "enum": [
-              "AC",
-              "AL",
-              "AP",
-              "AM",
-              "BA",
-              "CE",
-              "DF",
-              "ES",
-              "GO",
-              "MA",
-              "MT",
-              "MS",
-              "MG",
-              "PA",
-              "PB",
-              "PR",
-              "PE",
-              "PI",
-              "RJ",
-              "RN",
-              "RS",
-              "RO",
-              "RR",
-              "SC",
-              "SP",
-              "SE",
-              "TO"
-            ]
-          }
-        },
-        "required": [
-          "id",
-          "logradouro",
-          "numero",
-          "complemento",
-          "bairro",
-          "cep",
-          "cidade",
-          "uf"
-        ]
       },
       "CriarUsuarioDto": {
         "type": "object",

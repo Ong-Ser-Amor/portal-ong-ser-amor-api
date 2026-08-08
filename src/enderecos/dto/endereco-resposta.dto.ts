@@ -4,7 +4,7 @@ import { Uf } from '../enums/uf.enum';
 export class EnderecoRespostaDto {
   id: string;
   logradouro: string;
-  numero: string;
+  numero: string | null;
   complemento: string | null;
   bairro: string;
   cep: string;

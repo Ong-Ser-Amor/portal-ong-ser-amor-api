@@ -18,6 +18,9 @@ export class PessoaRespostaDto {
   @ApiProperty({ example: true })
   podeSairSozinho?: boolean;
 
+  @ApiProperty({ example: false })
+  emancipado: boolean;
+
   @ApiProperty({ example: '123456' })
   responsavelId?: string;
 
@@ -27,6 +30,7 @@ export class PessoaRespostaDto {
     this.cpf = pessoa.cpf;
     this.dataNascimento = pessoa.dataNascimento;
     this.podeSairSozinho = pessoa.podeSairSozinho;
+    this.emancipado = pessoa.emancipado;
     this.responsavelId = pessoa.responsavelId;
   }
 }

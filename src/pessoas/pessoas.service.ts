@@ -171,6 +171,13 @@ export class PessoasService {
         pessoa.responsavelId = atualizarPessoaDto.responsavelId;
         houveAlteracao = true;
       }
+      if (
+        atualizarPessoaDto.emancipado !== undefined &&
+        atualizarPessoaDto.emancipado !== pessoa.emancipado
+      ) {
+        pessoa.emancipado = atualizarPessoaDto.emancipado;
+        houveAlteracao = true;
+      }
 
       if (!houveAlteracao) {
         return pessoa;

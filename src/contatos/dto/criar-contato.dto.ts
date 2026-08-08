@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Matches,
   ValidateIf,
@@ -19,6 +21,11 @@ export class CriarContatoDto {
   @IsEnum(TipoContato, { message: 'O tipo de contato fornecido é inválido.' })
   @IsNotEmpty({ message: 'O tipo de contato é obrigatório.' })
   tipoContato: TipoContato;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean({ message: 'O campo ehPrincipal deve ser um valor booleano.' })
+  ehPrincipal?: boolean;
 
   // -------------------------------------------------------------------
   // VALIDAÇÕES DINÂMICAS COM BASE NO TIPO DE CONTATO
