@@ -47,7 +47,7 @@ export class BeneficiariosService {
     @Inject(forwardRef(() => FamiliasService))
     private readonly familiasService: FamiliasService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async criar(
     criarBeneficiarioDto: CriarBeneficiarioDto,
@@ -222,14 +222,19 @@ export class BeneficiariosService {
 
       const whereClause: FindOptionsWhere<Beneficiario> = {};
 
+      if (cpf && !/^\d{11}$/.test(cpf)) {
+        throw new BadRequestException(
+          'A busca por CPF deve conter apenas 11 dígitos numéricos.',
+        );
+      }
+
       if (nome || cpf) {
         whereClause.pessoa = {};
         if (nome) {
           whereClause.pessoa.nome = ILike(`%${nome.trim()}%`);
         }
         if (cpf) {
-          const cpfLimpo = cpf.replace(/\D/g, '');
-          whereClause.pessoa.cpf = ILike(`%${cpfLimpo}%`);
+          whereClause.pessoa.cpf = cpf;
         }
       }
 

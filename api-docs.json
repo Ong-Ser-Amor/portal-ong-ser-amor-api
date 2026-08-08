@@ -600,7 +600,7 @@
             "name": "cpf",
             "required": false,
             "in": "query",
-            "description": "Filtra beneficiários por CPF da pessoa",
+            "description": "Filtra beneficiários por CPF da pessoa. Deve conter exatamente 11 dígitos numéricos, sem pontos ou traços.",
             "schema": {
               "example": "12345678900",
               "type": "string"

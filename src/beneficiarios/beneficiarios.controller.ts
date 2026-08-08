@@ -421,7 +421,8 @@ export class BeneficiariosController {
     name: 'cpf',
     required: false,
     example: '12345678900',
-    description: 'Filtra beneficiários por CPF da pessoa',
+    description:
+      'Filtra beneficiários por CPF da pessoa. Deve conter exatamente 11 dígitos numéricos, sem pontos ou traços.',
   })
   @ApiBadRequestResponse({
     description:
