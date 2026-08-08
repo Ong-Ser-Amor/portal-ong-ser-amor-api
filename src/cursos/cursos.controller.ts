@@ -49,9 +49,7 @@ export class CursosController {
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao criar o curso.',
   })
-  async criar(
-    @Body() criarCursoDto: CriarCursoDto,
-  ): Promise<CursoRespostaDto> {
+  async criar(@Body() criarCursoDto: CriarCursoDto): Promise<CursoRespostaDto> {
     const cursoCriado = await this.cursosService.criar(criarCursoDto);
     return new CursoRespostaDto(cursoCriado);
   }

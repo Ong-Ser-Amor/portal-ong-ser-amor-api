@@ -1,13 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsNotEmpty,
-  IsString,
-  ValidateIf,
-  ValidateNested,
-} from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, ValidateNested } from 'class-validator';
 import { CriarEnderecoDto } from 'src/enderecos/dto/criar-endereco.dto';
 
 import { FaixaRenda } from '../enums/faixa-renda.enum';

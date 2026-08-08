@@ -107,7 +107,10 @@ export class ContatosService {
 
       return contatoSalvo;
     } catch (erro) {
-      if (erro instanceof BadRequestException || erro instanceof ConflictException) {
+      if (
+        erro instanceof BadRequestException ||
+        erro instanceof ConflictException
+      ) {
         throw erro;
       }
       const mensagemErro =
@@ -171,8 +174,12 @@ export class ContatosService {
       });
 
       return pessoasContatos
-        .filter((pc): pc is PessoaContato & { contato: Contato } => Boolean(pc.contato))
-        .map((pc) => Object.assign(pc.contato, { ehPrincipal: pc.ehPrincipal }));
+        .filter((pc): pc is PessoaContato & { contato: Contato } =>
+          Boolean(pc.contato),
+        )
+        .map((pc) =>
+          Object.assign(pc.contato, { ehPrincipal: pc.ehPrincipal }),
+        );
     } catch (erro) {
       if (erro instanceof EntityNotFoundError) {
         throw new NotFoundException(`Pessoa não encontrada.`);
@@ -252,7 +259,8 @@ export class ContatosService {
         }
         return {
           tipoContato: pc.contato.tipoContato,
-          ehPrincipal: atualizarContatoDto.ehPrincipal === true ? false : pc.ehPrincipal,
+          ehPrincipal:
+            atualizarContatoDto.ehPrincipal === true ? false : pc.ehPrincipal,
         };
       });
 
@@ -274,7 +282,10 @@ export class ContatosService {
       contatoRepo.merge(contatoAtual, atualizarContatoDto);
       return await contatoRepo.save(contatoAtual);
     } catch (erro) {
-      if (erro instanceof BadRequestException || erro instanceof ConflictException) {
+      if (
+        erro instanceof BadRequestException ||
+        erro instanceof ConflictException
+      ) {
         throw erro;
       }
       const mensagemErro =
@@ -311,7 +322,10 @@ export class ContatosService {
       await this.pessoaContatoRepository.softDelete({ contatoId: id });
       await this.repository.softDelete(id);
     } catch (erro) {
-      if (erro instanceof NotFoundException || erro instanceof BadRequestException) {
+      if (
+        erro instanceof NotFoundException ||
+        erro instanceof BadRequestException
+      ) {
         throw erro;
       }
 

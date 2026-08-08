@@ -5,8 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsuariosService } from 'src/usuarios/usuarios.service';
 import { compararSenha } from 'src/shared/utils/senha';
+import { UsuariosService } from 'src/usuarios/usuarios.service';
 
 import { LoginDto } from './dto/login.dto';
 import { PayloadJwtDto } from './dto/payload-jwt.dto';

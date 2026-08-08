@@ -28,7 +28,7 @@ import {
 
 export class ContatoAninhadoDto extends OmitType(CriarContatoDto, [
   'pessoaId',
-] as const) { }
+] as const) {}
 
 export class CriarBeneficiarioDto {
   // --- Dados referentes à entidade Pessoa ---

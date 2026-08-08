@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
+
 import { TipoContato } from '../enums/tipo-contato.enum';
 
 export interface ContatoValidadorInput {

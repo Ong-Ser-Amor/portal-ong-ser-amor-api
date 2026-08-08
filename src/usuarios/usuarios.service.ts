@@ -9,11 +9,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityNotFoundError, Repository } from 'typeorm';
 
-import { compararSenha, criarSenhaHash } from '../shared/utils/senha';
 import { AtualizarSenhaDto } from './dto/atualizar-senha.dto';
 import { AtualizarUsuarioDto } from './dto/atualizar-usuario.dto';
 import { CriarUsuarioDto } from './dto/criar-usuario.dto';
 import { Usuario } from './entities/usuario.entity';
+import { compararSenha, criarSenhaHash } from '../shared/utils/senha';
 
 @Injectable()
 export class UsuariosService {
