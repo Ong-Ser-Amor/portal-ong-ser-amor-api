@@ -3251,6 +3251,25 @@
           "endereco"
         ]
       },
+      "ContatoRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tipoContato": {
+            "type": "string"
+          },
+          "valor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tipoContato",
+          "valor"
+        ]
+      },
       "PessoaRespostaDto": {
         "type": "object",
         "properties": {
@@ -3282,6 +3301,12 @@
           "responsavelId": {
             "type": "string",
             "example": "123456"
+          },
+          "contatos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContatoRespostaDto"
+            }
           }
         },
         "required": [

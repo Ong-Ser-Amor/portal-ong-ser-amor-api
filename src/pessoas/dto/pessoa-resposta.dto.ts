@@ -1,5 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+import { ContatoRespostaDto } from '../../contatos/dto/contato-resposta.dto';
+import { PessoaContato } from '../entities/pessoa-contato.entity';
 import { Pessoa } from '../entities/pessoa.entity';
 
 export class PessoaRespostaDto {
@@ -24,6 +26,9 @@ export class PessoaRespostaDto {
   @ApiProperty({ example: '123456' })
   responsavelId?: string;
 
+  @ApiPropertyOptional({ type: [ContatoRespostaDto] })
+  contatos?: ContatoRespostaDto[];
+
   constructor(pessoa: Pessoa) {
     this.id = pessoa.id;
     this.nome = pessoa.nome;
@@ -32,5 +37,23 @@ export class PessoaRespostaDto {
     this.podeSairSozinho = pessoa.podeSairSozinho;
     this.emancipado = pessoa.emancipado;
     this.responsavelId = pessoa.responsavelId;
+    if (pessoa.contatos) {
+      this.contatos = pessoa.contatos
+        .filter(
+          (
+            pessoaContato,
+          ): pessoaContato is PessoaContato & {
+            contato: NonNullable<PessoaContato['contato']>;
+          } => Boolean(pessoaContato.contato),
+        )
+        .map(
+          (pessoaContato) =>
+            new ContatoRespostaDto(
+              Object.assign(pessoaContato.contato, {
+                ehPrincipal: pessoaContato.ehPrincipal,
+              }),
+            ),
+        );
+    }
   }
 }

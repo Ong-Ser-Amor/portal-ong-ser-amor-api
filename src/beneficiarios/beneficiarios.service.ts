@@ -47,7 +47,7 @@ export class BeneficiariosService {
     @Inject(forwardRef(() => FamiliasService))
     private readonly familiasService: FamiliasService,
     private readonly dataSource: DataSource,
-  ) { }
+  ) {}
 
   async criar(
     criarBeneficiarioDto: CriarBeneficiarioDto,
@@ -271,7 +271,13 @@ export class BeneficiariosService {
     try {
       return await this.repository.findOneOrFail({
         where: { id },
-        relations: ['pessoa', 'familia', 'familia.endereco'],
+        relations: [
+          'pessoa',
+          'pessoa.contatos',
+          'pessoa.contatos.contato',
+          'familia',
+          'familia.endereco',
+        ],
       });
     } catch (erro) {
       if (erro instanceof EntityNotFoundError) {
