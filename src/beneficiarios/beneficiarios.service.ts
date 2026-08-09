@@ -47,7 +47,7 @@ export class BeneficiariosService {
     @Inject(forwardRef(() => FamiliasService))
     private readonly familiasService: FamiliasService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async criar(
     criarBeneficiarioDto: CriarBeneficiarioDto,
@@ -240,7 +240,7 @@ export class BeneficiariosService {
 
       const [beneficiarios, total] = await this.repository.findAndCount({
         where: whereClause,
-        relations: ['pessoa', 'familia', 'familia.endereco'],
+        relations: ['pessoa'],
         take,
         skip,
         order: { pessoa: { nome: 'ASC' } },

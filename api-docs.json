@@ -622,7 +622,7 @@
                         "dados": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/BeneficiarioRespostaDto"
+                            "$ref": "#/components/schemas/BeneficiarioResumidoDto"
                           }
                         }
                       }
@@ -3540,6 +3540,102 @@
         "required": [
           "meta",
           "dados"
+        ]
+      },
+      "PessoaResumidaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "123456"
+          },
+          "nome": {
+            "type": "string",
+            "example": "Carlos Santos"
+          },
+          "cpf": {
+            "type": "string",
+            "example": "12345678900"
+          },
+          "dataNascimento": {
+            "type": "string",
+            "format": "date",
+            "example": "2000-01-01"
+          },
+          "emancipado": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "id",
+          "nome",
+          "cpf",
+          "dataNascimento",
+          "emancipado"
+        ]
+      },
+      "BeneficiarioResumidoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "ben-123"
+          },
+          "familiaId": {
+            "type": "string",
+            "example": "456"
+          },
+          "pessoa": {
+            "$ref": "#/components/schemas/PessoaResumidaDto"
+          },
+          "nivelEscolaridade": {
+            "enum": [
+              "ENSINO_FUNDAMENTAL_INCOMPLETO",
+              "ENSINO_FUNDAMENTAL_COMPLETO",
+              "ENSINO_MEDIO_INCOMPLETO",
+              "ENSINO_MEDIO_COMPLETO",
+              "ENSINO_SUPERIOR_INCOMPLETO",
+              "ENSINO_SUPERIOR_COMPLETO",
+              "SEM_ESCOLARIDADE"
+            ],
+            "type": "string",
+            "example": "ENSINO_FUNDAMENTAL_COMPLETO"
+          },
+          "estadoCivil": {
+            "enum": [
+              "CASADO",
+              "DIVORCIADO",
+              "SOLTEIRO",
+              "UNIAO_ESTAVEL",
+              "VIUVO"
+            ],
+            "type": "string",
+            "example": "SOLTEIRO"
+          },
+          "vinculoEmpregaticio": {
+            "enum": [
+              "APOSENTADO",
+              "AUTONOMO",
+              "DESEMPREGADO",
+              "EMPREGADO_CLT",
+              "INFORMAL"
+            ],
+            "type": "string",
+            "example": "DESEMPREGADO"
+          },
+          "quantidadeFilhos": {
+            "type": "number",
+            "nullable": true,
+            "example": 2
+          }
+        },
+        "required": [
+          "id",
+          "familiaId",
+          "pessoa",
+          "nivelEscolaridade",
+          "quantidadeFilhos"
         ]
       },
       "ContatoAninhadoDto": {

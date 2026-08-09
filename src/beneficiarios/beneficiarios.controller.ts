@@ -37,6 +37,7 @@ import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { BeneficiariosService } from './beneficiarios.service';
 import { AtualizarBeneficiarioDto } from './dto/atualizar-beneficiario.dto';
 import { BeneficiarioRespostaDto } from './dto/beneficiario-resposta.dto';
+import { BeneficiarioResumidoDto } from './dto/beneficiario-resumido.dto';
 import { CriarBeneficiarioDto } from './dto/criar-beneficiario.dto';
 import { TransferirFamiliaDto } from './dto/transferir-familia.dto';
 import {
@@ -398,7 +399,7 @@ export class BeneficiariosController {
 
   @Get()
   @ApiOperation({ summary: 'Buscar uma lista paginada de beneficiários' })
-  @ApiPaginacaoResposta(BeneficiarioRespostaDto)
+  @ApiPaginacaoResposta(BeneficiarioResumidoDto)
   @ApiQuery({
     name: 'pagina',
     required: false,
@@ -437,7 +438,7 @@ export class BeneficiariosController {
     itensPorPagina: number,
     @Query('nome') nome?: string,
     @Query('cpf') cpf?: string,
-  ): Promise<PaginacaoRespostaDto<BeneficiarioRespostaDto>> {
+  ): Promise<PaginacaoRespostaDto<BeneficiarioResumidoDto>> {
     const beneficiarios = await this.beneficiariosService.buscarTodos(
       pagina,
       itensPorPagina,
@@ -446,10 +447,10 @@ export class BeneficiariosController {
     );
 
     const beneficiariosDtos = beneficiarios.dados.map(
-      (beneficiario) => new BeneficiarioRespostaDto(beneficiario),
+      (beneficiario) => new BeneficiarioResumidoDto(beneficiario),
     );
 
-    return new PaginacaoRespostaDto<BeneficiarioRespostaDto>(
+    return new PaginacaoRespostaDto<BeneficiarioResumidoDto>(
       beneficiariosDtos,
       beneficiarios.meta.totalItens,
       beneficiarios.meta.itensPorPagina,
