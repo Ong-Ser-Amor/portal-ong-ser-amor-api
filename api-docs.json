@@ -3292,6 +3292,7 @@
           },
           "podeSairSozinho": {
             "type": "boolean",
+            "nullable": true,
             "example": true
           },
           "emancipado": {
@@ -3300,6 +3301,7 @@
           },
           "responsavelId": {
             "type": "string",
+            "nullable": true,
             "example": "123456"
           },
           "contatos": {
@@ -3314,7 +3316,9 @@
           "nome",
           "cpf",
           "dataNascimento",
-          "emancipado"
+          "podeSairSozinho",
+          "emancipado",
+          "responsavelId"
         ]
       },
       "EnderecoRespostaDto": {
@@ -3562,9 +3566,19 @@
             "format": "date",
             "example": "2000-01-01"
           },
+          "podeSairSozinho": {
+            "type": "boolean",
+            "nullable": true,
+            "example": true
+          },
           "emancipado": {
             "type": "boolean",
             "example": false
+          },
+          "responsavelId": {
+            "type": "string",
+            "nullable": true,
+            "example": "123456"
           }
         },
         "required": [
@@ -3572,7 +3586,9 @@
           "nome",
           "cpf",
           "dataNascimento",
-          "emancipado"
+          "podeSairSozinho",
+          "emancipado",
+          "responsavelId"
         ]
       },
       "BeneficiarioResumidoDto": {

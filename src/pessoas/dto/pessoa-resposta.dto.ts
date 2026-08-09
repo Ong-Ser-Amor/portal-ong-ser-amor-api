@@ -17,14 +17,14 @@ export class PessoaRespostaDto {
   @ApiProperty({ type: String, format: 'date', example: '2000-01-01' })
   dataNascimento: Date;
 
-  @ApiProperty({ example: true })
-  podeSairSozinho?: boolean;
+  @ApiProperty({ example: true, nullable: true })
+  podeSairSozinho: boolean | null;
 
   @ApiProperty({ example: false })
   emancipado: boolean;
 
-  @ApiProperty({ example: '123456' })
-  responsavelId?: string;
+  @ApiProperty({ example: '123456', nullable: true })
+  responsavelId: string | null;
 
   @ApiPropertyOptional({ type: [ContatoRespostaDto] })
   contatos?: ContatoRespostaDto[];
