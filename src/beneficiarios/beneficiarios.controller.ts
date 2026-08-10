@@ -425,6 +425,12 @@ export class BeneficiariosController {
     description:
       'Filtra beneficiários por CPF da pessoa. Deve conter exatamente 11 dígitos numéricos, sem pontos ou traços.',
   })
+  @ApiQuery({
+    name: 'familiaId',
+    required: false,
+    example: '456',
+    description: 'Filtra beneficiários pelo ID da família',
+  })
   @ApiBadRequestResponse({
     description:
       'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
@@ -438,12 +444,14 @@ export class BeneficiariosController {
     itensPorPagina: number,
     @Query('nome') nome?: string,
     @Query('cpf') cpf?: string,
+    @Query('familiaId') familiaId?: string,
   ): Promise<PaginacaoRespostaDto<BeneficiarioResumoDto>> {
     const beneficiarios = await this.beneficiariosService.buscarTodos(
       pagina,
       itensPorPagina,
       nome,
       cpf,
+      familiaId,
     );
 
     const beneficiariosDtos = beneficiarios.dados.map(

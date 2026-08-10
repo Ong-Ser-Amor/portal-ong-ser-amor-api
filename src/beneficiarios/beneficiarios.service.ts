@@ -47,7 +47,7 @@ export class BeneficiariosService {
     @Inject(forwardRef(() => FamiliasService))
     private readonly familiasService: FamiliasService,
     private readonly dataSource: DataSource,
-  ) { }
+  ) {}
 
   async criar(
     criarBeneficiarioDto: CriarBeneficiarioDto,
@@ -203,6 +203,7 @@ export class BeneficiariosService {
     itensPorPagina = 10,
     nome?: string,
     cpf?: string,
+    familiaId?: string,
   ): Promise<PaginacaoRespostaDto<Beneficiario>> {
     try {
       if (pagina < 1) {
@@ -221,6 +222,10 @@ export class BeneficiariosService {
       const skip = (pagina - 1) * itensPorPagina;
 
       const whereClause: FindOptionsWhere<Beneficiario> = {};
+
+      if (familiaId) {
+        whereClause.familiaId = familiaId;
+      }
 
       if (cpf && !/^\d{11}$/.test(cpf)) {
         throw new BadRequestException(

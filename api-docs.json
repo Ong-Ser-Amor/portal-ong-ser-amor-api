@@ -605,6 +605,16 @@
               "example": "12345678900",
               "type": "string"
             }
+          },
+          {
+            "name": "familiaId",
+            "required": false,
+            "in": "query",
+            "description": "Filtra beneficiários pelo ID da família",
+            "schema": {
+              "example": "456",
+              "type": "string"
+            }
           }
         ],
         "responses": {
