@@ -25,6 +25,7 @@ import {
   EntityNotFoundError,
   FindOptionsWhere,
   ILike,
+  Not,
   Repository,
 } from 'typeorm';
 
@@ -204,6 +205,7 @@ export class BeneficiariosService {
     nome?: string,
     cpf?: string,
     familiaId?: string,
+    ignorarId?: string,
   ): Promise<PaginacaoRespostaDto<Beneficiario>> {
     try {
       if (pagina < 1) {
@@ -222,6 +224,10 @@ export class BeneficiariosService {
       const skip = (pagina - 1) * itensPorPagina;
 
       const whereClause: FindOptionsWhere<Beneficiario> = {};
+
+      if (ignorarId) {
+        whereClause.id = Not(ignorarId);
+      }
 
       if (familiaId) {
         whereClause.familiaId = familiaId;

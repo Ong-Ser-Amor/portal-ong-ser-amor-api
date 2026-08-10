@@ -431,6 +431,13 @@ export class BeneficiariosController {
     example: '456',
     description: 'Filtra beneficiários pelo ID da família',
   })
+  @ApiQuery({
+    name: 'ignorarId',
+    required: false,
+    example: '123',
+    description:
+      'ID do beneficiário a ser ignorado/excluído do resultado da busca (ex: para listar familiares excluindo o próprio beneficiário da tela)',
+  })
   @ApiBadRequestResponse({
     description:
       'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
@@ -445,6 +452,7 @@ export class BeneficiariosController {
     @Query('nome') nome?: string,
     @Query('cpf') cpf?: string,
     @Query('familiaId') familiaId?: string,
+    @Query('ignorarId') ignorarId?: string,
   ): Promise<PaginacaoRespostaDto<BeneficiarioResumoDto>> {
     const beneficiarios = await this.beneficiariosService.buscarTodos(
       pagina,
@@ -452,6 +460,7 @@ export class BeneficiariosController {
       nome,
       cpf,
       familiaId,
+      ignorarId,
     );
 
     const beneficiariosDtos = beneficiarios.dados.map(

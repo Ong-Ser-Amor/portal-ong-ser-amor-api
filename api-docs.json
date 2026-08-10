@@ -615,6 +615,16 @@
               "example": "456",
               "type": "string"
             }
+          },
+          {
+            "name": "ignorarId",
+            "required": false,
+            "in": "query",
+            "description": "ID do beneficiário a ser ignorado/excluído do resultado da busca (ex: para listar familiares excluindo o próprio beneficiário da tela)",
+            "schema": {
+              "example": "123",
+              "type": "string"
+            }
           }
         ],
         "responses": {
