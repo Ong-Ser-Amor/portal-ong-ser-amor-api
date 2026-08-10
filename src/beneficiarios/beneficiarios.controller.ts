@@ -375,8 +375,8 @@ export class BeneficiariosController {
     description:
       'Cadastra um novo beneficiário vinculando uma pessoa (nova ou existente) e sua família.\n\n' +
       '**Regras por Idade e Emancipação:**\n' +
-      '- **Menor de idade não emancipado (< 18 anos)**: O campo `responsavelId` é **obrigatório** (a pessoa responsável informada deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). A lista de `contatos` própria do menor é opcional.\n' +
-      '- **Adulto (≥ 18 anos) ou Menor Emancipado (≥ 16 anos)**: A lista de `contatos` é **obrigatória** (mínimo 1 contato, com exatamente 1 contato marcado como `ehPrincipal: true`). O campo `responsavelId` é opcional.',
+      '- **Menor de idade não emancipado (< 18 anos)**: Os campos `responsavelId` e `podeSairSozinho` são **obrigatórios** (a pessoa responsável informada deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). A lista de `contatos` própria do menor é opcional.\n' +
+      '- **Adulto (≥ 18 anos) ou Menor Emancipado (≥ 16 anos)**: A lista de `contatos` é **obrigatória** (mínimo 1 contato, com exatamente 1 contato marcado como `ehPrincipal: true`). Os campos `responsavelId` e `podeSairSozinho` não devem ser informados.',
   })
   @ApiCreatedResponse({
     description: 'O beneficiário foi criado com sucesso.',

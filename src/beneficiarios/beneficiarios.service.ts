@@ -127,6 +127,7 @@ export class BeneficiariosService {
         pessoa.dataNascimento,
         pessoa.emancipado,
         pessoa.responsavelId,
+        pessoa.podeSairSozinho,
         pessoa.id,
         criarBeneficiarioDto.contatos,
         queryRunner.manager,
@@ -356,10 +357,23 @@ export class BeneficiariosService {
         ? atualizarBeneficiarioDto.responsavelId
         : beneficiarioAtual.pessoa.responsavelId;
 
+    const idadeConsolidada = calcularIdade(dataNascConsolidada);
+    const ehAdultoOuEmancipadoConsolidado =
+      idadeConsolidada >= 18 || Boolean(emancipadoConsolidado);
+
+    const podeSairSozinhoConsolidado =
+      atualizarBeneficiarioDto.podeSairSozinho !== undefined
+        ? atualizarBeneficiarioDto.podeSairSozinho
+        : ehAdultoOuEmancipadoConsolidado
+          ? null
+          : beneficiarioAtual.pessoa.podeSairSozinho;
+
     await this.validarRegrasMenoridade(
       dataNascConsolidada,
       emancipadoConsolidado,
       responsavelConsolidado,
+      podeSairSozinhoConsolidado,
+      beneficiarioAtual.pessoa.id,
     );
 
     const queryRunner = this.dataSource.createQueryRunner();
@@ -367,14 +381,19 @@ export class BeneficiariosService {
     await queryRunner.startTransaction();
 
     try {
-      const dadosPessoa = {
+      const dadosPessoa: AtualizarPessoaDto = {
         nome: atualizarBeneficiarioDto.nome,
         cpf: atualizarBeneficiarioDto.cpf,
         dataNascimento: atualizarBeneficiarioDto.dataNascimento,
-        podeSairSozinho: atualizarBeneficiarioDto.podeSairSozinho,
         responsavelId: atualizarBeneficiarioDto.responsavelId,
         emancipado: atualizarBeneficiarioDto.emancipado,
       };
+
+      if (ehAdultoOuEmancipadoConsolidado) {
+        dadosPessoa.podeSairSozinho = null;
+      } else if (atualizarBeneficiarioDto.podeSairSozinho !== undefined) {
+        dadosPessoa.podeSairSozinho = atualizarBeneficiarioDto.podeSairSozinho;
+      }
 
       // Se vier algum dado de pessoa, a PessoasService atualiza na mesma transação
       if (
@@ -569,6 +588,7 @@ export class BeneficiariosService {
     dataNascimento: Date,
     emancipado?: boolean,
     responsavelId?: string | null,
+    podeSairSozinhoInput?: boolean | null,
     pessoaId?: string,
     contatosDto?: ContatoValidadorInput[],
     manager?: EntityManager,
@@ -585,6 +605,12 @@ export class BeneficiariosService {
     const ehAdultoOuEmancipado = idade >= 18 || Boolean(emancipado);
 
     if (ehAdultoOuEmancipado) {
+      if (podeSairSozinhoInput !== undefined && podeSairSozinhoInput !== null) {
+        throw new BadRequestException(
+          'O campo podeSairSozinho é exclusivo para menores de idade não emancipados.',
+        );
+      }
+
       const possuiContatosNoDto = Boolean(
         contatosDto && contatosDto.length > 0,
       );
@@ -604,6 +630,12 @@ export class BeneficiariosService {
         }
       }
     } else {
+      if (podeSairSozinhoInput === undefined || podeSairSozinhoInput === null) {
+        throw new BadRequestException(
+          'O campo podeSairSozinho é obrigatório para menores de idade não emancipados.',
+        );
+      }
+
       if (!responsavelId) {
         throw new BadRequestException(
           'O beneficiário é menor de idade e não é emancipado. É obrigatório informar o responsável (responsavelId) no cadastro da pessoa.',

@@ -72,7 +72,12 @@ export class CriarBeneficiarioDto {
   @IsBoolean({ message: 'O campo emancipado deve ser booleano' })
   emancipado?: boolean;
 
-  @ApiProperty({ example: true })
+  @ApiProperty({
+    example: true,
+    description:
+      'Indica se o beneficiário pode sair sozinho da ONG. Obrigatório para menores de 18 anos não emancipados. Não deve ser informado para adultos ou menores emancipados.',
+    required: false,
+  })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
   @IsOptional()
   @IsBoolean({ message: 'O campo podeSairSozinho deve ser booleano' })
