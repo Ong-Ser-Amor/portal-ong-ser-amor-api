@@ -546,7 +546,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BeneficiarioRespostaDto"
+                  "$ref": "#/components/schemas/BeneficiarioDto"
                 }
               }
             }
@@ -622,7 +622,7 @@
                         "dados": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/BeneficiarioResumidoDto"
+                            "$ref": "#/components/schemas/BeneficiarioResumoDto"
                           }
                         }
                       }
@@ -664,7 +664,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BeneficiarioRespostaDto"
+                  "$ref": "#/components/schemas/BeneficiarioDto"
                 }
               }
             }
@@ -709,7 +709,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BeneficiarioRespostaDto"
+                  "$ref": "#/components/schemas/BeneficiarioDto"
                 }
               }
             }
@@ -840,7 +840,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BeneficiarioRespostaDto"
+                  "$ref": "#/components/schemas/BeneficiarioDto"
                 }
               }
             }
@@ -891,7 +891,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PessoaRespostaDto"
+                  "$ref": "#/components/schemas/PessoaDto"
                 }
               }
             }
@@ -933,7 +933,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PessoaRespostaDto"
+                  "$ref": "#/components/schemas/PessoaDto"
                 }
               }
             }
@@ -978,7 +978,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PessoaRespostaDto"
+                  "$ref": "#/components/schemas/PessoaDto"
                 }
               }
             }
@@ -3270,7 +3270,7 @@
           "valor"
         ]
       },
-      "PessoaRespostaDto": {
+      "PessoaDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -3429,7 +3429,7 @@
           "endereco"
         ]
       },
-      "BeneficiarioRespostaDto": {
+      "BeneficiarioDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -3437,7 +3437,7 @@
             "example": "ben-123"
           },
           "pessoa": {
-            "$ref": "#/components/schemas/PessoaRespostaDto"
+            "$ref": "#/components/schemas/PessoaDto"
           },
           "familia": {
             "$ref": "#/components/schemas/FamiliaRespostaDto"
@@ -3456,6 +3456,7 @@
             "example": "ENSINO_FUNDAMENTAL_COMPLETO"
           },
           "estadoCivil": {
+            "nullable": true,
             "enum": [
               "CASADO",
               "DIVORCIADO",
@@ -3467,6 +3468,7 @@
             "example": "SOLTEIRO"
           },
           "vinculoEmpregaticio": {
+            "nullable": true,
             "enum": [
               "APOSENTADO",
               "AUTONOMO",
@@ -3488,6 +3490,8 @@
           "pessoa",
           "familia",
           "nivelEscolaridade",
+          "estadoCivil",
+          "vinculoEmpregaticio",
           "quantidadeFilhos"
         ]
       },
@@ -3546,7 +3550,7 @@
           "dados"
         ]
       },
-      "PessoaResumidaDto": {
+      "PessoaResumoDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -3591,7 +3595,7 @@
           "responsavelId"
         ]
       },
-      "BeneficiarioResumidoDto": {
+      "BeneficiarioResumoDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -3603,7 +3607,7 @@
             "example": "456"
           },
           "pessoa": {
-            "$ref": "#/components/schemas/PessoaResumidaDto"
+            "$ref": "#/components/schemas/PessoaResumoDto"
           },
           "nivelEscolaridade": {
             "enum": [
@@ -3619,6 +3623,7 @@
             "example": "ENSINO_FUNDAMENTAL_COMPLETO"
           },
           "estadoCivil": {
+            "nullable": true,
             "enum": [
               "CASADO",
               "DIVORCIADO",
@@ -3630,6 +3635,7 @@
             "example": "SOLTEIRO"
           },
           "vinculoEmpregaticio": {
+            "nullable": true,
             "enum": [
               "APOSENTADO",
               "AUTONOMO",
@@ -3651,6 +3657,8 @@
           "familiaId",
           "pessoa",
           "nivelEscolaridade",
+          "estadoCivil",
+          "vinculoEmpregaticio",
           "quantidadeFilhos"
         ]
       },
@@ -3805,7 +3813,7 @@
             "example": "vol-123"
           },
           "pessoa": {
-            "$ref": "#/components/schemas/PessoaRespostaDto"
+            "$ref": "#/components/schemas/PessoaDto"
           },
           "formacaoAcademica": {
             "type": "string",

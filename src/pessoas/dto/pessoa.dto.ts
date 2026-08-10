@@ -4,7 +4,7 @@ import { ContatoRespostaDto } from '../../contatos/dto/contato-resposta.dto';
 import { PessoaContato } from '../entities/pessoa-contato.entity';
 import { Pessoa } from '../entities/pessoa.entity';
 
-export class PessoaRespostaDto {
+export class PessoaDto {
   @ApiProperty({ example: '123456' })
   id: string;
 

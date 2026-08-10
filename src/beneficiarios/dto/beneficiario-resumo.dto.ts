@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { PessoaResumidaDto } from '../../pessoas/dto/pessoa-resumida.dto';
+import { PessoaResumoDto } from '../../pessoas/dto/pessoa-resumo.dto';
 import { Beneficiario } from '../entities/beneficiario.entity';
 import {
   EstadoCivil,
@@ -8,15 +8,15 @@ import {
   VinculoEmpregaticio,
 } from '../enums/beneficiario.enum';
 
-export class BeneficiarioResumidoDto {
+export class BeneficiarioResumoDto {
   @ApiProperty({ example: 'ben-123' })
   id: string;
 
   @ApiProperty({ example: '456' })
   familiaId: string;
 
-  @ApiProperty({ type: PessoaResumidaDto })
-  pessoa: PessoaResumidaDto;
+  @ApiProperty({ type: PessoaResumoDto })
+  pessoa: PessoaResumoDto;
 
   @ApiProperty({
     enum: NivelEscolaridade,
@@ -27,16 +27,16 @@ export class BeneficiarioResumidoDto {
   @ApiProperty({
     enum: EstadoCivil,
     example: EstadoCivil.SOLTEIRO,
-    required: false,
+    nullable: true,
   })
-  estadoCivil?: EstadoCivil;
+  estadoCivil: EstadoCivil | null;
 
   @ApiProperty({
     enum: VinculoEmpregaticio,
     example: VinculoEmpregaticio.DESEMPREGADO,
-    required: false,
+    nullable: true,
   })
-  vinculoEmpregaticio?: VinculoEmpregaticio;
+  vinculoEmpregaticio: VinculoEmpregaticio | null;
 
   @ApiProperty({ example: 2, nullable: true })
   quantidadeFilhos: number | null;
@@ -44,7 +44,7 @@ export class BeneficiarioResumidoDto {
   constructor(beneficiario: Beneficiario) {
     this.id = beneficiario.id;
     this.familiaId = beneficiario.familiaId;
-    this.pessoa = new PessoaResumidaDto(beneficiario.pessoa);
+    this.pessoa = new PessoaResumoDto(beneficiario.pessoa);
     this.nivelEscolaridade = beneficiario.nivelEscolaridade;
     this.estadoCivil = beneficiario.estadoCivil;
     this.vinculoEmpregaticio = beneficiario.vinculoEmpregaticio;

@@ -36,8 +36,8 @@ import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 
 import { BeneficiariosService } from './beneficiarios.service';
 import { AtualizarBeneficiarioDto } from './dto/atualizar-beneficiario.dto';
-import { BeneficiarioRespostaDto } from './dto/beneficiario-resposta.dto';
-import { BeneficiarioResumidoDto } from './dto/beneficiario-resumido.dto';
+import { BeneficiarioResumoDto } from './dto/beneficiario-resumo.dto';
+import { BeneficiarioDto } from './dto/beneficiario.dto';
 import { CriarBeneficiarioDto } from './dto/criar-beneficiario.dto';
 import { TransferirFamiliaDto } from './dto/transferir-familia.dto';
 import {
@@ -380,7 +380,7 @@ export class BeneficiariosController {
   })
   @ApiCreatedResponse({
     description: 'O beneficiário foi criado com sucesso.',
-    type: BeneficiarioRespostaDto,
+    type: BeneficiarioDto,
   })
   @ApiConflictResponse({
     description:
@@ -391,15 +391,15 @@ export class BeneficiariosController {
   })
   async criar(
     @Body() criarBeneficiarioDto: CriarBeneficiarioDto,
-  ): Promise<BeneficiarioRespostaDto> {
+  ): Promise<BeneficiarioDto> {
     const beneficiarioCriado =
       await this.beneficiariosService.criar(criarBeneficiarioDto);
-    return new BeneficiarioRespostaDto(beneficiarioCriado);
+    return new BeneficiarioDto(beneficiarioCriado);
   }
 
   @Get()
   @ApiOperation({ summary: 'Buscar uma lista paginada de beneficiários' })
-  @ApiPaginacaoResposta(BeneficiarioResumidoDto)
+  @ApiPaginacaoResposta(BeneficiarioResumoDto)
   @ApiQuery({
     name: 'pagina',
     required: false,
@@ -438,7 +438,7 @@ export class BeneficiariosController {
     itensPorPagina: number,
     @Query('nome') nome?: string,
     @Query('cpf') cpf?: string,
-  ): Promise<PaginacaoRespostaDto<BeneficiarioResumidoDto>> {
+  ): Promise<PaginacaoRespostaDto<BeneficiarioResumoDto>> {
     const beneficiarios = await this.beneficiariosService.buscarTodos(
       pagina,
       itensPorPagina,
@@ -447,10 +447,10 @@ export class BeneficiariosController {
     );
 
     const beneficiariosDtos = beneficiarios.dados.map(
-      (beneficiario) => new BeneficiarioResumidoDto(beneficiario),
+      (beneficiario) => new BeneficiarioResumoDto(beneficiario),
     );
 
-    return new PaginacaoRespostaDto<BeneficiarioResumidoDto>(
+    return new PaginacaoRespostaDto<BeneficiarioResumoDto>(
       beneficiariosDtos,
       beneficiarios.meta.totalItens,
       beneficiarios.meta.itensPorPagina,
@@ -462,7 +462,7 @@ export class BeneficiariosController {
   @ApiOperation({ summary: 'Buscar um beneficiário pelo ID' })
   @ApiOkResponse({
     description: 'O beneficiário foi encontrado com sucesso.',
-    type: BeneficiarioRespostaDto,
+    type: BeneficiarioDto,
   })
   @ApiNotFoundResponse({
     description: 'Beneficiário não encontrado.',
@@ -470,16 +470,16 @@ export class BeneficiariosController {
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar o beneficiário.',
   })
-  async buscarPorId(@Param('id') id: string): Promise<BeneficiarioRespostaDto> {
+  async buscarPorId(@Param('id') id: string): Promise<BeneficiarioDto> {
     const beneficiario = await this.beneficiariosService.buscarPorId(id);
-    return new BeneficiarioRespostaDto(beneficiario);
+    return new BeneficiarioDto(beneficiario);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Atualizar os dados de um beneficiário' })
   @ApiOkResponse({
     description: 'O beneficiário foi atualizado com sucesso.',
-    type: BeneficiarioRespostaDto,
+    type: BeneficiarioDto,
   })
   @ApiNotFoundResponse({
     description: 'Beneficiário não encontrado.',
@@ -493,12 +493,12 @@ export class BeneficiariosController {
   async atualizar(
     @Param('id') id: string,
     @Body() atualizarBeneficiarioDto: AtualizarBeneficiarioDto,
-  ): Promise<BeneficiarioRespostaDto> {
+  ): Promise<BeneficiarioDto> {
     const beneficiarioAtualizado = await this.beneficiariosService.atualizar(
       id,
       atualizarBeneficiarioDto,
     );
-    return new BeneficiarioRespostaDto(beneficiarioAtualizado);
+    return new BeneficiarioDto(beneficiarioAtualizado);
   }
 
   @Patch(':id/transferir-familia')
@@ -555,7 +555,7 @@ export class BeneficiariosController {
   })
   @ApiOkResponse({
     description: 'O beneficiário foi transferido com sucesso.',
-    type: BeneficiarioRespostaDto,
+    type: BeneficiarioDto,
   })
   @ApiNotFoundResponse({
     description: 'Beneficiário ou família destino não encontrados.',
@@ -570,13 +570,13 @@ export class BeneficiariosController {
   async transferirFamilia(
     @Param('id') id: string,
     @Body() transferirFamiliaDto: TransferirFamiliaDto,
-  ): Promise<BeneficiarioRespostaDto> {
+  ): Promise<BeneficiarioDto> {
     const beneficiarioAtualizado =
       await this.beneficiariosService.transferirFamilia(
         id,
         transferirFamiliaDto,
       );
-    return new BeneficiarioRespostaDto(beneficiarioAtualizado);
+    return new BeneficiarioDto(beneficiarioAtualizado);
   }
 
   @Delete(':id')

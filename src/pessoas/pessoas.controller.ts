@@ -18,7 +18,7 @@ import {
 } from '@nestjs/swagger';
 
 import { AtualizarPessoaDto } from './dto/atualizar-pessoa.dto';
-import { PessoaRespostaDto } from './dto/pessoa-resposta.dto';
+import { PessoaDto } from './dto/pessoa.dto';
 import { PessoasService } from './pessoas.service';
 
 @ApiTags('Pessoas')
@@ -31,7 +31,7 @@ export class PessoasController {
   @ApiParam({ name: 'id', description: 'ID da pessoa', type: String })
   @ApiOkResponse({
     description: 'Pessoa atualizada com sucesso.',
-    type: PessoaRespostaDto,
+    type: PessoaDto,
   })
   @ApiBadRequestResponse({
     description: 'Dados inválidos enviados na requisição.',
@@ -45,14 +45,14 @@ export class PessoasController {
   async atualizar(
     @Param('id') id: string,
     @Body() atualizarPessoaDto: AtualizarPessoaDto,
-  ): Promise<PessoaRespostaDto> {
+  ): Promise<PessoaDto> {
     // Chama o serviço para atualizar os dados
     const pessoaAtualizada = await this.pessoasService.atualizar(
       id,
       atualizarPessoaDto,
     );
 
-    return new PessoaRespostaDto(pessoaAtualizada);
+    return new PessoaDto(pessoaAtualizada);
   }
 
   @Get('verificar-cadastro/beneficiario/cpf/:cpf')
@@ -67,7 +67,7 @@ export class PessoasController {
   })
   @ApiOkResponse({
     description: 'Pessoa encontrada com sucesso e sem beneficiário vinculado.',
-    type: PessoaRespostaDto,
+    type: PessoaDto,
   })
   @ApiBadRequestResponse({
     description: 'CPF inválido.',
@@ -83,14 +83,14 @@ export class PessoasController {
   })
   async verificarCadastroBeneficiarioPorCpf(
     @Param('cpf') cpf: string,
-  ): Promise<PessoaRespostaDto> {
+  ): Promise<PessoaDto> {
     if (!/^\d{11}$/.test(cpf)) {
       throw new BadRequestException('O CPF deve conter exatamente 11 dígitos.');
     }
 
     const pessoa =
       await this.pessoasService.verificarCadastroBeneficiarioPorCpf(cpf);
-    return new PessoaRespostaDto(pessoa);
+    return new PessoaDto(pessoa);
   }
 
   @Get('verificar-cadastro/voluntario/cpf/:cpf')
@@ -105,7 +105,7 @@ export class PessoasController {
   })
   @ApiOkResponse({
     description: 'Pessoa encontrada com sucesso e sem voluntário vinculado.',
-    type: PessoaRespostaDto,
+    type: PessoaDto,
   })
   @ApiBadRequestResponse({
     description: 'CPF inválido.',
@@ -121,13 +121,13 @@ export class PessoasController {
   })
   async verificarCadastroVoluntarioPorCpf(
     @Param('cpf') cpf: string,
-  ): Promise<PessoaRespostaDto> {
+  ): Promise<PessoaDto> {
     if (!/^\d{11}$/.test(cpf)) {
       throw new BadRequestException('O CPF deve conter exatamente 11 dígitos.');
     }
 
     const pessoa =
       await this.pessoasService.verificarCadastroVoluntarioPorCpf(cpf);
-    return new PessoaRespostaDto(pessoa);
+    return new PessoaDto(pessoa);
   }
 }

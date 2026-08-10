@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { Pessoa } from '../entities/pessoa.entity';
 
-export class PessoaResumidaDto {
+export class PessoaResumoDto {
   @ApiProperty({ example: '123456' })
   id: string;
 
