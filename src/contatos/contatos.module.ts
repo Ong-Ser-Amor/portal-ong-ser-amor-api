@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PessoaContato } from 'src/pessoas/entities/pessoa-contato.entity';
 import { PessoasModule } from 'src/pessoas/pessoas.module';
 
+import { ContatosController } from './contatos.controller';
 import { ContatosService } from './contatos.service';
 import { Contato } from './entities/contato.entity';
 
@@ -11,6 +12,7 @@ import { Contato } from './entities/contato.entity';
     TypeOrmModule.forFeature([Contato, PessoaContato]),
     forwardRef(() => PessoasModule),
   ],
+  controllers: [ContatosController],
   providers: [ContatosService],
   exports: [ContatosService],
 })

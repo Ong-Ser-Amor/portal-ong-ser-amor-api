@@ -105,7 +105,7 @@ export class ContatosService {
       });
       await pcRepository.save(vinculo);
 
-      return contatoSalvo;
+      return Object.assign(contatoSalvo, { ehPrincipal: vinculo.ehPrincipal });
     } catch (erro) {
       if (
         erro instanceof BadRequestException ||
@@ -143,9 +143,19 @@ export class ContatosService {
 
   async buscarPorId(id: string): Promise<Contato> {
     try {
-      return await this.repository.findOneOrFail({
+      const contato = await this.repository.findOneOrFail({
         where: { id },
       });
+
+      const vinculo = await this.pessoaContatoRepository.findOne({
+        where: { contatoId: id },
+      });
+
+      if (vinculo) {
+        Object.assign(contato, { ehPrincipal: vinculo.ehPrincipal });
+      }
+
+      return contato;
     } catch (erro) {
       if (erro instanceof EntityNotFoundError) {
         throw new NotFoundException(`Contato não encontrado.`);
@@ -280,7 +290,8 @@ export class ContatosService {
       }
 
       contatoRepo.merge(contatoAtual, atualizarContatoDto);
-      return await contatoRepo.save(contatoAtual);
+      const contatoSalvo = await contatoRepo.save(contatoAtual);
+      return Object.assign(contatoSalvo, { ehPrincipal: vinculo.ehPrincipal });
     } catch (erro) {
       if (
         erro instanceof BadRequestException ||

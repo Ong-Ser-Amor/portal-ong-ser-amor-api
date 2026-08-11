@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { ContatoRespostaDto } from '../../contatos/dto/contato-resposta.dto';
+import { ContatoDto } from '../../contatos/dto/contato.dto';
 import { PessoaContato } from '../entities/pessoa-contato.entity';
 import { Pessoa } from '../entities/pessoa.entity';
 
@@ -26,8 +26,8 @@ export class PessoaDto {
   @ApiProperty({ example: '123456', nullable: true })
   responsavelId: string | null;
 
-  @ApiPropertyOptional({ type: [ContatoRespostaDto] })
-  contatos?: ContatoRespostaDto[];
+  @ApiPropertyOptional({ type: [ContatoDto] })
+  contatos?: ContatoDto[];
 
   constructor(pessoa: Pessoa) {
     this.id = pessoa.id;
@@ -48,7 +48,7 @@ export class PessoaDto {
         )
         .map(
           (pessoaContato) =>
-            new ContatoRespostaDto(
+            new ContatoDto(
               Object.assign(pessoaContato.contato, {
                 ehPrincipal: pessoaContato.ehPrincipal,
               }),

@@ -1339,6 +1339,177 @@
         ]
       }
     },
+    "/contatos": {
+      "post": {
+        "operationId": "ContatosController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriarContatoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "O contato foi cadastrado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContatoDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos enviados na requisição ou violação das regras de negócio (ex: máximo de 3 contatos por pessoa, máximo de 2 celulares/1 email/1 fixo, exatamente 1 contato principal)."
+          },
+          "404": {
+            "description": "Pessoa não encontrada."
+          },
+          "409": {
+            "description": "Este número ou e-mail já está cadastrado para esta pessoa."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao cadastrar o contato."
+          }
+        },
+        "summary": "Cadastrar um novo contato para uma pessoa",
+        "tags": [
+          "Contatos"
+        ]
+      }
+    },
+    "/contatos/pessoa/{pessoaId}": {
+      "get": {
+        "operationId": "ContatosController_buscarPorPessoaId",
+        "parameters": [
+          {
+            "name": "pessoaId",
+            "required": true,
+            "in": "path",
+            "description": "ID da pessoa",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de contatos da pessoa retornada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContatoDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Pessoa não encontrada."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar os contatos."
+          }
+        },
+        "summary": "Buscar todos os contatos de uma pessoa",
+        "tags": [
+          "Contatos"
+        ]
+      }
+    },
+    "/contatos/{id}": {
+      "patch": {
+        "operationId": "ContatosController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID do contato",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarContatoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O contato foi atualizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContatoDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos enviados na requisição ou violação das regras de negócio de contatos."
+          },
+          "404": {
+            "description": "Contato não encontrado."
+          },
+          "409": {
+            "description": "Já existe outro contato cadastrado com este valor para esta pessoa."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar o contato."
+          }
+        },
+        "summary": "Atualizar os dados de um contato existente",
+        "tags": [
+          "Contatos"
+        ]
+      },
+      "delete": {
+        "operationId": "ContatosController_remover",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID do contato",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "O contato foi removido com sucesso."
+          },
+          "400": {
+            "description": "Não é permitido remover o contato se a pessoa (adulto/emancipado) ficar sem contatos ou se for o único contato principal."
+          },
+          "404": {
+            "description": "Contato não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao remover o contato."
+          }
+        },
+        "summary": "Remover um contato existente",
+        "tags": [
+          "Contatos"
+        ]
+      }
+    },
     "/familias/{id}": {
       "patch": {
         "operationId": "FamiliasController_atualizar",
@@ -3271,17 +3442,24 @@
           "endereco"
         ]
       },
-      "ContatoRespostaDto": {
+      "ContatoDto": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "example": "123"
           },
           "tipoContato": {
-            "type": "string"
+            "type": "string",
+            "example": "CELULAR"
           },
           "valor": {
-            "type": "string"
+            "type": "string",
+            "example": "11999999999"
+          },
+          "ehPrincipal": {
+            "type": "boolean",
+            "example": true
           }
         },
         "required": [
@@ -3327,7 +3505,7 @@
           "contatos": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ContatoRespostaDto"
+              "$ref": "#/components/schemas/ContatoDto"
             }
           }
         },
@@ -3910,6 +4088,61 @@
             ],
             "type": "string",
             "example": "PROFESSOR"
+          }
+        }
+      },
+      "CriarContatoDto": {
+        "type": "object",
+        "properties": {
+          "pessoaId": {
+            "type": "string",
+            "example": "12345678900"
+          },
+          "tipoContato": {
+            "enum": [
+              "CELULAR",
+              "TELEFONE_FIXO",
+              "EMAIL"
+            ],
+            "type": "string",
+            "example": "EMAIL"
+          },
+          "ehPrincipal": {
+            "type": "boolean",
+            "example": true
+          },
+          "valor": {
+            "type": "string",
+            "format": "email",
+            "pattern": "/^[0-9]{11}$/"
+          }
+        },
+        "required": [
+          "pessoaId",
+          "tipoContato",
+          "valor"
+        ]
+      },
+      "AtualizarContatoDto": {
+        "type": "object",
+        "properties": {
+          "tipoContato": {
+            "enum": [
+              "CELULAR",
+              "TELEFONE_FIXO",
+              "EMAIL"
+            ],
+            "type": "string",
+            "example": "EMAIL"
+          },
+          "ehPrincipal": {
+            "type": "boolean",
+            "example": true
+          },
+          "valor": {
+            "type": "string",
+            "format": "email",
+            "pattern": "/^[0-9]{11}$/"
           }
         }
       },
