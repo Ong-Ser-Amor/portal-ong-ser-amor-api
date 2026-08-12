@@ -6,6 +6,7 @@ import {
   IsArray,
   IsBoolean,
   IsDate,
+  IsEmpty,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -35,15 +36,25 @@ export class CriarBeneficiarioDto {
 
   @ApiProperty({
     example: 'João da Silva',
+    description:
+      'Nome completo da pessoa. Obrigatório ao cadastrar nova pessoa. Não deve ser informado se pessoaId for fornecido.',
+    required: false,
   })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
   @IsString({ message: 'O campo nome deve ser uma string' })
   @IsNotEmpty({ message: 'O campo nome não pode ser vazio' })
+  @ValidateIf((dto: CriarBeneficiarioDto) => Boolean(dto.pessoaId))
+  @IsEmpty({
+    message: 'Não é permitido enviar o campo nome quando pessoaId é informado.',
+  })
   nome?: string;
 
   @ApiProperty({
     type: String,
     example: '12345678900',
+    description:
+      'CPF com 11 dígitos numéricos. Obrigatório ao cadastrar nova pessoa. Não deve ser informado se pessoaId for fornecido.',
+    required: false,
   })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
   @IsString({ message: 'O campo cpf deve ser uma string' })
@@ -54,44 +65,76 @@ export class CriarBeneficiarioDto {
   @Matches(/^\d+$/, {
     message: 'O campo cpf deve conter apenas números.',
   })
+  @ValidateIf((dto: CriarBeneficiarioDto) => Boolean(dto.pessoaId))
+  @IsEmpty({
+    message: 'Não é permitido enviar o campo cpf quando pessoaId é informado.',
+  })
   cpf?: string;
 
-  @ApiProperty({ type: Date, example: '1990-01-01' })
+  @ApiProperty({
+    type: Date,
+    example: '1990-01-01',
+    description:
+      'Data de nascimento. Obrigatória ao cadastrar nova pessoa. Não deve ser informada se pessoaId for fornecido.',
+    required: false,
+  })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
   @IsDate({ message: 'O campo dataNascimento deve ser uma data válida' })
   @Type(() => Date)
   @IsNotEmpty({ message: 'O campo dataNascimento não pode ser vazio' })
+  @ValidateIf((dto: CriarBeneficiarioDto) => Boolean(dto.pessoaId))
+  @IsEmpty({
+    message:
+      'Não é permitido enviar o campo dataNascimento quando pessoaId é informado.',
+  })
   dataNascimento?: Date;
 
   @ApiProperty({
     example: false,
+    description:
+      'Indica se a pessoa é emancipada. Opcional ao cadastrar nova pessoa. Não deve ser informado se pessoaId for fornecido.',
     required: false,
   })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
   @IsOptional()
   @IsBoolean({ message: 'O campo emancipado deve ser booleano' })
+  @ValidateIf((dto: CriarBeneficiarioDto) => Boolean(dto.pessoaId))
+  @IsEmpty({
+    message:
+      'Não é permitido enviar o campo emancipado quando pessoaId é informado.',
+  })
   emancipado?: boolean;
 
   @ApiProperty({
     example: true,
     description:
-      'Indica se o beneficiário pode sair sozinho da ONG. Obrigatório para menores de 18 anos não emancipados. Não deve ser informado para adultos ou menores emancipados.',
+      'Indica se o beneficiário pode sair sozinho da ONG. Obrigatório para menores de 18 anos não emancipados. Não deve ser informado para adultos ou se pessoaId for fornecido.',
     required: false,
   })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
   @IsOptional()
   @IsBoolean({ message: 'O campo podeSairSozinho deve ser booleano' })
+  @ValidateIf((dto: CriarBeneficiarioDto) => Boolean(dto.pessoaId))
+  @IsEmpty({
+    message:
+      'Não é permitido enviar o campo podeSairSozinho quando pessoaId é informado.',
+  })
   podeSairSozinho?: boolean;
 
   @ApiProperty({
     example: '10',
     description:
-      'ID da pessoa responsável. Obrigatório para menores de 18 anos não emancipados (o responsável indicado deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). Opcional para adultos ou menores emancipados.',
+      'ID da pessoa responsável. Obrigatório para menores de 18 anos não emancipados. Não deve ser informado se pessoaId for fornecido.',
     required: false,
   })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.pessoaId)
   @IsOptional()
   @IsString()
+  @ValidateIf((dto: CriarBeneficiarioDto) => Boolean(dto.pessoaId))
+  @IsEmpty({
+    message:
+      'Não é permitido enviar o campo responsavelId quando pessoaId é informado.',
+  })
   responsavelId?: string;
 
   // --- Dados específicos da entidade Beneficiário ---

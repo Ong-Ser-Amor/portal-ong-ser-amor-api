@@ -22,7 +22,7 @@
         "parameters": [],
         "requestBody": {
           "required": true,
-          "description": "Existem 2 cenários:\n1) Se a pessoa JÁ É cadastrada: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do beneficiário.\n2) Se a pessoa NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do beneficiário (não envie 'pessoaId'). Em ambos os casos você pode informar 'familiaId' ou os dados de 'novaFamilia'.",
+          "description": "Existem 2 cenários mutuamente exclusivos:\n1) Se a pessoa JÁ É cadastrada: envie 'pessoaId' + os campos do beneficiário. NENHUM dado de pessoa ('nome', 'cpf', 'dataNascimento', 'emancipado', 'podeSairSozinho', 'responsavelId') deve ser informado.\n2) Se a pessoa NÃO possui cadastro de pessoa: envie os dados cadastrais da pessoa ('nome', 'cpf', 'dataNascimento', etc.) + os campos do beneficiário (não envie 'pessoaId'). Em ambos os casos você pode informar 'familiaId' ou os dados de 'novaFamilia'.",
           "content": {
             "application/json": {
               "schema": {
@@ -34,18 +34,6 @@
                       "pessoaId": {
                         "type": "string",
                         "example": "123456"
-                      },
-                      "emancipado": {
-                        "type": "boolean",
-                        "example": false
-                      },
-                      "podeSairSozinho": {
-                        "type": "boolean",
-                        "example": true
-                      },
-                      "responsavelId": {
-                        "type": "string",
-                        "example": "10"
                       },
                       "estadoCivil": {
                         "type": "string",
@@ -124,18 +112,6 @@
                       "pessoaId": {
                         "type": "string",
                         "example": "123456"
-                      },
-                      "emancipado": {
-                        "type": "boolean",
-                        "example": false
-                      },
-                      "podeSairSozinho": {
-                        "type": "boolean",
-                        "example": true
-                      },
-                      "responsavelId": {
-                        "type": "string",
-                        "example": "10"
                       },
                       "estadoCivil": {
                         "type": "string",
@@ -427,9 +403,6 @@
                   "value": {
                     "pessoaId": "123456",
                     "familiaId": "789012",
-                    "emancipado": false,
-                    "podeSairSozinho": true,
-                    "responsavelId": "10",
                     "estadoCivil": "SOLTEIRO",
                     "vinculoEmpregaticio": "DESEMPREGADO",
                     "quantidadeFilhos": 2,
@@ -447,9 +420,6 @@
                   "summary": "Pessoa existente + criar nova família",
                   "value": {
                     "pessoaId": "123456",
-                    "emancipado": false,
-                    "podeSairSozinho": true,
-                    "responsavelId": "10",
                     "estadoCivil": "SOLTEIRO",
                     "vinculoEmpregaticio": "DESEMPREGADO",
                     "quantidadeFilhos": 2,
@@ -3892,33 +3862,37 @@
         "properties": {
           "nome": {
             "type": "string",
-            "example": "João da Silva"
+            "example": "João da Silva",
+            "description": "Nome completo da pessoa. Obrigatório ao cadastrar nova pessoa. Não deve ser informado se pessoaId for fornecido."
           },
           "cpf": {
             "type": "string",
             "minLength": 11,
             "maxLength": 11,
             "pattern": "/^\\d+$/",
-            "example": "12345678900"
+            "example": "12345678900",
+            "description": "CPF com 11 dígitos numéricos. Obrigatório ao cadastrar nova pessoa. Não deve ser informado se pessoaId for fornecido."
           },
           "dataNascimento": {
             "format": "date-time",
             "type": "string",
-            "example": "1990-01-01"
+            "example": "1990-01-01",
+            "description": "Data de nascimento. Obrigatória ao cadastrar nova pessoa. Não deve ser informada se pessoaId for fornecido."
           },
           "emancipado": {
             "type": "boolean",
-            "example": false
+            "example": false,
+            "description": "Indica se a pessoa é emancipada. Opcional ao cadastrar nova pessoa. Não deve ser informado se pessoaId for fornecido."
           },
           "podeSairSozinho": {
             "type": "boolean",
             "example": true,
-            "description": "Indica se o beneficiário pode sair sozinho da ONG. Obrigatório para menores de 18 anos não emancipados. Não deve ser informado para adultos ou menores emancipados."
+            "description": "Indica se o beneficiário pode sair sozinho da ONG. Obrigatório para menores de 18 anos não emancipados. Não deve ser informado para adultos ou se pessoaId for fornecido."
           },
           "responsavelId": {
             "type": "string",
             "example": "10",
-            "description": "ID da pessoa responsável. Obrigatório para menores de 18 anos não emancipados (o responsável indicado deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). Opcional para adultos ou menores emancipados."
+            "description": "ID da pessoa responsável. Obrigatório para menores de 18 anos não emancipados. Não deve ser informado se pessoaId for fornecido."
           },
           "nivelEscolaridade": {
             "enum": [

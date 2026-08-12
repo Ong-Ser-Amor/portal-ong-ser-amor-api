@@ -53,7 +53,7 @@ export class BeneficiariosController {
   constructor(private readonly beneficiariosService: BeneficiariosService) {}
 
   @ApiBody({
-    description: `Existem 2 cenários:\n1) Se a pessoa JÁ É cadastrada: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do beneficiário.\n2) Se a pessoa NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do beneficiário (não envie 'pessoaId'). Em ambos os casos você pode informar 'familiaId' ou os dados de 'novaFamilia'.`,
+    description: `Existem 2 cenários mutuamente exclusivos:\n1) Se a pessoa JÁ É cadastrada: envie 'pessoaId' + os campos do beneficiário. NENHUM dado de pessoa ('nome', 'cpf', 'dataNascimento', 'emancipado', 'podeSairSozinho', 'responsavelId') deve ser informado.\n2) Se a pessoa NÃO possui cadastro de pessoa: envie os dados cadastrais da pessoa ('nome', 'cpf', 'dataNascimento', etc.) + os campos do beneficiário (não envie 'pessoaId'). Em ambos os casos você pode informar 'familiaId' ou os dados de 'novaFamilia'.`,
     schema: {
       oneOf: [
         {
@@ -61,9 +61,6 @@ export class BeneficiariosController {
           title: 'Pessoa existente + família existente',
           properties: {
             pessoaId: { type: 'string', example: '123456' },
-            emancipado: { type: 'boolean', example: false },
-            podeSairSozinho: { type: 'boolean', example: true },
-            responsavelId: { type: 'string', example: '10' },
             estadoCivil: {
               type: 'string',
               enum: Object.values(EstadoCivil),
@@ -100,9 +97,6 @@ export class BeneficiariosController {
           title: 'Pessoa existente + criar nova família',
           properties: {
             pessoaId: { type: 'string', example: '123456' },
-            emancipado: { type: 'boolean', example: false },
-            podeSairSozinho: { type: 'boolean', example: true },
-            responsavelId: { type: 'string', example: '10' },
             estadoCivil: {
               type: 'string',
               enum: Object.values(EstadoCivil),
@@ -258,9 +252,6 @@ export class BeneficiariosController {
         value: {
           pessoaId: '123456',
           familiaId: '789012',
-          emancipado: false,
-          podeSairSozinho: true,
-          responsavelId: '10',
           estadoCivil: EstadoCivil.SOLTEIRO,
           vinculoEmpregaticio: VinculoEmpregaticio.DESEMPREGADO,
           quantidadeFilhos: 2,
@@ -278,9 +269,6 @@ export class BeneficiariosController {
         summary: 'Pessoa existente + criar nova família',
         value: {
           pessoaId: '123456',
-          emancipado: false,
-          podeSairSozinho: true,
-          responsavelId: '10',
           estadoCivil: EstadoCivil.SOLTEIRO,
           vinculoEmpregaticio: VinculoEmpregaticio.DESEMPREGADO,
           quantidadeFilhos: 2,

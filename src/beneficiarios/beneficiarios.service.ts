@@ -77,33 +77,8 @@ export class BeneficiariosService {
         );
       } else {
         // Cenario B: Id da pessoa fornecido (pessoa já existe).
-        // Se vier qualquer dado parcial de pessoa no DTO, atualiza no banco.
-        const dadosPessoaParaAtualizar: AtualizarPessoaDto = {};
-        if (criarBeneficiarioDto.nome !== undefined) {
-          dadosPessoaParaAtualizar.nome = criarBeneficiarioDto.nome;
-        }
-        if (criarBeneficiarioDto.cpf !== undefined) {
-          dadosPessoaParaAtualizar.cpf = criarBeneficiarioDto.cpf;
-        }
-        if (criarBeneficiarioDto.dataNascimento !== undefined) {
-          dadosPessoaParaAtualizar.dataNascimento =
-            criarBeneficiarioDto.dataNascimento;
-        }
-        if (criarBeneficiarioDto.podeSairSozinho !== undefined) {
-          dadosPessoaParaAtualizar.podeSairSozinho =
-            criarBeneficiarioDto.podeSairSozinho;
-        }
-        if (criarBeneficiarioDto.responsavelId !== undefined) {
-          dadosPessoaParaAtualizar.responsavelId =
-            criarBeneficiarioDto.responsavelId;
-        }
-        if (criarBeneficiarioDto.emancipado !== undefined) {
-          dadosPessoaParaAtualizar.emancipado = criarBeneficiarioDto.emancipado;
-        }
-
-        pessoa = await this.pessoasService.atualizar(
+        pessoa = await this.pessoasService.buscarPorId(
           criarBeneficiarioDto.pessoaId,
-          dadosPessoaParaAtualizar,
           queryRunner.manager,
         );
       }
