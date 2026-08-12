@@ -156,8 +156,10 @@ export class CriarBeneficiarioDto {
   familiaId?: string;
 
   @ApiProperty({
-    description: 'Dados para criar uma nova família',
+    description:
+      'Dados para criar uma nova família. Obrigatório se familiaId não for fornecido. Não deve ser informado se familiaId for fornecido.',
     type: CriarFamiliaDto,
+    required: false,
   })
   @ValidateIf((dto: CriarBeneficiarioDto) => !dto.familiaId)
   @IsNotEmpty({
@@ -166,6 +168,11 @@ export class CriarBeneficiarioDto {
   })
   @ValidateNested()
   @Type(() => CriarFamiliaDto)
+  @ValidateIf((dto: CriarBeneficiarioDto) => Boolean(dto.familiaId))
+  @IsEmpty({
+    message:
+      'Não é permitido enviar os dados de novaFamilia quando familiaId é informado.',
+  })
   novaFamilia?: CriarFamiliaDto;
 
   @ApiProperty({

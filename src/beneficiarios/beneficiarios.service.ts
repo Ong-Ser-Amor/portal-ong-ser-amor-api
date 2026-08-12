@@ -122,7 +122,12 @@ export class BeneficiariosService {
 
       let familiaIdFinal = criarBeneficiarioDto.familiaId;
 
-      if (!familiaIdFinal && criarBeneficiarioDto.novaFamilia) {
+      if (familiaIdFinal) {
+        await this.familiasService.buscarPorId(
+          familiaIdFinal,
+          queryRunner.manager,
+        );
+      } else if (criarBeneficiarioDto.novaFamilia) {
         const familiaCriada = await this.familiasService.criar(
           criarBeneficiarioDto.novaFamilia,
           queryRunner.manager,
