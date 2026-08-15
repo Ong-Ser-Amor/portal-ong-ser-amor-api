@@ -27,7 +27,7 @@ export class PessoasService {
     private readonly voluntariosService: VoluntariosService,
     @Inject(forwardRef(() => BeneficiariosService))
     private readonly beneficiariosService: BeneficiariosService,
-  ) {}
+  ) { }
 
   async criar(
     criarPessoaDto: CriarPessoaDto,
@@ -96,7 +96,7 @@ export class PessoasService {
     }
   }
 
-  private async buscarPorCpf(cpf: string): Promise<Pessoa> {
+  async buscarPorCpf(cpf: string): Promise<Pessoa> {
     try {
       const pessoa = await this.repository.findOneBy({
         cpf,

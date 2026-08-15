@@ -14,15 +14,16 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
-  ApiBody,
   ApiExtraModels,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   getSchemaPath,
@@ -31,8 +32,10 @@ import { TipoContato } from 'src/contatos/enums/tipo-contato.enum';
 import { CriarFamiliaDto } from 'src/familias/dto/criar-familia.dto';
 import { FaixaRenda } from 'src/familias/enums/faixa-renda.enum';
 import { TipoMoradia } from 'src/familias/enums/tipo-moradia.enum';
+import { PessoaDto } from 'src/pessoas/dto/pessoa.dto';
 import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
+import { ValidarCpfPipe } from 'src/shared/pipes/validar-cpf.pipe';
 
 import { BeneficiariosService } from './beneficiarios.service';
 import { AtualizarBeneficiarioDto } from './dto/atualizar-beneficiario.dto';
@@ -50,7 +53,7 @@ import {
 @ApiExtraModels(CriarFamiliaDto)
 @Controller('beneficiarios')
 export class BeneficiariosController {
-  constructor(private readonly beneficiariosService: BeneficiariosService) {}
+  constructor(private readonly beneficiariosService: BeneficiariosService) { }
 
   @ApiBody({
     description: `Existem 2 cenários mutuamente exclusivos:\n1) Se a pessoa JÁ É cadastrada: envie 'pessoaId' + os campos do beneficiário. NENHUM dado de pessoa ('nome', 'cpf', 'dataNascimento', 'emancipado', 'podeSairSozinho', 'responsavelId') deve ser informado.\n2) Se a pessoa NÃO possui cadastro de pessoa: envie os dados cadastrais da pessoa ('nome', 'cpf', 'dataNascimento', etc.) + os campos do beneficiário (não envie 'pessoaId'). Em ambos os casos você pode informar 'familiaId' ou os dados de 'novaFamilia'.`,
@@ -383,6 +386,39 @@ export class BeneficiariosController {
     const beneficiarioCriado =
       await this.beneficiariosService.criar(criarBeneficiarioDto);
     return new BeneficiarioDto(beneficiarioCriado);
+  }
+
+  @Get('verificar-cadastro/cpf/:cpf')
+  @ApiOperation({
+    summary: 'Verificar cadastro de beneficiário pelo CPF',
+  })
+  @ApiParam({
+    name: 'cpf',
+    required: true,
+    example: '12345678900',
+    description: 'CPF com 11 dígitos numéricos.',
+  })
+  @ApiOkResponse({
+    description: 'Pessoa encontrada com sucesso e sem beneficiário vinculado.',
+    type: PessoaDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'CPF inválido.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Pessoa não encontrada.',
+  })
+  @ApiConflictResponse({
+    description: 'Pessoa já possui um cadastro de beneficiário ativo.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Erro interno ao verificar o cadastro de beneficiário.',
+  })
+  async verificarCadastroPorCpf(
+    @Param('cpf', ValidarCpfPipe) cpf: string,
+  ): Promise<PessoaDto> {
+    const pessoa = await this.beneficiariosService.verificarCadastroPorCpf(cpf);
+    return new PessoaDto(pessoa);
   }
 
   @Get()

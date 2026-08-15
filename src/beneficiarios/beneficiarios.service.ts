@@ -48,7 +48,7 @@ export class BeneficiariosService {
     @Inject(forwardRef(() => FamiliasService))
     private readonly familiasService: FamiliasService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async criar(
     criarBeneficiarioDto: CriarBeneficiarioDto,
@@ -653,6 +653,40 @@ export class BeneficiariosService {
 
       throw new InternalServerErrorException(
         'Erro interno ao verificar o vínculo de beneficiário.',
+      );
+    }
+  }
+
+  async verificarCadastroPorCpf(cpf: string): Promise<Pessoa> {
+    try {
+      const pessoa = await this.pessoasService.buscarPorCpf(cpf);
+
+      const beneficiarioExistente = await this.verificarExistenciaPorPessoaId(
+        pessoa.id,
+      );
+
+      if (beneficiarioExistente) {
+        throw new ConflictException(
+          'Esta pessoa já possui um cadastro de beneficiário ativo.',
+        );
+      }
+
+      return pessoa;
+    } catch (erro) {
+      if (
+        erro instanceof NotFoundException ||
+        erro instanceof ConflictException
+      ) {
+        throw erro;
+      }
+
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro inesperado ao buscar pessoa por CPF no módulo de beneficiários: ${mensagemErro}`,
+      );
+
+      throw new InternalServerErrorException(
+        'Erro interno ao buscar a pessoa.',
       );
     }
   }
