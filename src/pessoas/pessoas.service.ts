@@ -1,15 +1,11 @@
 import {
   ConflictException,
-  forwardRef,
-  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BeneficiariosService } from 'src/beneficiarios/beneficiarios.service';
-import { VoluntariosService } from 'src/voluntarios/voluntarios.service';
 import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
 import { AtualizarPessoaDto } from './dto/atualizar-pessoa.dto';
@@ -23,11 +19,7 @@ export class PessoasService {
   constructor(
     @InjectRepository(Pessoa)
     private readonly repository: Repository<Pessoa>,
-    @Inject(forwardRef(() => VoluntariosService))
-    private readonly voluntariosService: VoluntariosService,
-    @Inject(forwardRef(() => BeneficiariosService))
-    private readonly beneficiariosService: BeneficiariosService,
-  ) { }
+  ) {}
 
   async criar(
     criarPessoaDto: CriarPessoaDto,

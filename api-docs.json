@@ -896,323 +896,6 @@
         ]
       }
     },
-    "/voluntarios": {
-      "post": {
-        "operationId": "VoluntariosController_criar",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "description": "Existem 2 cenários:\n1) Se o voluntário JÁ É beneficiário: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do voluntário.\n2) Se o voluntário NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do voluntário (não envie 'pessoaId').",
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "type": "object",
-                    "title": "Cenário com pessoa já cadastrada",
-                    "properties": {
-                      "pessoaId": {
-                        "type": "string",
-                        "example": "123456"
-                      },
-                      "tipoVoluntario": {
-                        "type": "string",
-                        "enum": [
-                          "COORDENADOR",
-                          "PROFESSOR",
-                          "GERAL"
-                        ]
-                      },
-                      "formacaoAcademica": {
-                        "type": "string",
-                        "example": "Pedagogia"
-                      },
-                      "statusFormacao": {
-                        "type": "string",
-                        "enum": [
-                          "COMPLETO",
-                          "CURSANDO",
-                          "INCOMPLETO"
-                        ]
-                      }
-                    },
-                    "required": [
-                      "pessoaId",
-                      "tipoVoluntario"
-                    ]
-                  },
-                  {
-                    "type": "object",
-                    "title": "Cenário com nova pessoa",
-                    "properties": {
-                      "nome": {
-                        "type": "string",
-                        "example": "Carlos Santos"
-                      },
-                      "cpf": {
-                        "type": "string",
-                        "example": "12345678900",
-                        "minLength": 11,
-                        "maxLength": 11
-                      },
-                      "dataNascimento": {
-                        "type": "string",
-                        "format": "date",
-                        "example": "2000-01-01"
-                      },
-                      "tipoVoluntario": {
-                        "type": "string",
-                        "enum": [
-                          "COORDENADOR",
-                          "PROFESSOR",
-                          "GERAL"
-                        ]
-                      },
-                      "formacaoAcademica": {
-                        "type": "string",
-                        "example": "Pedagogia"
-                      },
-                      "statusFormacao": {
-                        "type": "string",
-                        "enum": [
-                          "COMPLETO",
-                          "CURSANDO",
-                          "INCOMPLETO"
-                        ]
-                      }
-                    },
-                    "required": [
-                      "nome",
-                      "cpf",
-                      "dataNascimento",
-                      "tipoVoluntario"
-                    ]
-                  }
-                ]
-              },
-              "examples": {
-                "pessoa_existente": {
-                  "summary": "Pessoa já cadastrada (use pessoaId)",
-                  "value": {
-                    "pessoaId": "123456",
-                    "tipoVoluntario": "COORDENADOR",
-                    "formacaoAcademica": "Pedagogia",
-                    "statusFormacao": "COMPLETO"
-                  }
-                },
-                "pessoa_nova": {
-                  "summary": "Pessoa nova (envia dados da pessoa)",
-                  "value": {
-                    "nome": "Carlos Santos",
-                    "cpf": "12345678900",
-                    "dataNascimento": "2000-01-01",
-                    "tipoVoluntario": "PROFESSOR",
-                    "formacaoAcademica": "Pedagogia",
-                    "statusFormacao": "COMPLETO"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "O voluntário foi criado com sucesso.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VoluntarioRespostaDto"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Já existe uma pessoa com este CPF ou a pessoa informada já possui um cadastro de voluntário ativo."
-          },
-          "500": {
-            "description": "Ocorreu um erro inesperado ao criar o voluntário."
-          }
-        },
-        "summary": "Criar um novo voluntário",
-        "tags": [
-          "Voluntarios"
-        ]
-      },
-      "get": {
-        "operationId": "VoluntariosController_buscarTodos",
-        "parameters": [
-          {
-            "name": "pagina",
-            "required": false,
-            "in": "query",
-            "description": "Número da página atual (padrão: 1)",
-            "schema": {
-              "example": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "itensPorPagina",
-            "required": false,
-            "in": "query",
-            "description": "Número de itens por página (padrão: 10)",
-            "schema": {
-              "example": 10,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Resposta paginada recebida com sucesso.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/PaginacaoRespostaDto"
-                    },
-                    {
-                      "properties": {
-                        "dados": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/VoluntarioRespostaDto"
-                          }
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1."
-          },
-          "500": {
-            "description": "Ocorreu um erro inesperado ao buscar os voluntários."
-          }
-        },
-        "summary": "Buscar uma lista paginada de voluntários",
-        "tags": [
-          "Voluntarios"
-        ]
-      }
-    },
-    "/voluntarios/{id}": {
-      "get": {
-        "operationId": "VoluntariosController_buscarPorId",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "O voluntário foi encontrado com sucesso.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VoluntarioRespostaDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Voluntário não encontrado."
-          },
-          "500": {
-            "description": "Ocorreu um erro inesperado ao buscar o voluntário."
-          }
-        },
-        "summary": "Buscar voluntário pelo ID",
-        "tags": [
-          "Voluntarios"
-        ]
-      },
-      "patch": {
-        "operationId": "VoluntariosController_atualizar",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AtualizarVoluntarioDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "O voluntário foi atualizado com sucesso.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VoluntarioRespostaDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Voluntário não encontrado."
-          },
-          "409": {
-            "description": "Já existe uma pessoa cadastrada com este CPF."
-          },
-          "500": {
-            "description": "Ocorreu um erro inesperado ao atualizar o voluntário."
-          }
-        },
-        "summary": "Atualizar voluntário pelo ID",
-        "tags": [
-          "Voluntarios"
-        ]
-      },
-      "delete": {
-        "operationId": "VoluntariosController_remover",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "O voluntário foi deletado com sucesso."
-          },
-          "404": {
-            "description": "Voluntário não encontrado."
-          },
-          "500": {
-            "description": "Ocorreu um erro inesperado ao deletar o voluntário."
-          }
-        },
-        "summary": "Deletar voluntário pelo ID",
-        "tags": [
-          "Voluntarios"
-        ]
-      }
-    },
     "/contatos": {
       "post": {
         "operationId": "ContatosController_criar",
@@ -1669,6 +1352,307 @@
         "summary": "Atualizar senha do usuário",
         "tags": [
           "Usuarios"
+        ]
+      }
+    },
+    "/voluntarios": {
+      "post": {
+        "operationId": "VoluntariosController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Existem 2 cenários:\n1) Se o voluntário JÁ É beneficiário: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do voluntário.\n2) Se o voluntário NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do voluntário (não envie 'pessoaId').",
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "title": "Cenário com pessoa já cadastrada",
+                    "properties": {
+                      "pessoaId": {
+                        "type": "string",
+                        "example": "123456"
+                      },
+                      "tipoVoluntario": {
+                        "type": "string",
+                        "enum": [
+                          "COORDENADOR",
+                          "PROFESSOR",
+                          "GERAL"
+                        ]
+                      },
+                      "formacaoAcademica": {
+                        "type": "string",
+                        "example": "Pedagogia"
+                      },
+                      "statusFormacao": {
+                        "type": "string",
+                        "enum": [
+                          "COMPLETO",
+                          "CURSANDO",
+                          "INCOMPLETO"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "pessoaId",
+                      "tipoVoluntario"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "title": "Cenário com nova pessoa",
+                    "properties": {
+                      "nome": {
+                        "type": "string",
+                        "example": "Carlos Santos"
+                      },
+                      "cpf": {
+                        "type": "string",
+                        "example": "12345678900",
+                        "minLength": 11,
+                        "maxLength": 11
+                      },
+                      "dataNascimento": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2000-01-01"
+                      },
+                      "tipoVoluntario": {
+                        "type": "string",
+                        "enum": [
+                          "COORDENADOR",
+                          "PROFESSOR",
+                          "GERAL"
+                        ]
+                      },
+                      "formacaoAcademica": {
+                        "type": "string",
+                        "example": "Pedagogia"
+                      },
+                      "statusFormacao": {
+                        "type": "string",
+                        "enum": [
+                          "COMPLETO",
+                          "CURSANDO",
+                          "INCOMPLETO"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "nome",
+                      "cpf",
+                      "dataNascimento",
+                      "tipoVoluntario"
+                    ]
+                  }
+                ]
+              },
+              "examples": {
+                "pessoa_existente": {
+                  "summary": "Pessoa já cadastrada (use pessoaId)",
+                  "value": {
+                    "pessoaId": "123456",
+                    "tipoVoluntario": "COORDENADOR",
+                    "formacaoAcademica": "Pedagogia",
+                    "statusFormacao": "COMPLETO"
+                  }
+                },
+                "pessoa_nova": {
+                  "summary": "Pessoa nova (envia dados da pessoa)",
+                  "value": {
+                    "nome": "Carlos Santos",
+                    "cpf": "12345678900",
+                    "dataNascimento": "2000-01-01",
+                    "tipoVoluntario": "PROFESSOR",
+                    "formacaoAcademica": "Pedagogia",
+                    "statusFormacao": "COMPLETO"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "O voluntário foi criado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoluntarioRespostaDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Já existe uma pessoa com este CPF ou a pessoa informada já possui um cadastro de voluntário ativo."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao criar o voluntário."
+          }
+        },
+        "summary": "Criar um novo voluntário",
+        "tags": [
+          "Voluntarios"
+        ]
+      }
+    },
+    "/voluntarios/verificar-cadastro/cpf/{cpf}": {
+      "get": {
+        "operationId": "VoluntariosController_verificarCadastroPorCpf",
+        "parameters": [
+          {
+            "name": "cpf",
+            "required": true,
+            "in": "path",
+            "description": "CPF com 11 dígitos numéricos.",
+            "schema": {
+              "example": "12345678900",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pessoa encontrada com sucesso e sem voluntário vinculado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PessoaDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "CPF inválido."
+          },
+          "404": {
+            "description": "Pessoa não encontrada."
+          },
+          "409": {
+            "description": "Pessoa já possui um cadastro de voluntário ativo."
+          },
+          "500": {
+            "description": "Erro interno ao verificar o cadastro de voluntário."
+          }
+        },
+        "summary": "Verificar cadastro de voluntário pelo CPF",
+        "tags": [
+          "Voluntarios"
+        ]
+      }
+    },
+    "/voluntarios/{id}": {
+      "get": {
+        "operationId": "VoluntariosController_buscarPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "O voluntário foi encontrado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoluntarioRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Voluntário não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar o voluntário."
+          }
+        },
+        "summary": "Buscar voluntário pelo ID",
+        "tags": [
+          "Voluntarios"
+        ]
+      },
+      "patch": {
+        "operationId": "VoluntariosController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarVoluntarioDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "O voluntário foi atualizado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoluntarioRespostaDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Voluntário não encontrado."
+          },
+          "409": {
+            "description": "Já existe uma pessoa cadastrada com este CPF."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao atualizar o voluntário."
+          }
+        },
+        "summary": "Atualizar voluntário pelo ID",
+        "tags": [
+          "Voluntarios"
+        ]
+      },
+      "delete": {
+        "operationId": "VoluntariosController_remover",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "O voluntário foi deletado com sucesso."
+          },
+          "404": {
+            "description": "Voluntário não encontrado."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao deletar o voluntário."
+          }
+        },
+        "summary": "Deletar voluntário pelo ID",
+        "tags": [
+          "Voluntarios"
         ]
       }
     },
@@ -3849,93 +3833,6 @@
           }
         }
       },
-      "VoluntarioRespostaDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "vol-123"
-          },
-          "pessoa": {
-            "$ref": "#/components/schemas/PessoaDto"
-          },
-          "formacaoAcademica": {
-            "type": "string",
-            "nullable": true,
-            "example": "Pedagogia"
-          },
-          "statusFormacao": {
-            "nullable": true,
-            "enum": [
-              "COMPLETO",
-              "CURSANDO",
-              "INCOMPLETO"
-            ],
-            "type": "string",
-            "example": "COMPLETO"
-          },
-          "tipoVoluntario": {
-            "enum": [
-              "COORDENADOR",
-              "PROFESSOR",
-              "GERAL"
-            ],
-            "type": "string",
-            "example": "PROFESSOR"
-          }
-        },
-        "required": [
-          "id",
-          "pessoa",
-          "formacaoAcademica",
-          "tipoVoluntario"
-        ]
-      },
-      "AtualizarVoluntarioDto": {
-        "type": "object",
-        "properties": {
-          "nome": {
-            "type": "string",
-            "example": "Carlos Santos"
-          },
-          "cpf": {
-            "type": "string",
-            "minLength": 11,
-            "maxLength": 11,
-            "pattern": "/^\\d+$/",
-            "example": "12345678900"
-          },
-          "dataNascimento": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2000-01-01"
-          },
-          "formacaoAcademica": {
-            "type": "string",
-            "nullable": true,
-            "example": "Pedagogia"
-          },
-          "statusFormacao": {
-            "nullable": true,
-            "enum": [
-              "COMPLETO",
-              "CURSANDO",
-              "INCOMPLETO"
-            ],
-            "type": "string",
-            "example": "COMPLETO"
-          },
-          "tipoVoluntario": {
-            "enum": [
-              "COORDENADOR",
-              "PROFESSOR",
-              "GERAL"
-            ],
-            "type": "string",
-            "example": "PROFESSOR"
-          }
-        }
-      },
       "CriarContatoDto": {
         "type": "object",
         "properties": {
@@ -4169,6 +4066,93 @@
           "senhaAtual",
           "novaSenha"
         ]
+      },
+      "VoluntarioRespostaDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "vol-123"
+          },
+          "pessoa": {
+            "$ref": "#/components/schemas/PessoaDto"
+          },
+          "formacaoAcademica": {
+            "type": "string",
+            "nullable": true,
+            "example": "Pedagogia"
+          },
+          "statusFormacao": {
+            "nullable": true,
+            "enum": [
+              "COMPLETO",
+              "CURSANDO",
+              "INCOMPLETO"
+            ],
+            "type": "string",
+            "example": "COMPLETO"
+          },
+          "tipoVoluntario": {
+            "enum": [
+              "COORDENADOR",
+              "PROFESSOR",
+              "GERAL"
+            ],
+            "type": "string",
+            "example": "PROFESSOR"
+          }
+        },
+        "required": [
+          "id",
+          "pessoa",
+          "formacaoAcademica",
+          "tipoVoluntario"
+        ]
+      },
+      "AtualizarVoluntarioDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "Carlos Santos"
+          },
+          "cpf": {
+            "type": "string",
+            "minLength": 11,
+            "maxLength": 11,
+            "pattern": "/^\\d+$/",
+            "example": "12345678900"
+          },
+          "dataNascimento": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2000-01-01"
+          },
+          "formacaoAcademica": {
+            "type": "string",
+            "nullable": true,
+            "example": "Pedagogia"
+          },
+          "statusFormacao": {
+            "nullable": true,
+            "enum": [
+              "COMPLETO",
+              "CURSANDO",
+              "INCOMPLETO"
+            ],
+            "type": "string",
+            "example": "COMPLETO"
+          },
+          "tipoVoluntario": {
+            "enum": [
+              "COORDENADOR",
+              "PROFESSOR",
+              "GERAL"
+            ],
+            "type": "string",
+            "example": "PROFESSOR"
+          }
+        }
       },
       "LoginDto": {
         "type": "object",

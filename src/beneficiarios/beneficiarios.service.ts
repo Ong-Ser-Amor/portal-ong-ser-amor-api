@@ -62,9 +62,6 @@ export class BeneficiariosService {
 
       if (!criarBeneficiarioDto.pessoaId) {
         // Cenario A: Id da pessoa não fornecido (pessoa não existe).
-        this.logger.log(
-          'Cenario A: Id da pessoa não fornecido (pessoa não existe).',
-        );
         const dadosPessoa: CriarPessoaDto = {
           nome: criarBeneficiarioDto.nome,
           cpf: criarBeneficiarioDto.cpf,
@@ -80,9 +77,6 @@ export class BeneficiariosService {
         );
       } else {
         // Cenario B: Id da pessoa fornecido (pessoa já existe).
-        this.logger.log(
-          'Cenario B: Id da pessoa fornecido (pessoa já existe).',
-        );
         pessoa = await this.pessoasService.buscarPorId(
           criarBeneficiarioDto.pessoaId,
           queryRunner.manager,
@@ -95,6 +89,17 @@ export class BeneficiariosService {
             queryRunner.manager,
           );
         }
+      }
+
+      const beneficioExistente = await queryRunner.manager.findOne(
+        Beneficiario,
+        { where: { pessoaId: pessoa.id } },
+      );
+
+      if (beneficioExistente) {
+        throw new ConflictException(
+          'Esta pessoa já possui um cadastro de beneficiário ativo.',
+        );
       }
 
       if (
@@ -122,17 +127,6 @@ export class BeneficiariosService {
         queryRunner.manager,
         !criarBeneficiarioDto.pessoaId,
       );
-
-      const beneficioExistente = await queryRunner.manager.findOne(
-        Beneficiario,
-        { where: { pessoaId: pessoa.id } },
-      );
-
-      if (beneficioExistente) {
-        throw new ConflictException(
-          'Esta pessoa já possui um cadastro de beneficiário ativo.',
-        );
-      }
 
       let familiaIdFinal = criarBeneficiarioDto.familiaId;
 

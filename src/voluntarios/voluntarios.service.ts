@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CriarPessoaDto } from 'src/pessoas/dto/criar-pessoa.dto';
+import { Pessoa } from 'src/pessoas/entities/pessoa.entity';
 import { PessoasService } from 'src/pessoas/pessoas.service';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { DataSource, EntityNotFoundError, Repository } from 'typeorm';
@@ -28,7 +29,7 @@ export class VoluntariosService {
     @Inject(forwardRef(() => PessoasService))
     private readonly pessoasService: PessoasService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async criar(criarVoluntarioDto: CriarVoluntarioDto): Promise<Voluntario> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -36,9 +37,9 @@ export class VoluntariosService {
     await queryRunner.startTransaction();
 
     try {
-      let pessoaId = criarVoluntarioDto.pessoaId;
+      let pessoa: Pessoa;
 
-      if (!pessoaId) {
+      if (!criarVoluntarioDto.pessoaId) {
         // Cenario A: Id da pessoa não fornecido (pessoa não existe).
 
         const dadosPessoa: CriarPessoaDto = {
@@ -48,21 +49,31 @@ export class VoluntariosService {
         };
 
         // Passa o queryRunner.manager para garantir que a pessoa será criada na mesma transação
-        const novaPessoa = await this.pessoasService.criar(
+        pessoa = await this.pessoasService.criar(
           dadosPessoa,
           queryRunner.manager,
         );
-        pessoaId = novaPessoa.id;
       } else {
         // Cenario B: Id da pessoa fornecido (pessoa já existe).
 
-        await this.pessoasService.buscarPorId(pessoaId, queryRunner.manager);
+        pessoa = await this.pessoasService.buscarPorId(
+          criarVoluntarioDto.pessoaId,
+          queryRunner.manager,
+          true,
+        );
+
+        if (pessoa.deletadoEm) {
+          pessoa = await this.pessoasService.restaurar(
+            pessoa.id,
+            queryRunner.manager,
+          );
+        }
       }
 
       const voluntarioExistente = await queryRunner.manager.findOne(
         Voluntario,
         {
-          where: { pessoaId },
+          where: { pessoaId: pessoa.id },
         },
       );
 
@@ -73,7 +84,7 @@ export class VoluntariosService {
       }
 
       const voluntario = new Voluntario({
-        pessoaId,
+        pessoaId: pessoa.id,
         formacaoAcademica: criarVoluntarioDto.formacaoAcademica,
         statusFormacao: criarVoluntarioDto.statusFormacao,
         tipoVoluntario: criarVoluntarioDto.tipoVoluntario,
@@ -104,8 +115,9 @@ export class VoluntariosService {
       this.logger.error(`Erro ao criar voluntário: ${mensagemErro}`);
 
       if (
+        erro instanceof NotFoundException ||
         erro instanceof ConflictException ||
-        erro instanceof NotFoundException
+        erro instanceof BadRequestException
       ) {
         throw erro;
       }
@@ -277,7 +289,7 @@ export class VoluntariosService {
 
   async verificarExistenciaPorPessoaId(pessoaId: string): Promise<boolean> {
     try {
-      return await this.repository.existsBy({ pessoaId });
+      return await this.repository.exists({ where: { pessoaId } });
     } catch (erro) {
       const mensagemErro =
         erro instanceof Error
@@ -290,6 +302,44 @@ export class VoluntariosService {
 
       throw new InternalServerErrorException(
         'Erro interno ao verificar o vínculo de voluntário.',
+      );
+    }
+  }
+
+  async verificarCadastroPorCpf(cpf: string): Promise<Pessoa> {
+    try {
+      const pessoa = await this.pessoasService.buscarPorCpf(
+        cpf,
+        undefined,
+        true,
+      );
+
+      const voluntarioExistente = await this.verificarExistenciaPorPessoaId(
+        pessoa.id,
+      );
+
+      if (voluntarioExistente) {
+        throw new ConflictException(
+          'Esta pessoa já possui um cadastro de voluntário ativo.',
+        );
+      }
+
+      return pessoa;
+    } catch (erro) {
+      if (
+        erro instanceof NotFoundException ||
+        erro instanceof ConflictException
+      ) {
+        throw erro;
+      }
+
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro inesperado ao buscar pessoa por CPF no módulo de voluntários: ${mensagemErro}`,
+      );
+
+      throw new InternalServerErrorException(
+        'Erro interno ao buscar a pessoa.',
       );
     }
   }

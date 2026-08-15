@@ -22,22 +22,25 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { PessoaDto } from 'src/pessoas/dto/pessoa.dto';
+import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
+import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
+import { ValidarCpfPipe } from 'src/shared/pipes/validar-cpf.pipe';
 
 import { AtualizarVoluntarioDto } from './dto/atualizar-voluntario.dto';
 import { CriarVoluntarioDto } from './dto/criar-voluntario.dto';
 import { VoluntarioRespostaDto } from './dto/voluntario-resposta.dto';
 import { StatusFormacao, TipoVoluntario } from './enums/voluntario.enum';
 import { VoluntariosService } from './voluntarios.service';
-import { ApiPaginacaoResposta } from '../shared/decorators/api-paginacao-resposta.decorator';
-import { PaginacaoRespostaDto } from '../shared/dtos/paginacao-resposta.dto';
 
 @ApiTags('Voluntarios')
 @Controller('voluntarios')
 export class VoluntariosController {
-  constructor(private readonly voluntariosService: VoluntariosService) {}
+  constructor(private readonly voluntariosService: VoluntariosService) { }
 
   @ApiBody({
     description: `Existem 2 cenários:\n1) Se o voluntário JÁ É beneficiário: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do voluntário.\n2) Se o voluntário NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do voluntário (não envie 'pessoaId').`,
@@ -134,7 +137,39 @@ export class VoluntariosController {
     return new VoluntarioRespostaDto(voluntarioCriado);
   }
 
-  @Get()
+  @Get('verificar-cadastro/cpf/:cpf')
+  @ApiOperation({
+    summary: 'Verificar cadastro de voluntário pelo CPF',
+  })
+  @ApiParam({
+    name: 'cpf',
+    required: true,
+    example: '12345678900',
+    description: 'CPF com 11 dígitos numéricos.',
+  })
+  @ApiOkResponse({
+    description: 'Pessoa encontrada com sucesso e sem voluntário vinculado.',
+    type: PessoaDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'CPF inválido.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Pessoa não encontrada.',
+  })
+  @ApiConflictResponse({
+    description: 'Pessoa já possui um cadastro de voluntário ativo.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Erro interno ao verificar o cadastro de voluntário.',
+  })
+  async verificarCadastroPorCpf(
+    @Param('cpf', ValidarCpfPipe) cpf: string,
+  ): Promise<PessoaDto> {
+    const pessoa = await this.voluntariosService.verificarCadastroPorCpf(cpf);
+    return new PessoaDto(pessoa);
+  }
+
   @ApiOperation({ summary: 'Buscar uma lista paginada de voluntários' })
   @ApiPaginacaoResposta(VoluntarioRespostaDto)
   @ApiQuery({
