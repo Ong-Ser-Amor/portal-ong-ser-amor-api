@@ -29,7 +29,7 @@ export class VoluntariosService {
     @Inject(forwardRef(() => PessoasService))
     private readonly pessoasService: PessoasService,
     private readonly dataSource: DataSource,
-  ) { }
+  ) {}
 
   async criar(criarVoluntarioDto: CriarVoluntarioDto): Promise<Voluntario> {
     const queryRunner = this.dataSource.createQueryRunner();

@@ -48,7 +48,7 @@ export class BeneficiariosService {
     @Inject(forwardRef(() => FamiliasService))
     private readonly familiasService: FamiliasService,
     private readonly dataSource: DataSource,
-  ) { }
+  ) {}
 
   async criar(
     criarBeneficiarioDto: CriarBeneficiarioDto,

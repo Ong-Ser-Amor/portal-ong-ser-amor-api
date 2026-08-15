@@ -53,7 +53,7 @@ import {
 @ApiExtraModels(CriarFamiliaDto)
 @Controller('beneficiarios')
 export class BeneficiariosController {
-  constructor(private readonly beneficiariosService: BeneficiariosService) { }
+  constructor(private readonly beneficiariosService: BeneficiariosService) {}
 
   @ApiBody({
     description: `Existem 2 cenários mutuamente exclusivos:\n1) Se a pessoa JÁ É cadastrada: envie 'pessoaId' + os campos do beneficiário. NENHUM dado de pessoa ('nome', 'cpf', 'dataNascimento', 'emancipado', 'podeSairSozinho', 'responsavelId') deve ser informado.\n2) Se a pessoa NÃO possui cadastro de pessoa: envie os dados cadastrais da pessoa ('nome', 'cpf', 'dataNascimento', etc.) + os campos do beneficiário (não envie 'pessoaId'). Em ambos os casos você pode informar 'familiaId' ou os dados de 'novaFamilia'.`,

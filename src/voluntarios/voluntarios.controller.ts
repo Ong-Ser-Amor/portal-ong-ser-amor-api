@@ -40,7 +40,7 @@ import { VoluntariosService } from './voluntarios.service';
 @ApiTags('Voluntarios')
 @Controller('voluntarios')
 export class VoluntariosController {
-  constructor(private readonly voluntariosService: VoluntariosService) { }
+  constructor(private readonly voluntariosService: VoluntariosService) {}
 
   @ApiBody({
     description: `Existem 2 cenários:\n1) Se o voluntário JÁ É beneficiário: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do voluntário.\n2) Se o voluntário NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do voluntário (não envie 'pessoaId').`,
