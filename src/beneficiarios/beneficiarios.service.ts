@@ -62,6 +62,9 @@ export class BeneficiariosService {
 
       if (!criarBeneficiarioDto.pessoaId) {
         // Cenario A: Id da pessoa não fornecido (pessoa não existe).
+        this.logger.log(
+          'Cenario A: Id da pessoa não fornecido (pessoa não existe).',
+        );
         const dadosPessoa: CriarPessoaDto = {
           nome: criarBeneficiarioDto.nome,
           cpf: criarBeneficiarioDto.cpf,
@@ -77,6 +80,9 @@ export class BeneficiariosService {
         );
       } else {
         // Cenario B: Id da pessoa fornecido (pessoa já existe).
+        this.logger.log(
+          'Cenario B: Id da pessoa fornecido (pessoa já existe).',
+        );
         pessoa = await this.pessoasService.buscarPorId(
           criarBeneficiarioDto.pessoaId,
           queryRunner.manager,
@@ -110,7 +116,7 @@ export class BeneficiariosService {
         pessoa.dataNascimento,
         pessoa.emancipado,
         pessoa.responsavelId,
-        pessoa.podeSairSozinho,
+        criarBeneficiarioDto.podeSairSozinho,
         pessoa.id,
         criarBeneficiarioDto.contatos,
         queryRunner.manager,
