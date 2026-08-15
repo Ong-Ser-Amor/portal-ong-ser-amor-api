@@ -70,12 +70,14 @@ export class PessoasService {
   async buscarPorId(
     id: string,
     gerenciadorTransacao?: EntityManager,
+    incluirDeletados = false,
   ): Promise<Pessoa> {
     try {
       const manager = gerenciadorTransacao || this.repository.manager;
 
       return await manager.findOneOrFail(Pessoa, {
         where: { id },
+        withDeleted: incluirDeletados,
       });
     } catch (erro) {
       // Traduz o erro do TypeORM para o erro 404 do NestJS
@@ -96,10 +98,16 @@ export class PessoasService {
     }
   }
 
-  async buscarPorCpf(cpf: string): Promise<Pessoa> {
+  async buscarPorCpf(
+    cpf: string,
+    gerenciadorTransacao?: EntityManager,
+    incluirDeletados = false,
+  ): Promise<Pessoa> {
     try {
-      const pessoa = await this.repository.findOneBy({
-        cpf,
+      const manager = gerenciadorTransacao || this.repository.manager;
+      const pessoa = await manager.findOne(Pessoa, {
+        where: { cpf },
+        withDeleted: incluirDeletados,
       });
 
       if (!pessoa) {
@@ -198,6 +206,29 @@ export class PessoasService {
 
       // Se for NotFoundException (vindo do buscarPorId) ou outro erro, sobe para quem chamou
       throw erro;
+    }
+  }
+
+  async restaurar(
+    id: string,
+    gerenciadorTransacao?: EntityManager,
+  ): Promise<Pessoa> {
+    try {
+      const manager = gerenciadorTransacao || this.repository.manager;
+      await manager.restore(Pessoa, id);
+
+      return await manager.findOneOrFail(Pessoa, {
+        where: { id },
+      });
+    } catch (erro) {
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro inesperado ao restaurar pessoa por ID: ${mensagemErro}`,
+      );
+
+      throw new InternalServerErrorException(
+        'Erro interno ao restaurar a pessoa.',
+      );
     }
   }
 

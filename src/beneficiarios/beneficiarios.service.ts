@@ -80,7 +80,15 @@ export class BeneficiariosService {
         pessoa = await this.pessoasService.buscarPorId(
           criarBeneficiarioDto.pessoaId,
           queryRunner.manager,
+          true,
         );
+
+        if (pessoa.deletadoEm) {
+          pessoa = await this.pessoasService.restaurar(
+            pessoa.id,
+            queryRunner.manager,
+          );
+        }
       }
 
       if (
@@ -640,7 +648,7 @@ export class BeneficiariosService {
 
   async verificarExistenciaPorPessoaId(pessoaId: string): Promise<boolean> {
     try {
-      return await this.repository.existsBy({ pessoaId });
+      return await this.repository.exists({ where: { pessoaId } });
     } catch (erro) {
       const mensagemErro =
         erro instanceof Error
@@ -659,7 +667,11 @@ export class BeneficiariosService {
 
   async verificarCadastroPorCpf(cpf: string): Promise<Pessoa> {
     try {
-      const pessoa = await this.pessoasService.buscarPorCpf(cpf);
+      const pessoa = await this.pessoasService.buscarPorCpf(
+        cpf,
+        undefined,
+        true,
+      );
 
       const beneficiarioExistente = await this.verificarExistenciaPorPessoaId(
         pessoa.id,
