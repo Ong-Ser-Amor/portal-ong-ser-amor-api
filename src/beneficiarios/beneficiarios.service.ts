@@ -485,6 +485,18 @@ export class BeneficiariosService {
 
       if (!novaFamiliaId && transferirFamiliaDto.novaFamilia) {
         // Cenario A: Criar uma nova familia e vincular o beneficiário a ela
+        const totalMembrosFamiliaAtual = await queryRunner.manager.count(
+          Beneficiario,
+          {
+            where: { familiaId: beneficiario.familiaId },
+          },
+        );
+
+        if (totalMembrosFamiliaAtual <= 1) {
+          throw new BadRequestException(
+            'Não é possível criar uma nova família pois o beneficiário já é o único membro da família atual. Para alterar dados ou endereço, atualize a família existente.',
+          );
+        }
 
         const familiaCriada = await this.familiasService.criar(
           transferirFamiliaDto.novaFamilia,
