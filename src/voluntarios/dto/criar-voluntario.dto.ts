@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsDate,
+  IsEmpty,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -14,31 +15,59 @@ import {
 import { StatusFormacao, TipoVoluntario } from '../enums/voluntario.enum';
 
 export class CriarVoluntarioDto {
-  // --- Dados referentes à entidade Pessoa ---
-
-  @ApiProperty({ example: 'Carlos Santos' })
+  @ApiProperty({
+    example: 'Carlos Santos',
+    description:
+      'Nome completo da pessoa. Obrigatório ao cadastrar nova pessoa. Não deve ser informado se pessoaId for fornecido.',
+    required: false,
+  })
   @ValidateIf((dto: CriarVoluntarioDto) => !dto.pessoaId)
-  @IsNotEmpty({ message: 'O campo nome não pode ser vazio' })
   @IsString({ message: 'O campo nome deve ser uma string' })
+  @IsNotEmpty({ message: 'O campo nome não pode ser vazio' })
+  @ValidateIf((dto: CriarVoluntarioDto) => Boolean(dto.pessoaId))
+  @IsEmpty({
+    message: 'Não é permitido enviar o campo nome quando pessoaId é informado.',
+  })
   nome?: string;
 
-  @ApiProperty({ type: String, example: '12345678900' })
+  @ApiProperty({
+    type: String,
+    example: '12345678900',
+    description:
+      'CPF com 11 dígitos numéricos. Obrigatório ao cadastrar nova pessoa. Não deve ser informado se pessoaId for fornecido.',
+    required: false,
+  })
   @ValidateIf((dto: CriarVoluntarioDto) => !dto.pessoaId)
-  @IsNotEmpty({ message: 'O campo cpf não pode ser vazio' })
   @IsString({ message: 'O campo cpf deve ser uma string' })
+  @IsNotEmpty({ message: 'O campo cpf não pode ser vazio' })
   @Length(11, 11, {
     message: 'O campo cpf deve ter exatamente 11 caracteres.',
   })
   @Matches(/^\d+$/, {
     message: 'O campo cpf deve conter apenas números.',
   })
+  @ValidateIf((dto: CriarVoluntarioDto) => Boolean(dto.pessoaId))
+  @IsEmpty({
+    message: 'Não é permitido enviar o campo cpf quando pessoaId é informado.',
+  })
   cpf?: string;
 
-  @ApiProperty({ type: Date, example: '2000-01-01' })
+  @ApiProperty({
+    type: Date,
+    example: '2000-01-01',
+    description:
+      'Data de nascimento. Obrigatória ao cadastrar nova pessoa. Não deve ser informada se pessoaId for fornecido.',
+    required: false,
+  })
   @ValidateIf((dto: CriarVoluntarioDto) => !dto.pessoaId)
-  @IsNotEmpty({ message: 'O campo dataNascimento não pode ser vazio' })
   @IsDate({ message: 'O campo dataNascimento deve ser uma data válida' })
   @Type(() => Date)
+  @IsNotEmpty({ message: 'O campo dataNascimento não pode ser vazio' })
+  @ValidateIf((dto: CriarVoluntarioDto) => Boolean(dto.pessoaId))
+  @IsEmpty({
+    message:
+      'Não é permitido enviar o campo dataNascimento quando pessoaId é informado.',
+  })
   dataNascimento?: Date;
 
   @ApiProperty({

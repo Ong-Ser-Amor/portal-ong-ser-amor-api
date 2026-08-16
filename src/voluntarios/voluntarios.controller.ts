@@ -33,7 +33,8 @@ import { ValidarCpfPipe } from 'src/shared/pipes/validar-cpf.pipe';
 
 import { AtualizarVoluntarioDto } from './dto/atualizar-voluntario.dto';
 import { CriarVoluntarioDto } from './dto/criar-voluntario.dto';
-import { VoluntarioRespostaDto } from './dto/voluntario-resposta.dto';
+import { VoluntarioResumoDto } from './dto/voluntario-resumo.dto';
+import { VoluntarioDto } from './dto/voluntario.dto';
 import { StatusFormacao, TipoVoluntario } from './enums/voluntario.enum';
 import { VoluntariosService } from './voluntarios.service';
 
@@ -120,7 +121,7 @@ export class VoluntariosController {
   @ApiOperation({ summary: 'Criar um novo voluntário' })
   @ApiCreatedResponse({
     description: 'O voluntário foi criado com sucesso.',
-    type: VoluntarioRespostaDto,
+    type: VoluntarioDto,
   })
   @ApiConflictResponse({
     description:
@@ -131,10 +132,10 @@ export class VoluntariosController {
   })
   async criar(
     @Body() criarVoluntarioDto: CriarVoluntarioDto,
-  ): Promise<VoluntarioRespostaDto> {
+  ): Promise<VoluntarioDto> {
     const voluntarioCriado =
       await this.voluntariosService.criar(criarVoluntarioDto);
-    return new VoluntarioRespostaDto(voluntarioCriado);
+    return new VoluntarioDto(voluntarioCriado);
   }
 
   @Get('verificar-cadastro/cpf/:cpf')
@@ -171,7 +172,7 @@ export class VoluntariosController {
   }
 
   @ApiOperation({ summary: 'Buscar uma lista paginada de voluntários' })
-  @ApiPaginacaoResposta(VoluntarioRespostaDto)
+  @ApiPaginacaoResposta(VoluntarioResumoDto)
   @ApiQuery({
     name: 'pagina',
     required: false,
@@ -195,17 +196,17 @@ export class VoluntariosController {
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
     @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
     itensPorPagina: number,
-  ): Promise<PaginacaoRespostaDto<VoluntarioRespostaDto>> {
+  ): Promise<PaginacaoRespostaDto<VoluntarioResumoDto>> {
     const voluntariosPaginados = await this.voluntariosService.buscarTodos(
       pagina,
       itensPorPagina,
     );
 
     const voluntariosDtos = voluntariosPaginados.dados.map(
-      (voluntario) => new VoluntarioRespostaDto(voluntario),
+      (voluntario) => new VoluntarioResumoDto(voluntario),
     );
 
-    return new PaginacaoRespostaDto<VoluntarioRespostaDto>(
+    return new PaginacaoRespostaDto<VoluntarioResumoDto>(
       voluntariosDtos,
       voluntariosPaginados.meta.totalItens,
       voluntariosPaginados.meta.itensPorPagina,
@@ -217,7 +218,7 @@ export class VoluntariosController {
   @ApiOperation({ summary: 'Buscar voluntário pelo ID' })
   @ApiOkResponse({
     description: 'O voluntário foi encontrado com sucesso.',
-    type: VoluntarioRespostaDto,
+    type: VoluntarioDto,
   })
   @ApiNotFoundResponse({
     description: 'Voluntário não encontrado.',
@@ -225,16 +226,16 @@ export class VoluntariosController {
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar o voluntário.',
   })
-  async buscarPorId(@Param('id') id: string): Promise<VoluntarioRespostaDto> {
+  async buscarPorId(@Param('id') id: string): Promise<VoluntarioDto> {
     const voluntario = await this.voluntariosService.buscarPorId(id);
-    return new VoluntarioRespostaDto(voluntario);
+    return new VoluntarioDto(voluntario);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Atualizar voluntário pelo ID' })
   @ApiOkResponse({
     description: 'O voluntário foi atualizado com sucesso.',
-    type: VoluntarioRespostaDto,
+    type: VoluntarioDto,
   })
   @ApiNotFoundResponse({
     description: 'Voluntário não encontrado.',
@@ -248,12 +249,12 @@ export class VoluntariosController {
   async atualizar(
     @Param('id') id: string,
     @Body() atualizarVoluntarioDto: AtualizarVoluntarioDto,
-  ): Promise<VoluntarioRespostaDto> {
+  ): Promise<VoluntarioDto> {
     const voluntarioAtualizado = await this.voluntariosService.atualizar(
       id,
       atualizarVoluntarioDto,
     );
-    return new VoluntarioRespostaDto(voluntarioAtualizado);
+    return new VoluntarioDto(voluntarioAtualizado);
   }
 
   @Delete(':id')

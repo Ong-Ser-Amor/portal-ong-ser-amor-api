@@ -4,20 +4,20 @@ import { PessoaDto } from '../../pessoas/dto/pessoa.dto';
 import { Voluntario } from '../entities/voluntario.entity';
 import { StatusFormacao, TipoVoluntario } from '../enums/voluntario.enum';
 
-export class VoluntarioRespostaDto {
+export class VoluntarioDto {
   @ApiProperty({ example: 'vol-123' })
   id: string;
 
   @ApiProperty({ type: PessoaDto })
   pessoa: PessoaDto;
 
-  @ApiProperty({ type: String, example: 'Pedagogia' })
+  @ApiProperty({ type: String, example: 'Pedagogia', nullable: true })
   formacaoAcademica: string | null;
 
   @ApiProperty({
     enum: StatusFormacao,
     example: StatusFormacao.COMPLETO,
-    required: false,
+    nullable: true,
   })
   statusFormacao: StatusFormacao | null;
 
