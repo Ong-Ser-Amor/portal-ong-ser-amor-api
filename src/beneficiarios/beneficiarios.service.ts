@@ -48,7 +48,7 @@ export class BeneficiariosService {
     @Inject(forwardRef(() => FamiliasService))
     private readonly familiasService: FamiliasService,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async criar(
     criarBeneficiarioDto: CriarBeneficiarioDto,
@@ -505,9 +505,25 @@ export class BeneficiariosService {
         );
       }
 
-      beneficiario.familiaId = novaFamiliaId;
-      const beneficiarioAtualizado =
-        await queryRunner.manager.save(beneficiario);
+      await queryRunner.manager.update(
+        Beneficiario,
+        { id: beneficiarioId },
+        { familiaId: novaFamiliaId },
+      );
+
+      const beneficiarioAtualizado = await queryRunner.manager.findOneOrFail(
+        Beneficiario,
+        {
+          where: { id: beneficiarioId },
+          relations: [
+            'pessoa',
+            'pessoa.contatos',
+            'pessoa.contatos.contato',
+            'familia',
+            'familia.endereco',
+          ],
+        },
+      );
 
       await queryRunner.commitTransaction();
       return beneficiarioAtualizado;
