@@ -1496,6 +1496,67 @@
         "tags": [
           "Voluntarios"
         ]
+      },
+      "get": {
+        "operationId": "VoluntariosController_buscarTodos",
+        "parameters": [
+          {
+            "name": "pagina",
+            "required": false,
+            "in": "query",
+            "description": "Número da página atual (padrão: 1)",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "itensPorPagina",
+            "required": false,
+            "in": "query",
+            "description": "Número de itens por página (padrão: 10)",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta paginada recebida com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginacaoRespostaDto"
+                    },
+                    {
+                      "properties": {
+                        "dados": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/VoluntarioResumoDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao buscar os voluntários."
+          }
+        },
+        "summary": "Buscar uma lista paginada de voluntários",
+        "tags": [
+          "Voluntarios"
+        ]
       }
     },
     "/voluntarios/verificar-cadastro/cpf/{cpf}": {

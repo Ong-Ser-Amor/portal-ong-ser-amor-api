@@ -171,6 +171,7 @@ export class VoluntariosController {
     return new PessoaDto(pessoa);
   }
 
+  @Get()
   @ApiOperation({ summary: 'Buscar uma lista paginada de voluntários' })
   @ApiPaginacaoResposta(VoluntarioResumoDto)
   @ApiQuery({
