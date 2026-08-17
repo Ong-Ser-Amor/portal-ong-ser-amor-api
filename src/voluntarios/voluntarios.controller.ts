@@ -186,6 +186,12 @@ export class VoluntariosController {
     example: 10,
     description: 'Número de itens por página (padrão: 10)',
   })
+  @ApiQuery({
+    name: 'nome',
+    required: false,
+    example: 'Carlos',
+    description: 'Filtra voluntários por parte do nome da pessoa',
+  })
   @ApiBadRequestResponse({
     description:
       'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
@@ -197,10 +203,12 @@ export class VoluntariosController {
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
     @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
     itensPorPagina: number,
+    @Query('nome') nome?: string,
   ): Promise<PaginacaoRespostaDto<VoluntarioResumoDto>> {
     const voluntariosPaginados = await this.voluntariosService.buscarTodos(
       pagina,
       itensPorPagina,
+      nome,
     );
 
     const voluntariosDtos = voluntariosPaginados.dados.map(

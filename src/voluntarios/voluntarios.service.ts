@@ -13,7 +13,13 @@ import { CriarPessoaDto } from 'src/pessoas/dto/criar-pessoa.dto';
 import { Pessoa } from 'src/pessoas/entities/pessoa.entity';
 import { PessoasService } from 'src/pessoas/pessoas.service';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
-import { DataSource, EntityNotFoundError, Repository } from 'typeorm';
+import {
+  DataSource,
+  EntityNotFoundError,
+  FindOptionsWhere,
+  ILike,
+  Repository,
+} from 'typeorm';
 
 import { AtualizarVoluntarioDto } from './dto/atualizar-voluntario.dto';
 import { CriarVoluntarioDto } from './dto/criar-voluntario.dto';
@@ -131,6 +137,7 @@ export class VoluntariosService {
   async buscarTodos(
     pagina = 1,
     itensPorPagina = 10,
+    nome?: string,
   ): Promise<PaginacaoRespostaDto<Voluntario>> {
     try {
       if (pagina < 1) {
@@ -148,7 +155,16 @@ export class VoluntariosService {
       const take = itensPorPagina;
       const skip = (pagina - 1) * itensPorPagina;
 
+      const whereClause: FindOptionsWhere<Voluntario> = {};
+
+      if (nome) {
+        whereClause.pessoa = {
+          nome: ILike(`%${nome.trim()}%`),
+        };
+      }
+
       const [voluntarios, total] = await this.repository.findAndCount({
+        where: whereClause,
         relations: ['pessoa'],
         take,
         skip,

@@ -1519,6 +1519,16 @@
               "example": 10,
               "type": "number"
             }
+          },
+          {
+            "name": "nome",
+            "required": false,
+            "in": "query",
+            "description": "Filtra voluntários por parte do nome da pessoa",
+            "schema": {
+              "example": "Carlos",
+              "type": "string"
+            }
           }
         ],
         "responses": {
