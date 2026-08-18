@@ -2291,7 +2291,7 @@
                         "dados": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/TurmaRespostaDto"
+                            "$ref": "#/components/schemas/TurmaResumoDto"
                           }
                         }
                       }
@@ -4510,40 +4510,50 @@
       "ProfessorResumoRespostaDto": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string"
-          },
           "nome": {
+            "type": "string",
+            "example": "Carlos Santos"
+          },
+          "id": {
             "type": "string"
           }
         },
         "required": [
-          "id",
-          "nome"
+          "nome",
+          "id"
         ]
       },
       "TurmaRespostaDto": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "example": "1"
+          },
+          "planoCursoId": {
+            "type": "string",
+            "example": "1"
           },
           "nome": {
-            "type": "string"
+            "type": "string",
+            "example": "Turma de Lógica de Programação"
           },
           "planoCurso": {
             "$ref": "#/components/schemas/PlanoCursoRespostaDto"
           },
           "cargaHoraria": {
-            "type": "number"
+            "type": "number",
+            "example": 40
           },
           "dataInicio": {
             "format": "date-time",
-            "type": "string"
+            "type": "string",
+            "example": "2024-01-01"
           },
           "dataFim": {
             "format": "date-time",
-            "type": "string"
+            "type": "string",
+            "example": "2024-12-31"
           },
           "status": {
             "enum": [
@@ -4552,7 +4562,8 @@
               "FINALIZADA",
               "CANCELADA"
             ],
-            "type": "string"
+            "type": "string",
+            "example": "EM_ANDAMENTO"
           },
           "criterioAvaliacao": {
             "enum": [
@@ -4561,15 +4572,18 @@
               "POR_NOTA_PRESENCA",
               "QUALITATIVA"
             ],
-            "type": "string"
+            "type": "string",
+            "example": "POR_NOTA_PRESENCA"
           },
           "frequenciaMinima": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "example": 75
           },
           "notaMinima": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "example": "6.00"
           },
           "professores": {
             "type": "array",
@@ -4580,6 +4594,81 @@
         },
         "required": [
           "id",
+          "planoCursoId",
+          "nome",
+          "cargaHoraria",
+          "dataInicio",
+          "dataFim",
+          "status",
+          "criterioAvaliacao"
+        ]
+      },
+      "TurmaResumoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1"
+          },
+          "planoCursoId": {
+            "type": "string",
+            "example": "1"
+          },
+          "nome": {
+            "type": "string",
+            "example": "Turma de Lógica de Programação"
+          },
+          "planoCurso": {
+            "$ref": "#/components/schemas/PlanoCursoRespostaDto"
+          },
+          "cargaHoraria": {
+            "type": "number",
+            "example": 40
+          },
+          "dataInicio": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01"
+          },
+          "dataFim": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-12-31"
+          },
+          "status": {
+            "enum": [
+              "EM_FORMACAO",
+              "EM_ANDAMENTO",
+              "FINALIZADA",
+              "CANCELADA"
+            ],
+            "type": "string",
+            "example": "EM_ANDAMENTO"
+          },
+          "criterioAvaliacao": {
+            "enum": [
+              "SEM_CONTROLE",
+              "POR_PARTICIPACAO",
+              "POR_NOTA_PRESENCA",
+              "QUALITATIVA"
+            ],
+            "type": "string",
+            "example": "POR_NOTA_PRESENCA"
+          },
+          "frequenciaMinima": {
+            "type": "number",
+            "nullable": true,
+            "example": 75
+          },
+          "notaMinima": {
+            "type": "string",
+            "nullable": true,
+            "example": "6.00"
+          }
+        },
+        "required": [
+          "id",
+          "planoCursoId",
           "nome",
           "cargaHoraria",
           "dataInicio",

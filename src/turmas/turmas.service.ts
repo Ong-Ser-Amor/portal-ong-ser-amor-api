@@ -99,6 +99,7 @@ export class TurmasService {
 
       const [turmas, total] = await this.repository.findAndCount({
         where,
+        relations: ['planoCurso'],
         order: { nome: 'ASC' },
         take,
         skip,

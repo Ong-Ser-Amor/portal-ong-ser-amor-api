@@ -1,31 +1,11 @@
-import { InternalServerErrorException } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PlanoCursoRespostaDto } from 'src/planos-curso/dto/plano-curso-resposta.dto';
-import { Voluntario } from 'src/voluntarios/entities/voluntario.entity';
 
 import { Turma } from '../entities/turma.entity';
 import { CriterioAvaliacao } from '../enums/criterio-avaliacao.enum';
 import { StatusTurma } from '../enums/status-turma.enum';
 
-class ProfessorResumoRespostaDto {
-  id: string;
-
-  @ApiProperty({ example: 'Carlos Santos' })
-  nome: string;
-
-  constructor(voluntario: Voluntario) {
-    if (!voluntario.pessoa) {
-      throw new InternalServerErrorException(
-        'Erro de integridade de dados: Relacionamento de Pessoa/Professor não foi carregado na consulta de Turmas.',
-      );
-    }
-
-    this.id = voluntario.id;
-    this.nome = voluntario.pessoa.nome;
-  }
-}
-
-export class TurmaRespostaDto {
+export class TurmaResumoDto {
   @ApiProperty({ example: '1' })
   id: string;
 
@@ -62,9 +42,6 @@ export class TurmaRespostaDto {
   @ApiPropertyOptional({ example: '6.00', nullable: true })
   notaMinima?: string | null;
 
-  @ApiPropertyOptional({ type: () => [ProfessorResumoRespostaDto] })
-  professores?: ProfessorResumoRespostaDto[];
-
   constructor(turma: Turma) {
     this.id = turma.id;
     this.planoCursoId = turma.planoCursoId;
@@ -81,11 +58,5 @@ export class TurmaRespostaDto {
     this.criterioAvaliacao = turma.criterioAvaliacao;
     this.frequenciaMinima = turma.frequenciaMinima;
     this.notaMinima = turma.notaMinima;
-
-    if (turma.turmasProfessores) {
-      this.professores = turma.turmasProfessores.map(
-        (tp) => new ProfessorResumoRespostaDto(tp.professor),
-      );
-    }
   }
 }

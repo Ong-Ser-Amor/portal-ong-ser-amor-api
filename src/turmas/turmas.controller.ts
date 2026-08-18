@@ -31,6 +31,7 @@ import { AtualizarTurmaDto } from './dto/atualizar-turma.dto';
 import { CriarTurmaDto } from './dto/criar-turma.dto';
 import { TurmaProfessorRespostaDto } from './dto/turma-professor-resposta.dto';
 import { TurmaRespostaDto } from './dto/turma-resposta.dto';
+import { TurmaResumoDto } from './dto/turma-resumo.dto';
 import { VincularProfessorDto } from './dto/vincular-professor.dto';
 import { TurmasService } from './turmas.service';
 
@@ -63,7 +64,7 @@ export class TurmasController {
 
   @Get()
   @ApiOperation({ summary: 'Buscar uma lista paginada de turmas' })
-  @ApiPaginacaoResposta(TurmaRespostaDto)
+  @ApiPaginacaoResposta(TurmaResumoDto)
   @ApiQuery({
     name: 'pagina',
     required: false,
@@ -101,7 +102,7 @@ export class TurmasController {
     itensPorPagina: number,
     @Query('cursoId') cursoId?: string,
     @Query('planoCursoId') planoCursoId?: string,
-  ): Promise<PaginacaoRespostaDto<TurmaRespostaDto>> {
+  ): Promise<PaginacaoRespostaDto<TurmaResumoDto>> {
     const turmas = await this.turmasService.buscarTodos(
       pagina,
       itensPorPagina,
@@ -110,10 +111,10 @@ export class TurmasController {
     );
 
     const turmasMapeadasComPaginacao = turmas.dados.map(
-      (turma) => new TurmaRespostaDto(turma),
+      (turma) => new TurmaResumoDto(turma),
     );
 
-    return new PaginacaoRespostaDto<TurmaRespostaDto>(
+    return new PaginacaoRespostaDto<TurmaResumoDto>(
       turmasMapeadasComPaginacao,
       turmas.meta.totalItens,
       turmas.meta.itensPorPagina,
