@@ -2254,6 +2254,26 @@
               "example": 10,
               "type": "number"
             }
+          },
+          {
+            "name": "cursoId",
+            "required": false,
+            "in": "query",
+            "description": "Filtra as turmas pertencentes a um curso específico",
+            "schema": {
+              "example": "1",
+              "type": "string"
+            }
+          },
+          {
+            "name": "planoCursoId",
+            "required": false,
+            "in": "query",
+            "description": "Filtra as turmas pertencentes a um plano de curso específico",
+            "schema": {
+              "example": "1",
+              "type": "string"
+            }
           }
         ],
         "responses": {

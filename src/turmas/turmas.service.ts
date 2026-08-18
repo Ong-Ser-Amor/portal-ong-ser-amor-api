@@ -12,7 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AulasService } from 'src/aulas/aulas.service';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { TurmasMatriculasService } from 'src/turmas-matriculas/turmas-matriculas.service';
-import { EntityNotFoundError, Repository } from 'typeorm';
+import { EntityNotFoundError, FindOptionsWhere, Repository } from 'typeorm';
 
 import { AtualizarTurmaDto } from './dto/atualizar-turma.dto';
 import { CriarTurmaDto } from './dto/criar-turma.dto';
@@ -66,6 +66,8 @@ export class TurmasService {
   async buscarTodos(
     pagina = 1,
     itensPorPagina = 10,
+    cursoId?: string,
+    planoCursoId?: string,
   ): Promise<PaginacaoRespostaDto<Turma>> {
     try {
       if (pagina < 1) {
@@ -83,7 +85,20 @@ export class TurmasService {
       const take = itensPorPagina;
       const skip = (pagina - 1) * itensPorPagina;
 
+      const where: FindOptionsWhere<Turma> = {};
+
+      if (planoCursoId) {
+        where.planoCursoId = planoCursoId;
+      }
+
+      if (cursoId) {
+        where.planoCurso = {
+          cursoId: cursoId,
+        };
+      }
+
       const [turmas, total] = await this.repository.findAndCount({
+        where,
         order: { nome: 'ASC' },
         take,
         skip,
