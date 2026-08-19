@@ -2039,6 +2039,16 @@
               "example": 10,
               "type": "number"
             }
+          },
+          {
+            "name": "cursoId",
+            "required": false,
+            "in": "query",
+            "description": "Filtra os planos de curso pertencentes a um curso específico",
+            "schema": {
+              "example": "1",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -4364,10 +4374,12 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "example": "1"
           },
           "nome": {
-            "type": "string"
+            "type": "string",
+            "example": "Informática Básica"
           }
         },
         "required": [
@@ -4409,13 +4421,19 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "example": "1"
           },
           "nome": {
-            "type": "string"
+            "type": "string",
+            "example": "Plano Básico de Informática"
           },
           "cursoId": {
-            "type": "string"
+            "type": "string",
+            "example": "1"
+          },
+          "curso": {
+            "$ref": "#/components/schemas/CursoRespostaDto"
           }
         },
         "required": [

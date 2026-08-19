@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
-import { EntityNotFoundError, Repository } from 'typeorm';
+import { EntityNotFoundError, FindOptionsWhere, Repository } from 'typeorm';
 
 import { AtualizarPlanoCursoDto } from './dto/atualizar-planos-curso.dto';
 import { CriarPlanoCursoDto } from './dto/criar-plano-curso.dto';
@@ -46,6 +46,7 @@ export class PlanosCursoService {
   async buscarTodos(
     pagina = 1,
     itensPorPagina = 10,
+    cursoId?: string,
   ): Promise<PaginacaoRespostaDto<PlanoCurso>> {
     try {
       if (pagina < 1) {
@@ -63,7 +64,15 @@ export class PlanosCursoService {
       const take = itensPorPagina;
       const skip = (pagina - 1) * itensPorPagina;
 
+      const where: FindOptionsWhere<PlanoCurso> = {};
+
+      if (cursoId) {
+        where.cursoId = cursoId;
+      }
+
       const [planosCurso, total] = await this.repository.findAndCount({
+        where,
+        relations: ['curso'],
         order: { nome: 'ASC' },
         take,
         skip,
@@ -92,7 +101,10 @@ export class PlanosCursoService {
 
   async buscarPorId(id: string): Promise<PlanoCurso> {
     try {
-      return await this.repository.findOneByOrFail({ id });
+      return await this.repository.findOneOrFail({
+        where: { id },
+        relations: ['curso'],
+      });
     } catch (erro) {
       if (erro instanceof EntityNotFoundError) {
         throw new NotFoundException(

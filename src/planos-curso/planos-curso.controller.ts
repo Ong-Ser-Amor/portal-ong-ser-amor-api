@@ -71,6 +71,12 @@ export class PlanosCursoController {
     description: 'Número de itens por página (padrão: 10)',
     example: 10,
   })
+  @ApiQuery({
+    name: 'cursoId',
+    required: false,
+    description: 'Filtra os planos de curso pertencentes a um curso específico',
+    example: '1',
+  })
   @ApiBadRequestResponse({
     description:
       'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
@@ -82,10 +88,12 @@ export class PlanosCursoController {
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
     @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
     itensPorPagina: number,
+    @Query('cursoId') cursoId?: string,
   ): Promise<PaginacaoRespostaDto<PlanoCursoRespostaDto>> {
     const planosCursoPaginados = await this.planosCursoService.buscarTodos(
       pagina,
       itensPorPagina,
+      cursoId,
     );
 
     const planosCursoResposta = planosCursoPaginados.dados.map(

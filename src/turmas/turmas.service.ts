@@ -132,6 +132,7 @@ export class TurmasService {
         where: { id },
         relations: [
           'planoCurso',
+          'planoCurso.curso',
           'turmasProfessores',
           'turmasProfessores.professor',
           'turmasProfessores.professor.pessoa',
