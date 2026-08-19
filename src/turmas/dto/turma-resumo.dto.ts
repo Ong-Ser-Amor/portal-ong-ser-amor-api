@@ -21,11 +21,11 @@ export class TurmaResumoDto {
   @ApiProperty({ example: 40 })
   cargaHoraria: number;
 
-  @ApiProperty({ example: '2024-01-01' })
-  dataInicio: Date;
+  @ApiProperty({ example: '2026-02-01' })
+  dataInicio: string;
 
-  @ApiProperty({ example: '2024-12-31' })
-  dataFim: Date;
+  @ApiProperty({ example: '2026-06-30' })
+  dataFim: string;
 
   @ApiProperty({ enum: StatusTurma, example: StatusTurma.EM_ANDAMENTO })
   status: StatusTurma;

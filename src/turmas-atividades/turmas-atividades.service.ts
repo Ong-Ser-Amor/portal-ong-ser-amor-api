@@ -401,21 +401,16 @@ export class TurmasAtividadesService {
   }
 
   private validarLimitesDatasTurma(
-    inicioTurma: Date,
-    fimTurma: Date,
-    atribuicao: Date,
-    prazo: Date,
+    inicioTurma: string,
+    fimTurma: string,
+    atribuicao: string,
+    prazo: string,
   ): void {
-    const dataInicio = new Date(inicioTurma);
-    const dataFim = new Date(fimTurma);
-    const dataAtrib = new Date(atribuicao);
-    const dataPraz = new Date(prazo);
-
     if (
-      dataAtrib < dataInicio ||
-      dataAtrib > dataFim ||
-      dataPraz < dataInicio ||
-      dataPraz > dataFim
+      atribuicao < inicioTurma ||
+      atribuicao > fimTurma ||
+      prazo < inicioTurma ||
+      prazo > fimTurma
     ) {
       throw new BadRequestException(
         'As datas de atribuição e os prazos limite de entrega devem estar contidos estritamente dentro do cronograma de vigência da turma.',

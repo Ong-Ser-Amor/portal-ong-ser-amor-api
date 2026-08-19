@@ -175,10 +175,9 @@ export class TurmasService {
 
     // BLOQUEIO: Valida se a alteração da data de início choca com aulas existentes
     if (atualizarTurmaDto.dataInicio) {
-      const novaDataInicio = new Date(atualizarTurmaDto.dataInicio);
       const possuiAulaAnterior = await this.aulasService.existeAulaAnteriorA(
         id,
-        novaDataInicio,
+        atualizarTurmaDto.dataInicio,
       );
 
       if (possuiAulaAnterior) {
@@ -190,10 +189,9 @@ export class TurmasService {
 
     // BLOQUEIO: Valida se a alteração da data de encerramento choca com aulas existentes
     if (atualizarTurmaDto.dataFim) {
-      const novaDataFim = new Date(atualizarTurmaDto.dataFim);
       const possuiAulaPosterior = await this.aulasService.existeAulaPosteriorA(
         id,
-        novaDataFim,
+        atualizarTurmaDto.dataFim,
       );
 
       if (possuiAulaPosterior) {
@@ -209,7 +207,7 @@ export class TurmasService {
     const dataFimConsolidada = atualizarTurmaDto.dataFim ?? turmaAtual.dataFim;
 
     // Valida a regra de negócio com os dados consolidados
-    if (new Date(dataFimConsolidada) < new Date(dataInicioConsolidada)) {
+    if (dataFimConsolidada < dataInicioConsolidada) {
       throw new BadRequestException(
         'A data final não pode ser anterior à data de início da turma.',
       );

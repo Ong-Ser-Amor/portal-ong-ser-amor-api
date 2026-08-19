@@ -47,10 +47,10 @@ export class TurmaAtividade {
   notaMaxima: number | null;
 
   @Column({ name: 'data_atribuicao', type: 'date' })
-  dataAtribuicao: Date;
+  dataAtribuicao: string;
 
   @Column({ name: 'prazo_entrega', type: 'date' })
-  prazoEntrega: Date;
+  prazoEntrega: string;
 
   // =========================================================
   // RELACIONAMENTOS

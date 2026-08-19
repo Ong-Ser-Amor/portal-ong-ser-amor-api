@@ -22,13 +22,7 @@ export class AulaRespostaDto {
   constructor(aula: Aula) {
     this.id = aula.id;
     this.turmaId = aula.turmaId;
-    const dataValor = aula.data as string | Date;
-    this.data =
-      typeof dataValor === 'string'
-        ? dataValor.split('T')[0]
-        : dataValor instanceof Date
-          ? dataValor.toISOString().split('T')[0]
-          : String(dataValor);
+    this.data = aula.data;
     this.tema = aula.tema;
     this.status = aula.status;
   }

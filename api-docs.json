@@ -4472,14 +4472,14 @@
             "example": 40
           },
           "dataInicio": {
-            "format": "date-time",
             "type": "string",
-            "example": "2024-01-01"
+            "example": "2026-02-01",
+            "description": "Data de início da turma no formato YYYY-MM-DD"
           },
           "dataFim": {
-            "format": "date-time",
             "type": "string",
-            "example": "2024-12-31"
+            "example": "2026-06-30",
+            "description": "Data de encerramento da turma no formato YYYY-MM-DD"
           },
           "status": {
             "enum": [
@@ -4564,14 +4564,12 @@
             "example": 40
           },
           "dataInicio": {
-            "format": "date-time",
             "type": "string",
-            "example": "2024-01-01"
+            "example": "2026-02-01"
           },
           "dataFim": {
-            "format": "date-time",
             "type": "string",
-            "example": "2024-12-31"
+            "example": "2026-06-30"
           },
           "status": {
             "enum": [
@@ -4644,14 +4642,12 @@
             "example": 40
           },
           "dataInicio": {
-            "format": "date-time",
             "type": "string",
-            "example": "2024-01-01"
+            "example": "2026-02-01"
           },
           "dataFim": {
-            "format": "date-time",
             "type": "string",
-            "example": "2024-12-31"
+            "example": "2026-06-30"
           },
           "status": {
             "enum": [
@@ -4710,14 +4706,14 @@
             "example": 40
           },
           "dataInicio": {
-            "format": "date-time",
             "type": "string",
-            "example": "2024-01-01"
+            "example": "2026-02-01",
+            "description": "Data de início da turma no formato YYYY-MM-DD"
           },
           "dataFim": {
-            "format": "date-time",
             "type": "string",
-            "example": "2024-12-31"
+            "example": "2026-06-30",
+            "description": "Data de encerramento da turma no formato YYYY-MM-DD"
           },
           "status": {
             "enum": [
@@ -5156,14 +5152,14 @@
             "description": "Nota ou XP máximo da atividade. Aceita até 5 dígitos antes da vírgula e 2 decimais (precisão 7,2).\n    REGRAS DE NEGÓCIO:\n    - Obrigatório se 'valeNota' for 'true' (exige critério 'POR_NOTA_PRESENCA' na turma).\n    - Deve ser nulo (não enviado) se 'valeNota' for 'false' ou se a turma possuir critérios que não avaliam notas numéricas."
           },
           "dataAtribuicao": {
-            "format": "date-time",
             "type": "string",
-            "example": "2026-07-15"
+            "example": "2026-07-15",
+            "description": "Data de atribuição da atividade no formato YYYY-MM-DD"
           },
           "prazoEntrega": {
-            "format": "date-time",
             "type": "string",
-            "example": "2026-07-22"
+            "example": "2026-07-22",
+            "description": "Prazo limite de entrega no formato YYYY-MM-DD"
           }
         },
         "required": [
@@ -5179,17 +5175,21 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "example": "1"
           },
           "turmaId": {
-            "type": "string"
+            "type": "string",
+            "example": "1"
           },
           "titulo": {
-            "type": "string"
+            "type": "string",
+            "example": "Exercício de Lógica de Programação"
           },
           "descricao": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "example": "Criar um algoritmo..."
           },
           "tipoAtividade": {
             "enum": [
@@ -5198,32 +5198,33 @@
               "PROVA",
               "OUTRA"
             ],
-            "type": "string"
+            "type": "string",
+            "example": "EXERCICIO"
           },
           "valeNota": {
-            "type": "boolean"
+            "type": "boolean",
+            "example": true
           },
           "notaMaxima": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "example": "10.00"
           },
           "dataAtribuicao": {
-            "format": "date-time",
-            "type": "string"
+            "type": "string",
+            "example": "2026-07-15"
           },
           "prazoEntrega": {
-            "format": "date-time",
-            "type": "string"
+            "type": "string",
+            "example": "2026-07-22"
           }
         },
         "required": [
           "id",
           "turmaId",
           "titulo",
-          "descricao",
           "tipoAtividade",
           "valeNota",
-          "notaMaxima",
           "dataAtribuicao",
           "prazoEntrega"
         ]
@@ -5363,14 +5364,14 @@
             "description": "Nota ou XP máximo da atividade. Aceita até 5 dígitos antes da vírgula e 2 decimais (precisão 7,2).\n    REGRAS DE NEGÓCIO:\n    - Obrigatório se 'valeNota' for 'true' (exige critério 'POR_NOTA_PRESENCA' na turma).\n    - Deve ser nulo (não enviado) se 'valeNota' for 'false' ou se a turma possuir critérios que não avaliam notas numéricas."
           },
           "dataAtribuicao": {
-            "format": "date-time",
             "type": "string",
-            "example": "2026-07-15"
+            "example": "2026-07-15",
+            "description": "Data de atribuição da atividade no formato YYYY-MM-DD"
           },
           "prazoEntrega": {
-            "format": "date-time",
             "type": "string",
-            "example": "2026-07-22"
+            "example": "2026-07-22",
+            "description": "Prazo limite de entrega no formato YYYY-MM-DD"
           }
         }
       }

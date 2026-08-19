@@ -1,7 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import {
-  IsDate,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -14,6 +12,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { IsDateAfter } from 'src/shared/decorators/is-date-after.decorator';
+import { IsDateOnly } from 'src/shared/decorators/is-date-only.decorator';
 
 import { CriterioAvaliacao } from '../enums/criterio-avaliacao.enum';
 import { StatusTurma } from '../enums/status-turma.enum';
@@ -41,20 +40,31 @@ export class CriarTurmaDto {
   @IsNotEmpty({ message: 'O campo carga horária é obrigatório' })
   cargaHoraria: number;
 
-  @ApiProperty({ type: Date, example: '2024-01-01' })
+  @ApiProperty({
+    type: String,
+    example: '2026-02-01',
+    description: 'Data de início da turma no formato YYYY-MM-DD',
+  })
   @IsNotEmpty({ message: 'O campo dataInicio é obrigatório' })
-  @IsDate({ message: 'O campo dataInicio deve ser uma data válida' })
-  @Type(() => Date)
-  dataInicio: Date;
+  @IsDateOnly({
+    message:
+      'O campo dataInicio deve ser uma data válida no formato YYYY-MM-DD',
+  })
+  dataInicio: string;
 
-  @ApiProperty({ type: Date, example: '2024-12-31' })
+  @ApiProperty({
+    type: String,
+    example: '2026-06-30',
+    description: 'Data de encerramento da turma no formato YYYY-MM-DD',
+  })
   @IsNotEmpty({ message: 'O campo dataFim é obrigatório' })
-  @IsDate({ message: 'O campo dataFim deve ser uma data válida' })
-  @Type(() => Date)
+  @IsDateOnly({
+    message: 'O campo dataFim deve ser uma data válida no formato YYYY-MM-DD',
+  })
   @IsDateAfter('dataInicio', {
     message: 'A data final não pode ser anterior à data de início',
   })
-  dataFim: Date;
+  dataFim: string;
 
   @ApiProperty({ enum: StatusTurma, example: StatusTurma.EM_FORMACAO })
   @IsEnum(StatusTurma, {

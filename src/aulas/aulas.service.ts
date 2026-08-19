@@ -182,11 +182,11 @@ export class AulasService {
         aulaAtual.turma.dataFim,
       );
 
-      const dataNovaStr = this.formatarDataStr(atualizarAulaDto.data);
-      const dataAtualStr = this.formatarDataStr(aulaAtual.data);
-
-      if (dataNovaStr !== dataAtualStr) {
-        await this.verificarDuplicidadeData(aulaAtual.turmaId, dataNovaStr);
+      if (atualizarAulaDto.data !== aulaAtual.data) {
+        await this.verificarDuplicidadeData(
+          aulaAtual.turmaId,
+          atualizarAulaDto.data,
+        );
       }
     }
 
@@ -230,22 +230,20 @@ export class AulasService {
    */
   async existeAulaAnteriorA(
     turmaId: string,
-    dataLimite: Date | string,
+    dataLimite: string,
   ): Promise<boolean> {
     try {
-      const dataLimiteStr = this.formatarDataStr(dataLimite);
       const resultado = await this.repository
         .createQueryBuilder('aula')
         .where('aula.turmaId = :turmaId', { turmaId })
-        .andWhere('aula.data < :dataLimite', { dataLimite: dataLimiteStr })
+        .andWhere('aula.data < :dataLimite', { dataLimite })
         .getExists();
 
       return resultado;
     } catch (erro) {
       const mensagemErro = erro instanceof Error ? erro.message : String(erro);
-      const dataLimiteStr = this.formatarDataStr(dataLimite);
       this.logger.error(
-        `Erro ao verificar aulas anteriores a ${dataLimiteStr} na turma ${turmaId}: ${mensagemErro}`,
+        `Erro ao verificar aulas anteriores a ${dataLimite} na turma ${turmaId}: ${mensagemErro}`,
       );
       throw new InternalServerErrorException(
         'Erro ao validar calendário de aulas existentes.',
@@ -258,22 +256,20 @@ export class AulasService {
    */
   async existeAulaPosteriorA(
     turmaId: string,
-    dataLimite: Date | string,
+    dataLimite: string,
   ): Promise<boolean> {
     try {
-      const dataLimiteStr = this.formatarDataStr(dataLimite);
       const resultado = await this.repository
         .createQueryBuilder('aula')
         .where('aula.turmaId = :turmaId', { turmaId })
-        .andWhere('aula.data > :dataLimite', { dataLimite: dataLimiteStr })
+        .andWhere('aula.data > :dataLimite', { dataLimite })
         .getExists();
 
       return resultado;
     } catch (erro) {
       const mensagemErro = erro instanceof Error ? erro.message : String(erro);
-      const dataLimiteStr = this.formatarDataStr(dataLimite);
       this.logger.error(
-        `Erro ao verificar aulas posteriores a ${dataLimiteStr} na turma ${turmaId}: ${mensagemErro}`,
+        `Erro ao verificar aulas posteriores a ${dataLimite} na turma ${turmaId}: ${mensagemErro}`,
       );
       throw new InternalServerErrorException(
         'Erro ao validar calendário de aulas existentes.',
@@ -285,46 +281,31 @@ export class AulasService {
   // MÉTODOS PRIVADOS DE VALIDAÇÃO (REGRAS DE NEGÓCIO)
   // =========================================================================
 
-  private formatarDataStr(data: Date | string): string {
-    if (typeof data === 'string') {
-      return data.split('T')[0];
-    }
-    if (data instanceof Date) {
-      return data.toISOString().split('T')[0];
-    }
-    return String(data);
-  }
-
   private validarLimitesPeriodoTurma(
-    dataDaAula: Date | string,
-    dataInicioDaTurma: Date | string,
-    dataFimDaTurma: Date | string,
+    dataDaAula: string,
+    dataInicioDaTurma: string,
+    dataFimDaTurma: string,
   ): void {
-    const dataAulaStr = this.formatarDataStr(dataDaAula);
-    const dataInicioStr = this.formatarDataStr(dataInicioDaTurma);
-    const dataFimStr = this.formatarDataStr(dataFimDaTurma);
-
-    if (dataAulaStr < dataInicioStr) {
+    if (dataDaAula < dataInicioDaTurma) {
       throw new BadRequestException(
-        `A data da aula não pode ser anterior à data de início da turma (${dataInicioStr}).`,
+        `A data da aula não pode ser anterior à data de início da turma (${dataInicioDaTurma}).`,
       );
     }
 
-    if (dataAulaStr > dataFimStr) {
+    if (dataDaAula > dataFimDaTurma) {
       throw new BadRequestException(
-        `A data da aula não pode ser posterior à data de encerramento da turma (${dataFimStr}).`,
+        `A data da aula não pode ser posterior à data de encerramento da turma (${dataFimDaTurma}).`,
       );
     }
   }
 
   private async verificarDuplicidadeData(
     turmaId: string,
-    data: Date | string,
+    data: string,
   ): Promise<void> {
-    const dataStr = this.formatarDataStr(data);
     const existeDuplicidade = await this.repository.existsBy({
       turmaId,
-      data: dataStr,
+      data,
     });
 
     if (existeDuplicidade) {

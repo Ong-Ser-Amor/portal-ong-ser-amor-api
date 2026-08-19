@@ -34,10 +34,10 @@ export class Turma {
   cargaHoraria: number;
 
   @Column({ name: 'data_inicio', type: 'date' })
-  dataInicio: Date;
+  dataInicio: string;
 
   @Column({ name: 'data_fim', type: 'date' })
-  dataFim: Date;
+  dataFim: string;
 
   @Column({ type: 'varchar', length: 20, enum: StatusTurma })
   status: StatusTurma;

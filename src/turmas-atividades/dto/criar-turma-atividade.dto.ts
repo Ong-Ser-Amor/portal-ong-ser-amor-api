@@ -1,8 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import {
   IsBoolean,
-  IsDate,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -12,6 +10,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { IsDateAfter } from 'src/shared/decorators/is-date-after.decorator';
+import { IsDateOnly } from 'src/shared/decorators/is-date-only.decorator';
 
 import { TipoAtividade } from '../enums/tipo-atividade.enum';
 
@@ -74,19 +73,31 @@ export class CriarTurmaAtividadeDto {
   })
   notaMaxima?: string;
 
-  @ApiProperty({ type: Date, example: '2026-07-15' })
+  @ApiProperty({
+    type: String,
+    example: '2026-07-15',
+    description: 'Data de atribuição da atividade no formato YYYY-MM-DD',
+  })
   @IsNotEmpty({ message: 'O campo dataAtribuicao é obrigatório' })
-  @IsDate({ message: 'O campo dataAtribuicao deve ser uma data válida' })
-  @Type(() => Date)
-  dataAtribuicao: Date;
+  @IsDateOnly({
+    message:
+      'O campo dataAtribuicao deve ser uma data válida no formato YYYY-MM-DD',
+  })
+  dataAtribuicao: string;
 
-  @ApiProperty({ type: Date, example: '2026-07-22' })
+  @ApiProperty({
+    type: String,
+    example: '2026-07-22',
+    description: 'Prazo limite de entrega no formato YYYY-MM-DD',
+  })
   @IsNotEmpty({ message: 'O campo prazoEntrega é obrigatório' })
-  @IsDate({ message: 'O campo prazoEntrega deve ser uma data válida' })
-  @Type(() => Date)
+  @IsDateOnly({
+    message:
+      'O campo prazoEntrega deve ser uma data válida no formato YYYY-MM-DD',
+  })
   @IsDateAfter('dataAtribuicao', {
     message:
       'O prazo de entrega não pode ser anterior à data de atribuição da atividade',
   })
-  prazoEntrega: Date;
+  prazoEntrega: string;
 }
