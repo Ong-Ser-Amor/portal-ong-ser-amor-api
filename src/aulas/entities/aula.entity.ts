@@ -21,7 +21,7 @@ export class Aula {
   turmaId: string;
 
   @Column({ type: 'date' })
-  data: Date;
+  data: string;
 
   @Column({ type: 'varchar', length: 255 })
   tema: string;

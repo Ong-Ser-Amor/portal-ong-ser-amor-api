@@ -1,12 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import {
-  IsDate,
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsDateOnly } from 'src/shared/decorators/is-date-only.decorator';
 
 export class CriarAulaDto {
   @ApiProperty({
@@ -17,14 +11,15 @@ export class CriarAulaDto {
   turmaId: string;
 
   @ApiProperty({
-    type: Date,
-    example: '2026-07-18',
+    type: String,
+    example: '2026-09-26',
     description: 'Data de realização da aula no formato YYYY-MM-DD',
   })
   @IsNotEmpty({ message: 'O campo data é obrigatório' })
-  @IsDate({ message: 'O campo data deve ser uma data válida' })
-  @Type(() => Date)
-  data: Date;
+  @IsDateOnly({
+    message: 'O campo data deve ser uma data válida no formato YYYY-MM-DD',
+  })
+  data: string;
 
   @ApiProperty({
     example: 'Primeira aula',

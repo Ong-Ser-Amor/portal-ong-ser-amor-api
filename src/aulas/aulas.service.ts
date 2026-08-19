@@ -182,14 +182,11 @@ export class AulasService {
         aulaAtual.turma.dataFim,
       );
 
-      if (
-        new Date(atualizarAulaDto.data).getTime() !==
-        new Date(aulaAtual.data).getTime()
-      ) {
-        await this.verificarDuplicidadeData(
-          aulaAtual.turmaId,
-          atualizarAulaDto.data,
-        );
+      const dataNovaStr = this.formatarDataStr(atualizarAulaDto.data);
+      const dataAtualStr = this.formatarDataStr(aulaAtual.data);
+
+      if (dataNovaStr !== dataAtualStr) {
+        await this.verificarDuplicidadeData(aulaAtual.turmaId, dataNovaStr);
       }
     }
 
@@ -233,23 +230,20 @@ export class AulasService {
    */
   async existeAulaAnteriorA(
     turmaId: string,
-    dataLimite: Date,
+    dataLimite: Date | string,
   ): Promise<boolean> {
     try {
-      // O TypeORM converterá o Date para o formato correto na query do banco
+      const dataLimiteStr = this.formatarDataStr(dataLimite);
       const resultado = await this.repository
         .createQueryBuilder('aula')
         .where('aula.turmaId = :turmaId', { turmaId })
-        .andWhere('aula.data < :dataLimite', { dataLimite })
+        .andWhere('aula.data < :dataLimite', { dataLimite: dataLimiteStr })
         .getExists();
 
       return resultado;
     } catch (erro) {
       const mensagemErro = erro instanceof Error ? erro.message : String(erro);
-      const dataLimiteStr =
-        dataLimite instanceof Date
-          ? dataLimite.toISOString().split('T')[0]
-          : String(dataLimite);
+      const dataLimiteStr = this.formatarDataStr(dataLimite);
       this.logger.error(
         `Erro ao verificar aulas anteriores a ${dataLimiteStr} na turma ${turmaId}: ${mensagemErro}`,
       );
@@ -264,22 +258,20 @@ export class AulasService {
    */
   async existeAulaPosteriorA(
     turmaId: string,
-    dataLimite: Date,
+    dataLimite: Date | string,
   ): Promise<boolean> {
     try {
+      const dataLimiteStr = this.formatarDataStr(dataLimite);
       const resultado = await this.repository
         .createQueryBuilder('aula')
         .where('aula.turmaId = :turmaId', { turmaId })
-        .andWhere('aula.data > :dataLimite', { dataLimite })
+        .andWhere('aula.data > :dataLimite', { dataLimite: dataLimiteStr })
         .getExists();
 
       return resultado;
     } catch (erro) {
       const mensagemErro = erro instanceof Error ? erro.message : String(erro);
-      const dataLimiteStr =
-        dataLimite instanceof Date
-          ? dataLimite.toISOString().split('T')[0]
-          : String(dataLimite);
+      const dataLimiteStr = this.formatarDataStr(dataLimite);
       this.logger.error(
         `Erro ao verificar aulas posteriores a ${dataLimiteStr} na turma ${turmaId}: ${mensagemErro}`,
       );
@@ -293,33 +285,46 @@ export class AulasService {
   // MÉTODOS PRIVADOS DE VALIDAÇÃO (REGRAS DE NEGÓCIO)
   // =========================================================================
 
+  private formatarDataStr(data: Date | string): string {
+    if (typeof data === 'string') {
+      return data.split('T')[0];
+    }
+    if (data instanceof Date) {
+      return data.toISOString().split('T')[0];
+    }
+    return String(data);
+  }
+
   private validarLimitesPeriodoTurma(
-    dataDaAula: Date,
-    dataInicioDaTurma: Date,
-    dataFimDaTurma: Date,
+    dataDaAula: Date | string,
+    dataInicioDaTurma: Date | string,
+    dataFimDaTurma: Date | string,
   ): void {
-    if (dataDaAula < dataInicioDaTurma) {
-      const dataInicioFormatada = dataInicioDaTurma.toISOString().split('T')[0];
+    const dataAulaStr = this.formatarDataStr(dataDaAula);
+    const dataInicioStr = this.formatarDataStr(dataInicioDaTurma);
+    const dataFimStr = this.formatarDataStr(dataFimDaTurma);
+
+    if (dataAulaStr < dataInicioStr) {
       throw new BadRequestException(
-        `A data da aula não pode ser anterior à data de início da turma (${dataInicioFormatada}).`,
+        `A data da aula não pode ser anterior à data de início da turma (${dataInicioStr}).`,
       );
     }
 
-    if (dataDaAula > dataFimDaTurma) {
-      const dataFimFormatada = dataFimDaTurma.toISOString().split('T')[0];
+    if (dataAulaStr > dataFimStr) {
       throw new BadRequestException(
-        `A data da aula não pode ser posterior à data de encerramento da turma (${dataFimFormatada}).`,
+        `A data da aula não pode ser posterior à data de encerramento da turma (${dataFimStr}).`,
       );
     }
   }
 
   private async verificarDuplicidadeData(
     turmaId: string,
-    data: Date,
+    data: Date | string,
   ): Promise<void> {
+    const dataStr = this.formatarDataStr(data);
     const existeDuplicidade = await this.repository.existsBy({
       turmaId,
-      data,
+      data: dataStr,
     });
 
     if (existeDuplicidade) {

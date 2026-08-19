@@ -4794,9 +4794,8 @@
             "example": "1"
           },
           "data": {
-            "format": "date-time",
             "type": "string",
-            "example": "2026-07-18",
+            "example": "2026-09-26",
             "description": "Data de realização da aula no formato YYYY-MM-DD"
           },
           "tema": {
@@ -4817,17 +4816,20 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "example": "1"
           },
           "turmaId": {
-            "type": "string"
+            "type": "string",
+            "example": "1"
           },
           "data": {
-            "format": "date-time",
-            "type": "string"
+            "type": "string",
+            "example": "2026-09-26"
           },
           "tema": {
-            "type": "string"
+            "type": "string",
+            "example": "Aula 3"
           },
           "status": {
             "enum": [
@@ -4835,7 +4837,8 @@
               "REALIZADA",
               "CANCELADA"
             ],
-            "type": "string"
+            "type": "string",
+            "example": "AGENDADA"
           }
         },
         "required": [
@@ -4850,9 +4853,8 @@
         "type": "object",
         "properties": {
           "data": {
-            "format": "date-time",
             "type": "string",
-            "example": "2026-07-18",
+            "example": "2026-09-26",
             "description": "Data de realização da aula no formato YYYY-MM-DD"
           },
           "tema": {
