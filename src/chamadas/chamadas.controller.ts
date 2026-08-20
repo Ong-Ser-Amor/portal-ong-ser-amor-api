@@ -1,15 +1,17 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  Controller,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Post,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiInternalServerErrorResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -76,5 +78,28 @@ export class ChamadasController {
     const chamadas = await this.chamadasService.buscarPorAula(aulaId);
 
     return chamadas.map((chamada) => new ChamadaRespostaDto(chamada));
+  }
+
+  @Delete('aula/:aulaId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Remover o lote de chamadas de uma aula (limpar presenças)',
+    description:
+      'Exclui todas as presenças/faltas registradas para a aula especificada (soft delete).\n' +
+      'Se a aula estiver com status REALIZADA, o status é revertido automaticamente para AGENDADA.',
+  })
+  @ApiNoContentResponse({
+    description:
+      'As presenças da aula foram removidas com sucesso e o status da aula foi revertido para AGENDADA.',
+  })
+  @ApiNotFoundResponse({
+    description:
+      'A aula informada não foi encontrada ou não possui registros de chamada para serem removidos.',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Ocorreu um erro inesperado ao remover a lista de chamadas.',
+  })
+  async removerPorAula(@Param('aulaId') aulaId: string): Promise<void> {
+    await this.chamadasService.removerPorAula(aulaId);
   }
 }

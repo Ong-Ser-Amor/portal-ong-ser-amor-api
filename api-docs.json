@@ -2926,6 +2926,35 @@
         "tags": [
           "Chamadas (presença nas aulas)"
         ]
+      },
+      "delete": {
+        "description": "Exclui todas as presenças/faltas registradas para a aula especificada (soft delete).\nSe a aula estiver com status REALIZADA, o status é revertido automaticamente para AGENDADA.",
+        "operationId": "ChamadasController_removerPorAula",
+        "parameters": [
+          {
+            "name": "aulaId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "As presenças da aula foram removidas com sucesso e o status da aula foi revertido para AGENDADA."
+          },
+          "404": {
+            "description": "A aula informada não foi encontrada ou não possui registros de chamada para serem removidos."
+          },
+          "500": {
+            "description": "Ocorreu um erro inesperado ao remover a lista de chamadas."
+          }
+        },
+        "summary": "Remover o lote de chamadas de uma aula (limpar presenças)",
+        "tags": [
+          "Chamadas (presença nas aulas)"
+        ]
       }
     },
     "/turmas-matriculas": {

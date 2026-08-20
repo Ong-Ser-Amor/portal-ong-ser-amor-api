@@ -118,9 +118,14 @@ export class AulasService {
     }
   }
 
-  async buscarPorId(id: string): Promise<Aula> {
+  async buscarPorId(
+    id: string,
+    gerenciadorTransacao?: EntityManager,
+  ): Promise<Aula> {
+    const manager = gerenciadorTransacao || this.repository.manager;
+
     try {
-      return await this.repository.findOneOrFail({
+      return await manager.findOneOrFail(Aula, {
         where: { id },
         relations: ['turma'],
       });
@@ -146,7 +151,7 @@ export class AulasService {
     // Define qual manager usar (o da transação ativa ou o padrão do repositório)
     const manager = gerenciadorTransacao || this.repository.manager;
 
-    const aulaAtual = await this.buscarPorId(id);
+    const aulaAtual = await this.buscarPorId(id, manager);
 
     const possuiChamadaSalva = await this.chamadasService.existeChamadaParaAula(
       id,

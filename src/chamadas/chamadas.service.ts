@@ -5,6 +5,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AulasService } from 'src/aulas/aulas.service';
@@ -148,6 +149,68 @@ export class ChamadasService {
       throw new InternalServerErrorException(
         'Erro ao buscar a lista de presenças da aula.',
       );
+    }
+  }
+
+  /**
+   * Remove todo o lote de chamadas de uma aula (limpa a lista de presença lançada por engano).
+   * Se a aula estiver como REALIZADA, reverte automaticamente para AGENDADA dentro da mesma transação.
+   */
+  async removerPorAula(aulaId: string): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // 1. Busca a aula dentro do contexto da transação
+      const aula = await this.aulasService.buscarPorId(
+        aulaId,
+        queryRunner.manager,
+      );
+
+      // 2. Verifica a existência de chamadas usando o manager da transação
+      const possuiChamada = await this.existeChamadaParaAula(
+        aulaId,
+        queryRunner.manager,
+      );
+
+      if (!possuiChamada) {
+        throw new NotFoundException(
+          `A aula com ID ${aulaId} não possui registros de chamada para serem removidos.`,
+        );
+      }
+
+      // 3. Realiza o soft delete em todas as chamadas vinculadas a esta aula
+      await queryRunner.manager.softDelete(Chamada, { aulaId });
+
+      // 4. Se a aula estava REALIZADA por conta do registro de chamada, reverte para AGENDADA
+      if (aula.status === StatusAula.REALIZADA) {
+        await this.aulasService.atualizar(
+          aulaId,
+          { status: StatusAula.AGENDADA },
+          queryRunner.manager,
+        );
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (erro) {
+      await queryRunner.rollbackTransaction();
+
+      const msg = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(`Erro ao remover chamadas da aula ${aulaId}: ${msg}`);
+
+      if (
+        erro instanceof BadRequestException ||
+        erro instanceof NotFoundException
+      ) {
+        throw erro;
+      }
+
+      throw new InternalServerErrorException(
+        'Erro interno ao remover a lista de chamadas da aula.',
+      );
+    } finally {
+      await queryRunner.release();
     }
   }
 
