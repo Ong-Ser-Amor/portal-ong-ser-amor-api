@@ -2361,6 +2361,7 @@
         ]
       },
       "patch": {
+        "description": "Atualiza campos cadastrais, limites de período letivo, status e critérios de avaliação de uma turma existente.\n\n**Regras de Negócio e Bloqueios Específicos:**\n- **Alunos Ativos**: Não é permitido alterar o status para `FINALIZADA` se houver matrículas no status `ATIVA`.\n- **Choque de Data Inicial**: Não é permitido postergar `dataInicio` para uma data posterior a aulas já agendadas/realizadas.\n- **Choque de Data Final**: Não é permitido adiantar `dataFim` para uma data anterior a aulas já agendadas/realizadas.\n- **Ordem das Datas**: A nova data final consolidada não pode ser anterior à data de início.\n- **Critérios de Avaliação**: As notas e frequências consolidadas devem respeitar o critério configurado.",
         "operationId": "TurmasController_atualizar",
         "parameters": [
           {
@@ -2394,7 +2395,94 @@
             }
           },
           "400": {
-            "description": "A data final não pode ser anterior à data de início, houve inconsistência nos limites de avaliação, a turma possui alunos ativos ao tentar finalizá-la OU a alteração de datas conflita com as aulas já cadastradas."
+            "description": "Erro de validação de regras de negócio ao atualizar a turma.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "alunos_ativos_ao_finalizar": {
+                    "summary": "Tentativa de finalizar turma com matrículas ativas",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "TURMA_ALUNOS_ATIVOS_AO_FINALIZAR",
+                      "message": "Não é possível finalizar a turma pois ainda existem alunos com a matrícula no status ATIVA. Altere o status de todas as matrículas para CONCLUIDA ou EVADIDA antes de finalizar a turma.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "conflito_data_inicio_com_aulas": {
+                    "summary": "Data de início posterior a aulas já existentes",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "TURMA_CONFLITO_DATA_INICIO",
+                      "message": "Não é possível postergar a data de início da turma, pois já existem aulas cadastradas em datas anteriores a esse novo limite.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "conflito_data_fim_com_aulas": {
+                    "summary": "Data de término anterior a aulas já existentes",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "TURMA_CONFLITO_DATA_FIM",
+                      "message": "Não é possível adiantar a data final da turma, pois já existem aulas cadastradas em datas posteriores a esse novo limite.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "data_fim_anterior_inicio": {
+                    "summary": "Data final consolidada anterior à data de início",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "TURMA_DATAS_INVERTIDAS",
+                      "message": "A data final não pode ser anterior à data de início da turma.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "criterio_sem_controle_com_limites": {
+                    "summary": "Critério SEM_CONTROLE com nota ou frequência",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "TURMA_CRITERIO_SEM_CONTROLE_INVALIDO",
+                      "message": "Turmas sem controle de avaliação não podem possuir limites de nota ou frequência mínima.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "criterio_participacao_sem_frequencia": {
+                    "summary": "Critério POR_PARTICIPACAO sem frequência mínima",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "TURMA_CRITERIO_PARTICIPACAO_SEM_FREQUENCIA",
+                      "message": "O campo frequência mínima é obrigatório para turmas avaliadas por participação.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "criterio_participacao_com_nota": {
+                    "summary": "Critério POR_PARTICIPACAO com nota mínima",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "TURMA_CRITERIO_PARTICIPACAO_COM_NOTA",
+                      "message": "Turmas avaliadas por participação não devem possuir uma nota mínima de aprovação.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "criterio_nota_presenca_incompleto": {
+                    "summary": "Critério POR_NOTA_PRESENCA sem nota ou frequência",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "TURMA_CRITERIO_NOTA_PRESENCA_INCOMPLETO",
+                      "message": "Os campos de frequência mínima e nota mínima são obrigatórios para turmas com aprovação por nota e presença.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "criterio_qualitativa_com_nota": {
+                    "summary": "Critério QUALITATIVA com nota mínima",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "TURMA_CRITERIO_QUALITATIVA_COM_NOTA",
+                      "message": "Turmas com avaliação qualitativa não devem possuir uma nota mínima numérica de aprovação.",
+                      "error": "Bad Request"
+                    }
+                  }
+                }
+              }
+            }
           },
           "404": {
             "description": "Turma com o ID especificado não foi encontrada."

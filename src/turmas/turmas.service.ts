@@ -14,6 +14,7 @@ import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { TurmasMatriculasService } from 'src/turmas-matriculas/turmas-matriculas.service';
 import { EntityNotFoundError, FindOptionsWhere, Repository } from 'typeorm';
 
+import { ERROS_ATUALIZACAO_TURMA } from './constants/turmas-erros.constant';
 import { AtualizarTurmaDto } from './dto/atualizar-turma.dto';
 import { CriarTurmaDto } from './dto/criar-turma.dto';
 import { VincularProfessorDto } from './dto/vincular-professor.dto';
@@ -167,9 +168,10 @@ export class TurmasService {
         await this.matriculasService.existeMatriculaAtivaNaTurma(id);
 
       if (possuiAlunosAtivos) {
-        throw new BadRequestException(
-          'Não é possível finalizar a turma pois ainda existem alunos com a matrícula no status ATIVA. Altere o status de todas as matrículas para CONCLUIDA ou EVADIDA antes de finalizar a turma.',
-        );
+        throw new BadRequestException({
+          codigo: ERROS_ATUALIZACAO_TURMA.ALUNOS_ATIVOS_AO_FINALIZAR.codigo,
+          message: ERROS_ATUALIZACAO_TURMA.ALUNOS_ATIVOS_AO_FINALIZAR.mensagem,
+        });
       }
     }
 
@@ -181,9 +183,10 @@ export class TurmasService {
       );
 
       if (possuiAulaAnterior) {
-        throw new BadRequestException(
-          'Não é possível postergar a data de início da turma, pois já existem aulas cadastradas em datas anteriores a esse novo limite.',
-        );
+        throw new BadRequestException({
+          codigo: ERROS_ATUALIZACAO_TURMA.CONFLITO_DATA_INICIO.codigo,
+          message: ERROS_ATUALIZACAO_TURMA.CONFLITO_DATA_INICIO.mensagem,
+        });
       }
     }
 
@@ -195,9 +198,10 @@ export class TurmasService {
       );
 
       if (possuiAulaPosterior) {
-        throw new BadRequestException(
-          'Não é possível adiantar a data final da turma, pois já existem aulas cadastradas em datas posteriores a esse novo limite.',
-        );
+        throw new BadRequestException({
+          codigo: ERROS_ATUALIZACAO_TURMA.CONFLITO_DATA_FIM.codigo,
+          message: ERROS_ATUALIZACAO_TURMA.CONFLITO_DATA_FIM.mensagem,
+        });
       }
     }
 
@@ -208,9 +212,10 @@ export class TurmasService {
 
     // Valida a regra de negócio com os dados consolidados
     if (dataFimConsolidada < dataInicioConsolidada) {
-      throw new BadRequestException(
-        'A data final não pode ser anterior à data de início da turma.',
-      );
+      throw new BadRequestException({
+        codigo: ERROS_ATUALIZACAO_TURMA.DATAS_INVERTIDAS.codigo,
+        message: ERROS_ATUALIZACAO_TURMA.DATAS_INVERTIDAS.mensagem,
+      });
     }
 
     // Consolida e valida os critérios de avaliação (evita misturar dados velhos com novos critérios)
@@ -282,38 +287,51 @@ export class TurmasService {
   ): void {
     if (criterio === CriterioAvaliacao.SEM_CONTROLE) {
       if (frequencia || nota) {
-        throw new BadRequestException(
-          'Turmas sem controle de avaliação não podem possuir limites de nota ou frequência mínima.',
-        );
+        throw new BadRequestException({
+          codigo: ERROS_ATUALIZACAO_TURMA.CRITERIO_SEM_CONTROLE_INVALIDO.codigo,
+          message:
+            ERROS_ATUALIZACAO_TURMA.CRITERIO_SEM_CONTROLE_INVALIDO.mensagem,
+        });
       }
     }
 
     if (criterio === CriterioAvaliacao.POR_PARTICIPACAO) {
       if (!frequencia) {
-        throw new BadRequestException(
-          'O campo frequência mínima é obrigatório para turmas avaliadas por participação.',
-        );
+        throw new BadRequestException({
+          codigo:
+            ERROS_ATUALIZACAO_TURMA.CRITERIO_PARTICIPACAO_SEM_FREQUENCIA.codigo,
+          message:
+            ERROS_ATUALIZACAO_TURMA.CRITERIO_PARTICIPACAO_SEM_FREQUENCIA
+              .mensagem,
+        });
       }
       if (nota) {
-        throw new BadRequestException(
-          'Turmas avaliadas por participação não devem possuir uma nota mínima de aprovação.',
-        );
+        throw new BadRequestException({
+          codigo: ERROS_ATUALIZACAO_TURMA.CRITERIO_PARTICIPACAO_COM_NOTA.codigo,
+          message:
+            ERROS_ATUALIZACAO_TURMA.CRITERIO_PARTICIPACAO_COM_NOTA.mensagem,
+        });
       }
     }
 
     if (criterio === CriterioAvaliacao.POR_NOTA_PRESENCA) {
       if (!frequencia || !nota) {
-        throw new BadRequestException(
-          'Os campos de frequência mínima e nota mínima são obrigatórios para turmas com aprovação por nota e presença.',
-        );
+        throw new BadRequestException({
+          codigo:
+            ERROS_ATUALIZACAO_TURMA.CRITERIO_NOTA_PRESENCA_INCOMPLETO.codigo,
+          message:
+            ERROS_ATUALIZACAO_TURMA.CRITERIO_NOTA_PRESENCA_INCOMPLETO.mensagem,
+        });
       }
     }
 
     if (criterio === CriterioAvaliacao.QUALITATIVA) {
       if (nota) {
-        throw new BadRequestException(
-          'Turmas com avaliação qualitativa não devem possuir uma nota mínima numérica de aprovação.',
-        );
+        throw new BadRequestException({
+          codigo: ERROS_ATUALIZACAO_TURMA.CRITERIO_QUALITATIVA_COM_NOTA.codigo,
+          message:
+            ERROS_ATUALIZACAO_TURMA.CRITERIO_QUALITATIVA_COM_NOTA.mensagem,
+        });
       }
     }
   }

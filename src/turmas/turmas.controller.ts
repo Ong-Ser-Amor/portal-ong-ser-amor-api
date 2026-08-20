@@ -27,6 +27,7 @@ import {
 import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 
+import { ERROS_ATUALIZACAO_TURMA } from './constants/turmas-erros.constant';
 import { AtualizarTurmaDto } from './dto/atualizar-turma.dto';
 import { CriarTurmaDto } from './dto/criar-turma.dto';
 import { TurmaProfessorRespostaDto } from './dto/turma-professor-resposta.dto';
@@ -140,7 +141,17 @@ export class TurmasController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Atualizar uma turma pelo ID' })
+  @ApiOperation({
+    summary: 'Atualizar uma turma pelo ID',
+    description:
+      'Atualiza campos cadastrais, limites de período letivo, status e critérios de avaliação de uma turma existente.\n\n' +
+      '**Regras de Negócio e Bloqueios Específicos:**\n' +
+      '- **Alunos Ativos**: Não é permitido alterar o status para `FINALIZADA` se houver matrículas no status `ATIVA`.\n' +
+      '- **Choque de Data Inicial**: Não é permitido postergar `dataInicio` para uma data posterior a aulas já agendadas/realizadas.\n' +
+      '- **Choque de Data Final**: Não é permitido adiantar `dataFim` para uma data anterior a aulas já agendadas/realizadas.\n' +
+      '- **Ordem das Datas**: A nova data final consolidada não pode ser anterior à data de início.\n' +
+      '- **Critérios de Avaliação**: As notas e frequências consolidadas devem respeitar o critério configurado.',
+  })
   @ApiOkResponse({
     description: 'A turma foi atualizada com sucesso.',
     type: TurmaRespostaDto,
@@ -149,8 +160,109 @@ export class TurmasController {
     description: 'Turma com o ID especificado não foi encontrada.',
   })
   @ApiBadRequestResponse({
-    description:
-      'A data final não pode ser anterior à data de início, houve inconsistência nos limites de avaliação, a turma possui alunos ativos ao tentar finalizá-la OU a alteração de datas conflita com as aulas já cadastradas.',
+    description: 'Erro de validação de regras de negócio ao atualizar a turma.',
+    content: {
+      'application/json': {
+        examples: {
+          alunos_ativos_ao_finalizar: {
+            summary: 'Tentativa de finalizar turma com matrículas ativas',
+            value: {
+              statusCode: 400,
+              codigo: ERROS_ATUALIZACAO_TURMA.ALUNOS_ATIVOS_AO_FINALIZAR.codigo,
+              message:
+                ERROS_ATUALIZACAO_TURMA.ALUNOS_ATIVOS_AO_FINALIZAR.mensagem,
+              error: 'Bad Request',
+            },
+          },
+          conflito_data_inicio_com_aulas: {
+            summary: 'Data de início posterior a aulas já existentes',
+            value: {
+              statusCode: 400,
+              codigo: ERROS_ATUALIZACAO_TURMA.CONFLITO_DATA_INICIO.codigo,
+              message: ERROS_ATUALIZACAO_TURMA.CONFLITO_DATA_INICIO.mensagem,
+              error: 'Bad Request',
+            },
+          },
+          conflito_data_fim_com_aulas: {
+            summary: 'Data de término anterior a aulas já existentes',
+            value: {
+              statusCode: 400,
+              codigo: ERROS_ATUALIZACAO_TURMA.CONFLITO_DATA_FIM.codigo,
+              message: ERROS_ATUALIZACAO_TURMA.CONFLITO_DATA_FIM.mensagem,
+              error: 'Bad Request',
+            },
+          },
+          data_fim_anterior_inicio: {
+            summary: 'Data final consolidada anterior à data de início',
+            value: {
+              statusCode: 400,
+              codigo: ERROS_ATUALIZACAO_TURMA.DATAS_INVERTIDAS.codigo,
+              message: ERROS_ATUALIZACAO_TURMA.DATAS_INVERTIDAS.mensagem,
+              error: 'Bad Request',
+            },
+          },
+          criterio_sem_controle_com_limites: {
+            summary: 'Critério SEM_CONTROLE com nota ou frequência',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_TURMA.CRITERIO_SEM_CONTROLE_INVALIDO.codigo,
+              message:
+                ERROS_ATUALIZACAO_TURMA.CRITERIO_SEM_CONTROLE_INVALIDO.mensagem,
+              error: 'Bad Request',
+            },
+          },
+          criterio_participacao_sem_frequencia: {
+            summary: 'Critério POR_PARTICIPACAO sem frequência mínima',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_TURMA.CRITERIO_PARTICIPACAO_SEM_FREQUENCIA
+                  .codigo,
+              message:
+                ERROS_ATUALIZACAO_TURMA.CRITERIO_PARTICIPACAO_SEM_FREQUENCIA
+                  .mensagem,
+              error: 'Bad Request',
+            },
+          },
+          criterio_participacao_com_nota: {
+            summary: 'Critério POR_PARTICIPACAO com nota mínima',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_TURMA.CRITERIO_PARTICIPACAO_COM_NOTA.codigo,
+              message:
+                ERROS_ATUALIZACAO_TURMA.CRITERIO_PARTICIPACAO_COM_NOTA.mensagem,
+              error: 'Bad Request',
+            },
+          },
+          criterio_nota_presenca_incompleto: {
+            summary: 'Critério POR_NOTA_PRESENCA sem nota ou frequência',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_TURMA.CRITERIO_NOTA_PRESENCA_INCOMPLETO
+                  .codigo,
+              message:
+                ERROS_ATUALIZACAO_TURMA.CRITERIO_NOTA_PRESENCA_INCOMPLETO
+                  .mensagem,
+              error: 'Bad Request',
+            },
+          },
+          criterio_qualitativa_com_nota: {
+            summary: 'Critério QUALITATIVA com nota mínima',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_TURMA.CRITERIO_QUALITATIVA_COM_NOTA.codigo,
+              message:
+                ERROS_ATUALIZACAO_TURMA.CRITERIO_QUALITATIVA_COM_NOTA.mensagem,
+              error: 'Bad Request',
+            },
+          },
+        },
+      },
+    },
   })
   @ApiConflictResponse({
     description:
