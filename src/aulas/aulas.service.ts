@@ -15,6 +15,7 @@ import { StatusTurma } from 'src/turmas/enums/status-turma.enum';
 import { TurmasService } from 'src/turmas/turmas.service';
 import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 
+import { ERROS_ATUALIZACAO_AULA } from './constants/aulas-erros.constant';
 import { AtualizarAulaDto } from './dto/atualizar-aula.dto';
 import { CriarAulaDto } from './dto/criar-aula.dto';
 import { Aula } from './entities/aula.entity';
@@ -160,14 +161,20 @@ export class AulasService {
 
     if (possuiChamadaSalva) {
       if (atualizarAulaDto.status === StatusAula.AGENDADA) {
-        throw new BadRequestException(
-          'Esta aula já possui registros de presença lançados e não pode retornar ao status de AGENDADA.',
-        );
+        throw new BadRequestException({
+          codigo:
+            ERROS_ATUALIZACAO_AULA.AULA_COM_CHAMADA_NAO_PODE_AGENDAR.codigo,
+          message:
+            ERROS_ATUALIZACAO_AULA.AULA_COM_CHAMADA_NAO_PODE_AGENDAR.mensagem,
+        });
       }
       if (atualizarAulaDto.status === StatusAula.CANCELADA) {
-        throw new BadRequestException(
-          'Não é possível CANCELAR uma aula que já possui registros de chamada salvos no sistema.',
-        );
+        throw new BadRequestException({
+          codigo:
+            ERROS_ATUALIZACAO_AULA.AULA_COM_CHAMADA_NAO_PODE_CANCELAR.codigo,
+          message:
+            ERROS_ATUALIZACAO_AULA.AULA_COM_CHAMADA_NAO_PODE_CANCELAR.mensagem,
+        });
       }
     }
 
@@ -175,9 +182,10 @@ export class AulasService {
       atualizarAulaDto.status === StatusAula.REALIZADA &&
       !possuiChamadaSalva
     ) {
-      throw new BadRequestException(
-        'Não é possível marcar uma aula como REALIZADA sem antes registrar o lote de chamadas dos alunos.',
-      );
+      throw new BadRequestException({
+        codigo: ERROS_ATUALIZACAO_AULA.AULA_REALIZADA_SEM_CHAMADA.codigo,
+        message: ERROS_ATUALIZACAO_AULA.AULA_REALIZADA_SEM_CHAMADA.mensagem,
+      });
     }
 
     if (atualizarAulaDto.data) {
@@ -292,15 +300,17 @@ export class AulasService {
     dataFimDaTurma: string,
   ): void {
     if (dataDaAula < dataInicioDaTurma) {
-      throw new BadRequestException(
-        `A data da aula não pode ser anterior à data de início da turma (${dataInicioDaTurma}).`,
-      );
+      throw new BadRequestException({
+        codigo: ERROS_ATUALIZACAO_AULA.AULA_DATA_ANTERIOR_INICIO_TURMA.codigo,
+        message: `A data da aula não pode ser anterior à data de início da turma (${dataInicioDaTurma}).`,
+      });
     }
 
     if (dataDaAula > dataFimDaTurma) {
-      throw new BadRequestException(
-        `A data da aula não pode ser posterior à data de encerramento da turma (${dataFimDaTurma}).`,
-      );
+      throw new BadRequestException({
+        codigo: ERROS_ATUALIZACAO_AULA.AULA_DATA_POSTERIOR_FIM_TURMA.codigo,
+        message: `A data da aula não pode ser posterior à data de encerramento da turma (${dataFimDaTurma}).`,
+      });
     }
   }
 
@@ -314,9 +324,10 @@ export class AulasService {
     });
 
     if (existeDuplicidade) {
-      throw new ConflictException(
-        'Já existe uma aula cadastrada nesta mesma data para esta turma.',
-      );
+      throw new ConflictException({
+        codigo: ERROS_ATUALIZACAO_AULA.AULA_DATA_DUPLICADA.codigo,
+        message: ERROS_ATUALIZACAO_AULA.AULA_DATA_DUPLICADA.mensagem,
+      });
     }
   }
 }

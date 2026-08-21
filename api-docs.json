@@ -2765,6 +2765,7 @@
         ]
       },
       "patch": {
+        "description": "Permite atualizar o tema, a data e o status de uma aula existente.\n\n**Regras de Negócio e Transições de Status:**\n- **Presenças Registradas**: Uma aula com chamadas salvas não pode retornar ao status `AGENDADA` nem ser alterada para `CANCELADA` (é necessário excluir o lote de chamadas primeiro caso tenha sido feito por engano).\n- **Marcação de Realização**: Uma aula só pode ser marcada como `REALIZADA` se possuir chamadas registradas.\n- **Limites do Calendário**: A data da aula deve estar estritamente contida entre a data de início e de término da turma correspondente.\n- **Unicidade de Data**: Não é permitido agendar duas aulas na mesma data para a mesma turma.",
         "operationId": "AulasController_atualizar",
         "parameters": [
           {
@@ -2788,7 +2789,7 @@
         },
         "responses": {
           "200": {
-            "description": "O registro da aula foi updated com sucesso.",
+            "description": "O registro da aula foi atualizado com sucesso.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2798,10 +2799,79 @@
             }
           },
           "400": {
-            "description": "A nova data ultrapassa os limites do curso, a data é duplicada, tentou-se reverter uma aula com chamada para AGENDADA/CANCELADA, ou marcar como REALIZADA sem lista de presença salva."
+            "description": "Erro de validação de regras de negócio ao atualizar a aula.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "aula_com_chamada_nao_pode_agendar": {
+                    "summary": "Tentativa de reverter aula com chamada para AGENDADA",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "AULA_COM_CHAMADA_NAO_PODE_AGENDAR",
+                      "message": "Esta aula já possui registros de presença lançados e não pode retornar ao status de AGENDADA. Para reverter o status, exclua a lista de chamadas da aula primeiro.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "aula_com_chamada_nao_pode_cancelar": {
+                    "summary": "Tentativa de cancelar aula que já possui chamada",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "AULA_COM_CHAMADA_NAO_PODE_CANCELAR",
+                      "message": "Não é possível CANCELAR uma aula que já possui registros de chamada salvos no sistema. Exclua a lista de chamadas da aula antes de cancelá-la.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "aula_realizada_sem_chamada": {
+                    "summary": "Tentativa de marcar como REALIZADA sem chamada",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "AULA_REALIZADA_SEM_CHAMADA",
+                      "message": "Não é possível marcar uma aula como REALIZADA sem antes registrar o lote de chamadas dos alunos.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "aula_data_anterior_inicio_turma": {
+                    "summary": "Data anterior ao início da turma",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "AULA_DATA_ANTERIOR_INICIO_TURMA",
+                      "message": "A data da aula não pode ser anterior à data de início da turma (2026-02-01).",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "aula_data_posterior_fim_turma": {
+                    "summary": "Data posterior ao encerramento da turma",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "AULA_DATA_POSTERIOR_FIM_TURMA",
+                      "message": "A data da aula não pode ser posterior à data de encerramento da turma (2026-06-30).",
+                      "error": "Bad Request"
+                    }
+                  }
+                }
+              }
+            }
           },
           "404": {
             "description": "Aula com o ID especificado não foi encontrada."
+          },
+          "409": {
+            "description": "Conflito de duplicidade de data na turma.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "aula_data_duplicada": {
+                    "summary": "Aula já cadastrada para esta mesma data na turma",
+                    "value": {
+                      "statusCode": 409,
+                      "codigo": "AULA_DATA_DUPLICADA",
+                      "message": "Já existe uma aula cadastrada nesta mesma data para esta turma.",
+                      "error": "Conflict"
+                    }
+                  }
+                }
+              }
+            }
           },
           "500": {
             "description": "Ocorreu um erro inesperado ao atualizar a aula."

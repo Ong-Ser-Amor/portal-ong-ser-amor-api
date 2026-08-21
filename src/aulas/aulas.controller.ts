@@ -28,6 +28,7 @@ import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-respos
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 
 import { AulasService } from './aulas.service';
+import { ERROS_ATUALIZACAO_AULA } from './constants/aulas-erros.constant';
 import { AtualizarAulaDto } from './dto/atualizar-aula.dto';
 import { AulaRespostaDto } from './dto/aula-resposta.dto';
 import { CriarAulaDto } from './dto/criar-aula.dto';
@@ -130,17 +131,106 @@ export class AulasController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Atualizar dados ou o status de uma aula pelo ID' })
+  @ApiOperation({
+    summary: 'Atualizar dados ou o status de uma aula pelo ID',
+    description:
+      'Permite atualizar o tema, a data e o status de uma aula existente.\n\n' +
+      '**Regras de Negócio e Transições de Status:**\n' +
+      '- **Presenças Registradas**: Uma aula com chamadas salvas não pode retornar ao status `AGENDADA` nem ser alterada para `CANCELADA` (é necessário excluir o lote de chamadas primeiro caso tenha sido feito por engano).\n' +
+      '- **Marcação de Realização**: Uma aula só pode ser marcada como `REALIZADA` se possuir chamadas registradas.\n' +
+      '- **Limites do Calendário**: A data da aula deve estar estritamente contida entre a data de início e de término da turma correspondente.\n' +
+      '- **Unicidade de Data**: Não é permitido agendar duas aulas na mesma data para a mesma turma.',
+  })
   @ApiOkResponse({
-    description: 'O registro da aula foi updated com sucesso.',
+    description: 'O registro da aula foi atualizado com sucesso.',
     type: AulaRespostaDto,
   })
   @ApiNotFoundResponse({
     description: 'Aula com o ID especificado não foi encontrada.',
   })
   @ApiBadRequestResponse({
-    description:
-      'A nova data ultrapassa os limites do curso, a data é duplicada, tentou-se reverter uma aula com chamada para AGENDADA/CANCELADA, ou marcar como REALIZADA sem lista de presença salva.',
+    description: 'Erro de validação de regras de negócio ao atualizar a aula.',
+    content: {
+      'application/json': {
+        examples: {
+          aula_com_chamada_nao_pode_agendar: {
+            summary: 'Tentativa de reverter aula com chamada para AGENDADA',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_AULA.AULA_COM_CHAMADA_NAO_PODE_AGENDAR.codigo,
+              message:
+                ERROS_ATUALIZACAO_AULA.AULA_COM_CHAMADA_NAO_PODE_AGENDAR
+                  .mensagem,
+              error: 'Bad Request',
+            },
+          },
+          aula_com_chamada_nao_pode_cancelar: {
+            summary: 'Tentativa de cancelar aula que já possui chamada',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_AULA.AULA_COM_CHAMADA_NAO_PODE_CANCELAR
+                  .codigo,
+              message:
+                ERROS_ATUALIZACAO_AULA.AULA_COM_CHAMADA_NAO_PODE_CANCELAR
+                  .mensagem,
+              error: 'Bad Request',
+            },
+          },
+          aula_realizada_sem_chamada: {
+            summary: 'Tentativa de marcar como REALIZADA sem chamada',
+            value: {
+              statusCode: 400,
+              codigo: ERROS_ATUALIZACAO_AULA.AULA_REALIZADA_SEM_CHAMADA.codigo,
+              message:
+                ERROS_ATUALIZACAO_AULA.AULA_REALIZADA_SEM_CHAMADA.mensagem,
+              error: 'Bad Request',
+            },
+          },
+          aula_data_anterior_inicio_turma: {
+            summary: 'Data anterior ao início da turma',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_AULA.AULA_DATA_ANTERIOR_INICIO_TURMA.codigo,
+              message:
+                'A data da aula não pode ser anterior à data de início da turma (2026-02-01).',
+              error: 'Bad Request',
+            },
+          },
+          aula_data_posterior_fim_turma: {
+            summary: 'Data posterior ao encerramento da turma',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_AULA.AULA_DATA_POSTERIOR_FIM_TURMA.codigo,
+              message:
+                'A data da aula não pode ser posterior à data de encerramento da turma (2026-06-30).',
+              error: 'Bad Request',
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiConflictResponse({
+    description: 'Conflito de duplicidade de data na turma.',
+    content: {
+      'application/json': {
+        examples: {
+          aula_data_duplicada: {
+            summary: 'Aula já cadastrada para esta mesma data na turma',
+            value: {
+              statusCode: 409,
+              codigo: ERROS_ATUALIZACAO_AULA.AULA_DATA_DUPLICADA.codigo,
+              message: ERROS_ATUALIZACAO_AULA.AULA_DATA_DUPLICADA.mensagem,
+              error: 'Conflict',
+            },
+          },
+        },
+      },
+    },
   })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao atualizar a aula.',
