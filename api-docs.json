@@ -3092,6 +3092,16 @@
               "example": 10,
               "type": "number"
             }
+          },
+          {
+            "name": "turmaId",
+            "required": false,
+            "in": "query",
+            "description": "Filtrar matrículas por uma turma específica",
+            "schema": {
+              "example": "3",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -3169,6 +3179,7 @@
         ]
       },
       "patch": {
+        "description": "Permite atualizar os dados pedagógicos, parecer descritivo e o status da matrícula.\n\n**Regras de Negócio e Conclusão de Matrícula:**\n- **Turma em Andamento**: Só é permitido alterar matrículas quando a turma estiver com o status `EM_ANDAMENTO`.\n- **Atividades Avaliativas Concluídas**: Para concluir uma matrícula (`status: CONCLUIDA`) em turmas avaliadas por nota, todas as atividades avaliativas (`valeNota: true`) devem estar entregues e com nota lançada para o estudante.\n- **Resultado e Nota Final**: Em turmas por nota, a definição de `resultadoFinal` e `notaFinal` é obrigatória ao concluir.",
         "operationId": "TurmasMatriculasController_atualizar",
         "parameters": [
           {
@@ -3202,7 +3213,76 @@
             }
           },
           "400": {
-            "description": "A turma associada não está com o status EM_ANDAMENTO OU houve quebra nas regras de consistência de notas, pontuações e status da matrícula."
+            "description": "Erro de validação de regras de negócio ao atualizar a matrícula.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "turma_nao_em_andamento": {
+                    "summary": "Turma não está em andamento",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "MATRICULA_TURMA_NAO_EM_ANDAMENTO",
+                      "message": "Não é permitido modificar notas, pareceres ou dados cadastrais de matrículas quando a turma está com o status diferente de EM_ANDAMENTO. Status atual da turma: FINALIZADA",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "matricula_nao_concluida_com_resultado": {
+                    "summary": "Matrícula ATIVA/EVADIDA/CANCELADA com resultado final",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "MATRICULA_NAO_CONCLUIDA_COM_RESULTADO",
+                      "message": "Matrículas com status diferente de CONCLUIDA não podem possuir resultado final. O resultado final só deve ser atribuído quando a matrícula for concluída.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "matricula_nao_concluida_com_nota": {
+                    "summary": "Matrícula ATIVA/EVADIDA/CANCELADA com nota final",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "MATRICULA_NAO_CONCLUIDA_COM_NOTA",
+                      "message": "Matrículas com status diferente de CONCLUIDA não podem possuir nota final. A nota final só deve ser informada quando a matrícula for concluída.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "turma_possui_aulas_agendadas": {
+                    "summary": "Turma ainda possui aulas agendadas",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "MATRICULA_TURMA_POSSUI_AULAS_AGENDADAS",
+                      "message": "Não é possível concluir a matrícula pois a turma ainda possui aulas agendadas pendentes de realização ou cancelamento.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "atividade_avaliativa_pendente": {
+                    "summary": "Atividade avaliativa pendente ou sem nota lançada",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "MATRICULA_ATIVIDADE_AVALIATIVA_PENDENTE",
+                      "message": "Não é possível concluir a matrícula pois a atividade avaliativa 'Exercício 1' está pendente de entrega ou sem nota atribuída para este aluno.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "resultado_final_obrigatorio": {
+                    "summary": "Resultado final não informado em turma com nota",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "MATRICULA_RESULTADO_FINAL_OBRIGATORIO",
+                      "message": "É obrigatório definir o resultado final (APROVADO/REPROVADO) para turmas com avaliação por nota.",
+                      "error": "Bad Request"
+                    }
+                  },
+                  "nota_final_obrigatoria": {
+                    "summary": "Nota final não informada em turma com nota",
+                    "value": {
+                      "statusCode": 400,
+                      "codigo": "MATRICULA_NOTA_FINAL_OBRIGATORIA",
+                      "message": "A turma foi configurada para avaliação por nota, portanto é obrigatório informar a nota final do aluno.",
+                      "error": "Bad Request"
+                    }
+                  }
+                }
+              }
+            }
           },
           "404": {
             "description": "Registro de matrícula com o ID especificado não foi encontrado."

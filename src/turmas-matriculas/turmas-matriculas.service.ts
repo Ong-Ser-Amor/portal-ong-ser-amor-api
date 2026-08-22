@@ -9,13 +9,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AulasService } from 'src/aulas/aulas.service';
 import { BeneficiariosService } from 'src/beneficiarios/beneficiarios.service';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { CriterioAvaliacao } from 'src/turmas/enums/criterio-avaliacao.enum';
 import { StatusTurma } from 'src/turmas/enums/status-turma.enum';
 import { TurmasService } from 'src/turmas/turmas.service';
-import { EntityNotFoundError, Repository } from 'typeorm';
+import { TurmaAtividadeEntrega } from 'src/turmas-atividades/entities/turma-atividade-entrega.entity';
+import { StatusEntrega } from 'src/turmas-atividades/enums/status-entrega.enum';
+import { EntityNotFoundError, FindOptionsWhere, Repository } from 'typeorm';
 
+import { ERROS_ATUALIZACAO_MATRICULA } from './constants/turmas-matriculas-erros.constant';
 import { AtualizarTurmaMatriculaDto } from './dto/atualizar-turma-matricula.dto';
 import { CriarTurmaMatriculaDto } from './dto/criar-turma-matricula.dto';
 import { TurmaMatricula } from './entities/turmas-matricula.entity';
@@ -29,10 +33,14 @@ export class TurmasMatriculasService {
   constructor(
     @InjectRepository(TurmaMatricula)
     private readonly repository: Repository<TurmaMatricula>,
+    @InjectRepository(TurmaAtividadeEntrega)
+    private readonly entregaRepository: Repository<TurmaAtividadeEntrega>,
     @Inject(BeneficiariosService)
     private readonly beneficiariosService: BeneficiariosService,
     @Inject(forwardRef(() => TurmasService))
     private readonly turmasService: TurmasService,
+    @Inject(forwardRef(() => AulasService))
+    private readonly aulasService: AulasService,
   ) {}
 
   async criar(
@@ -92,6 +100,7 @@ export class TurmasMatriculasService {
   async buscarTodas(
     pagina = 1,
     itensPorPagina = 10,
+    turmaId?: string,
   ): Promise<PaginacaoRespostaDto<TurmaMatricula>> {
     try {
       if (pagina < 1) {
@@ -106,13 +115,20 @@ export class TurmasMatriculasService {
         );
       }
 
+      const where: FindOptionsWhere<TurmaMatricula> = {};
+      if (turmaId) {
+        where.turmaId = turmaId;
+      }
+
       const take = itensPorPagina;
       const skip = (pagina - 1) * itensPorPagina;
 
       const [matriculas, total] = await this.repository.findAndCount({
+        where,
         relations: ['turma', 'beneficiario', 'beneficiario.pessoa'],
         take,
         skip,
+        order: { id: 'ASC' },
       });
 
       return new PaginacaoRespostaDto<TurmaMatricula>(
@@ -163,9 +179,10 @@ export class TurmasMatriculasService {
     const matriculaAtual = await this.buscarPorId(id);
 
     if (matriculaAtual.turma.status !== StatusTurma.EM_ANDAMENTO) {
-      throw new BadRequestException(
-        `Não é permitido modificar notas, pareceres ou dados cadastrais de matrículas quando a turma está com o status diferente de EM_ANDAMENTO. Status atual da turma: ${matriculaAtual.turma.status}`,
-      );
+      throw new BadRequestException({
+        codigo: ERROS_ATUALIZACAO_MATRICULA.TURMA_NAO_EM_ANDAMENTO.codigo,
+        message: `${ERROS_ATUALIZACAO_MATRICULA.TURMA_NAO_EM_ANDAMENTO.mensagem} Status atual da turma: ${matriculaAtual.turma.status}`,
+      });
     }
 
     // Consolida os dados novos com os já existentes na memória para validação das regras
@@ -181,7 +198,9 @@ export class TurmasMatriculasService {
         : matriculaAtual.notaFinal;
 
     // Executa a validação cruzada com base nas regras herdadas da turma
-    this.validarRegrasDeMatricula(
+    await this.validarRegrasDeMatricula(
+      id,
+      matriculaAtual.turmaId,
       matriculaAtual.turma.criterioAvaliacao,
       statusConsolidado,
       resultadoConsolidado,
@@ -267,48 +286,168 @@ export class TurmasMatriculasService {
   /**
    * Método privado para isolar e aplicar as restrições de encerramento da matrícula
    */
-  private validarRegrasDeMatricula(
+  private async validarRegrasDeMatricula(
+    matriculaId: string,
+    turmaId: string,
     criterioTurma: CriterioAvaliacao,
     status: StatusMatricula,
     resultado: ResultadoFinalMatricula | null,
     nota: string | null,
-  ): void {
-    // Se a matrícula foi concluída em uma turma que possui avaliação obrigatória, exige o veredito
-    if (
-      status === StatusMatricula.CONCLUIDA &&
-      criterioTurma === CriterioAvaliacao.POR_NOTA_PRESENCA
-    ) {
-      if (!resultado) {
-        throw new BadRequestException(
-          'É obrigatório definir o resultado final (APROVADO/REPROVADO) para turmas com avaliação por nota.',
-        );
+  ): Promise<void> {
+    // 1. Matrículas com status diferente de CONCLUIDA (ATIVA, EVADIDA, CANCELADA) não podem possuir resultado nem nota
+    if (status !== StatusMatricula.CONCLUIDA) {
+      if (resultado !== null && resultado !== undefined) {
+        throw new BadRequestException({
+          codigo:
+            ERROS_ATUALIZACAO_MATRICULA.MATRICULA_NAO_CONCLUIDA_COM_RESULTADO
+              .codigo,
+          message:
+            ERROS_ATUALIZACAO_MATRICULA.MATRICULA_NAO_CONCLUIDA_COM_RESULTADO
+              .mensagem,
+        });
       }
-      if (!nota) {
-        throw new BadRequestException(
-          'A turma foi configurada para avaliação por nota, portanto é obrigatório informar a nota final do aluno.',
-        );
+
+      if (nota !== null && nota !== undefined) {
+        throw new BadRequestException({
+          codigo:
+            ERROS_ATUALIZACAO_MATRICULA.MATRICULA_NAO_CONCLUIDA_COM_NOTA.codigo,
+          message:
+            ERROS_ATUALIZACAO_MATRICULA.MATRICULA_NAO_CONCLUIDA_COM_NOTA
+              .mensagem,
+        });
       }
+
+      return;
     }
 
-    // Abordagem limpa acordada: se a turma é sem controle, o resultado deve permanecer nulo
-    if (criterioTurma === CriterioAvaliacao.SEM_CONTROLE) {
-      if (resultado) {
-        throw new BadRequestException(
-          'Turmas sem controle de avaliação não aceitam o preenchimento de resultado final.',
-        );
+    // 2. Regras para matrículas que estão sendo CONCLUÍDAS (status === StatusMatricula.CONCLUIDA)
+    const possuiAulasAgendadas =
+      await this.aulasService.possuiAulasAgendadas(turmaId);
+    if (possuiAulasAgendadas) {
+      throw new BadRequestException({
+        codigo: ERROS_ATUALIZACAO_MATRICULA.TURMA_POSSUI_AULAS_AGENDADAS.codigo,
+        message:
+          ERROS_ATUALIZACAO_MATRICULA.TURMA_POSSUI_AULAS_AGENDADAS.mensagem,
+      });
+    }
+    switch (criterioTurma) {
+      case CriterioAvaliacao.POR_NOTA_PRESENCA: {
+        if (!resultado) {
+          throw new BadRequestException({
+            codigo:
+              ERROS_ATUALIZACAO_MATRICULA.RESULTADO_FINAL_OBRIGATORIO.codigo,
+            message:
+              ERROS_ATUALIZACAO_MATRICULA.RESULTADO_FINAL_OBRIGATORIO.mensagem,
+          });
+        }
+        if (!nota) {
+          throw new BadRequestException({
+            codigo: ERROS_ATUALIZACAO_MATRICULA.NOTA_FINAL_OBRIGATORIA.codigo,
+            message:
+              ERROS_ATUALIZACAO_MATRICULA.NOTA_FINAL_OBRIGATORIA.mensagem,
+          });
+        }
+        await this.validarAtividadesAvaliativasConcluidas(matriculaId);
+        break;
       }
-      if (nota) {
-        throw new BadRequestException(
-          'Não é permitido atribuir pontuação/nota para turmas sem controle de avaliação.',
-        );
+
+      case CriterioAvaliacao.QUALITATIVA: {
+        if (!resultado) {
+          throw new BadRequestException({
+            codigo:
+              ERROS_ATUALIZACAO_MATRICULA.QUALITATIVA_RESULTADO_OBRIGATORIO
+                .codigo,
+            message:
+              ERROS_ATUALIZACAO_MATRICULA.QUALITATIVA_RESULTADO_OBRIGATORIO
+                .mensagem,
+          });
+        }
+        if (nota) {
+          throw new BadRequestException({
+            codigo:
+              ERROS_ATUALIZACAO_MATRICULA.QUALITATIVA_NOTA_INVALIDA.codigo,
+            message:
+              ERROS_ATUALIZACAO_MATRICULA.QUALITATIVA_NOTA_INVALIDA.mensagem,
+          });
+        }
+        break;
+      }
+
+      case CriterioAvaliacao.POR_PARTICIPACAO: {
+        if (!resultado) {
+          throw new BadRequestException({
+            codigo:
+              ERROS_ATUALIZACAO_MATRICULA.PARTICIPACAO_RESULTADO_OBRIGATORIO
+                .codigo,
+            message:
+              ERROS_ATUALIZACAO_MATRICULA.PARTICIPACAO_RESULTADO_OBRIGATORIO
+                .mensagem,
+          });
+        }
+        if (nota) {
+          throw new BadRequestException({
+            codigo:
+              ERROS_ATUALIZACAO_MATRICULA.PARTICIPACAO_NOTA_INVALIDA.codigo,
+            message:
+              ERROS_ATUALIZACAO_MATRICULA.PARTICIPACAO_NOTA_INVALIDA.mensagem,
+          });
+        }
+        break;
+      }
+
+      case CriterioAvaliacao.SEM_CONTROLE: {
+        if (resultado) {
+          throw new BadRequestException({
+            codigo:
+              ERROS_ATUALIZACAO_MATRICULA.SEM_CONTROLE_RESULTADO_INVALIDO
+                .codigo,
+            message:
+              ERROS_ATUALIZACAO_MATRICULA.SEM_CONTROLE_RESULTADO_INVALIDO
+                .mensagem,
+          });
+        }
+        if (nota) {
+          throw new BadRequestException({
+            codigo:
+              ERROS_ATUALIZACAO_MATRICULA.SEM_CONTROLE_NOTA_INVALIDA.codigo,
+            message:
+              ERROS_ATUALIZACAO_MATRICULA.SEM_CONTROLE_NOTA_INVALIDA.mensagem,
+          });
+        }
+        break;
       }
     }
+  }
 
-    // Se o critério for qualitativo, rejeitamos qualquer atribuição de nota
-    if (criterioTurma === CriterioAvaliacao.QUALITATIVA && nota) {
-      throw new BadRequestException(
-        'Turmas com avaliação qualitativa não aceitam o preenchimento de nota final.',
-      );
+  /**
+   * Garante que o estudante não possui atividades que valem nota com entrega PENDENTE ou ENTREGUE sem nota lançada.
+   */
+  private async validarAtividadesAvaliativasConcluidas(
+    matriculaId: string,
+  ): Promise<void> {
+    const entregaPendente = await this.entregaRepository
+      .createQueryBuilder('entrega')
+      .innerJoinAndSelect('entrega.atividade', 'atividade')
+      .where('entrega.matriculaId = :matriculaId', { matriculaId })
+      .andWhere('atividade.valeNota = true')
+      .andWhere(
+        '(entrega.statusEntrega = :pendente OR (entrega.statusEntrega IN (:...statusEntregues) AND entrega.notaObtida IS NULL))',
+        {
+          pendente: StatusEntrega.PENDENTE,
+          statusEntregues: [
+            StatusEntrega.ENTREGUE,
+            StatusEntrega.ENTREGUE_COM_ATRASO,
+          ],
+        },
+      )
+      .getOne();
+
+    if (entregaPendente) {
+      throw new BadRequestException({
+        codigo:
+          ERROS_ATUALIZACAO_MATRICULA.ATIVIDADE_AVALIATIVA_PENDENTE.codigo,
+        message: `Não é possível concluir a matrícula pois a atividade avaliativa '${entregaPendente.atividade.titulo}' está pendente de entrega ou sem nota atribuída para este aluno.`,
+      });
     }
   }
 }

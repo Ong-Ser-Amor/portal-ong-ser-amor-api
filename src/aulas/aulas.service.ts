@@ -32,7 +32,7 @@ export class AulasService {
     private readonly chamadasService: ChamadasService,
     @Inject(forwardRef(() => TurmasService))
     private readonly turmasService: TurmasService,
-  ) {}
+  ) { }
 
   async criar(criarAulaDto: CriarAulaDto): Promise<Aula> {
     const turma = await this.turmasService.buscarPorId(criarAulaDto.turmaId);
@@ -286,6 +286,23 @@ export class AulasService {
       );
       throw new InternalServerErrorException(
         'Erro ao validar calendário de aulas existentes.',
+      );
+    }
+  }
+
+  async possuiAulasAgendadas(turmaId: string): Promise<boolean> {
+    try {
+      return await this.repository.existsBy({
+        turmaId,
+        status: StatusAula.AGENDADA,
+      });
+    } catch (erro) {
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro ao verificar aulas agendadas na turma ${turmaId}: ${mensagemErro}`,
+      );
+      throw new InternalServerErrorException(
+        'Erro ao validar aulas agendadas da turma.',
       );
     }
   }

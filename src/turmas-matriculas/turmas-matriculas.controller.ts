@@ -27,6 +27,7 @@ import {
 import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 
+import { ERROS_ATUALIZACAO_MATRICULA } from './constants/turmas-matriculas-erros.constant';
 import { AtualizarTurmaMatriculaDto } from './dto/atualizar-turma-matricula.dto';
 import { CriarTurmaMatriculaDto } from './dto/criar-turma-matricula.dto';
 import { TurmaMatriculaRespostaDto } from './dto/turma-matricula-resposta.dto';
@@ -83,6 +84,12 @@ export class TurmasMatriculasController {
     description: 'Número de itens por página (padrão: 10)',
     example: 10,
   })
+  @ApiQuery({
+    name: 'turmaId',
+    required: false,
+    description: 'Filtrar matrículas por uma turma específica',
+    example: '3',
+  })
   @ApiBadRequestResponse({
     description:
       'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
@@ -95,10 +102,12 @@ export class TurmasMatriculasController {
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
     @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
     itensPorPagina: number,
+    @Query('turmaId') turmaId?: string,
   ): Promise<PaginacaoRespostaDto<TurmaMatriculaRespostaDto>> {
     const matriculas = await this.turmasMatriculasService.buscarTodas(
       pagina,
       itensPorPagina,
+      turmaId,
     );
 
     const matriculasMapeadasComPaginacao = matriculas.dados.map(
@@ -136,6 +145,12 @@ export class TurmasMatriculasController {
   @Patch(':id')
   @ApiOperation({
     summary: 'Atualizar notas, pareceres ou status de uma matrícula',
+    description:
+      'Permite atualizar os dados pedagógicos, parecer descritivo e o status da matrícula.\n\n' +
+      '**Regras de Negócio e Conclusão de Matrícula:**\n' +
+      '- **Turma em Andamento**: Só é permitido alterar matrículas quando a turma estiver com o status `EM_ANDAMENTO`.\n' +
+      '- **Atividades Avaliativas Concluídas**: Para concluir uma matrícula (`status: CONCLUIDA`) em turmas avaliadas por nota, todas as atividades avaliativas (`valeNota: true`) devem estar entregues e com nota lançada para o estudante.\n' +
+      '- **Resultado e Nota Final**: Em turmas por nota, a definição de `resultadoFinal` e `notaFinal` é obrigatória ao concluir.',
   })
   @ApiOkResponse({
     description: 'O registro de matrícula foi atualizado com sucesso.',
@@ -147,7 +162,95 @@ export class TurmasMatriculasController {
   })
   @ApiBadRequestResponse({
     description:
-      'A turma associada não está com o status EM_ANDAMENTO OU houve quebra nas regras de consistência de notas, pontuações e status da matrícula.',
+      'Erro de validação de regras de negócio ao atualizar a matrícula.',
+    content: {
+      'application/json': {
+        examples: {
+          turma_nao_em_andamento: {
+            summary: 'Turma não está em andamento',
+            value: {
+              statusCode: 400,
+              codigo: ERROS_ATUALIZACAO_MATRICULA.TURMA_NAO_EM_ANDAMENTO.codigo,
+              message:
+                'Não é permitido modificar notas, pareceres ou dados cadastrais de matrículas quando a turma está com o status diferente de EM_ANDAMENTO. Status atual da turma: FINALIZADA',
+              error: 'Bad Request',
+            },
+          },
+          matricula_nao_concluida_com_resultado: {
+            summary: 'Matrícula ATIVA/EVADIDA/CANCELADA com resultado final',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_MATRICULA
+                  .MATRICULA_NAO_CONCLUIDA_COM_RESULTADO.codigo,
+              message:
+                ERROS_ATUALIZACAO_MATRICULA
+                  .MATRICULA_NAO_CONCLUIDA_COM_RESULTADO.mensagem,
+              error: 'Bad Request',
+            },
+          },
+          matricula_nao_concluida_com_nota: {
+            summary: 'Matrícula ATIVA/EVADIDA/CANCELADA com nota final',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_MATRICULA.MATRICULA_NAO_CONCLUIDA_COM_NOTA
+                  .codigo,
+              message:
+                ERROS_ATUALIZACAO_MATRICULA.MATRICULA_NAO_CONCLUIDA_COM_NOTA
+                  .mensagem,
+              error: 'Bad Request',
+            },
+          },
+          turma_possui_aulas_agendadas: {
+            summary: 'Turma ainda possui aulas agendadas',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_MATRICULA.TURMA_POSSUI_AULAS_AGENDADAS.codigo,
+              message:
+                ERROS_ATUALIZACAO_MATRICULA.TURMA_POSSUI_AULAS_AGENDADAS
+                  .mensagem,
+              error: 'Bad Request',
+            },
+          },
+          atividade_avaliativa_pendente: {
+            summary: 'Atividade avaliativa pendente ou sem nota lançada',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_MATRICULA.ATIVIDADE_AVALIATIVA_PENDENTE
+                  .codigo,
+              message:
+                "Não é possível concluir a matrícula pois a atividade avaliativa 'Exercício 1' está pendente de entrega ou sem nota atribuída para este aluno.",
+              error: 'Bad Request',
+            },
+          },
+          resultado_final_obrigatorio: {
+            summary: 'Resultado final não informado em turma com nota',
+            value: {
+              statusCode: 400,
+              codigo:
+                ERROS_ATUALIZACAO_MATRICULA.RESULTADO_FINAL_OBRIGATORIO.codigo,
+              message:
+                ERROS_ATUALIZACAO_MATRICULA.RESULTADO_FINAL_OBRIGATORIO
+                  .mensagem,
+              error: 'Bad Request',
+            },
+          },
+          nota_final_obrigatoria: {
+            summary: 'Nota final não informada em turma com nota',
+            value: {
+              statusCode: 400,
+              codigo: ERROS_ATUALIZACAO_MATRICULA.NOTA_FINAL_OBRIGATORIA.codigo,
+              message:
+                ERROS_ATUALIZACAO_MATRICULA.NOTA_FINAL_OBRIGATORIA.mensagem,
+              error: 'Bad Request',
+            },
+          },
+        },
+      },
+    },
   })
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao atualizar a matrícula.',
