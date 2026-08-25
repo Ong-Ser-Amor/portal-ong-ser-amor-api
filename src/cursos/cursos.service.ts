@@ -1,13 +1,16 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
+import { temAcessoIrrestritoEmCursos } from 'src/shared/utils/permissao-cursos.util';
 import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { AtualizarCursoDto } from './dto/atualizar-curso.dto';
@@ -21,7 +24,7 @@ export class CursosService {
   constructor(
     @InjectRepository(Curso)
     private readonly repository: Repository<Curso>,
-  ) {}
+  ) { }
 
   async criar(criarCursoDto: CriarCursoDto): Promise<Curso> {
     // 1. Valida duplicidade ANTES de tentar salvar
@@ -42,6 +45,7 @@ export class CursosService {
   }
 
   async buscarTodos(
+    usuario: PayloadJwtDto,
     pagina = 1,
     itensPorPagina = 10,
   ): Promise<PaginacaoRespostaDto<Curso>> {
@@ -61,11 +65,34 @@ export class CursosService {
       const take = itensPorPagina;
       const skip = (pagina - 1) * itensPorPagina;
 
-      const [cursos, total] = await this.repository.findAndCount({
-        order: { nome: 'ASC' },
-        take,
-        skip,
-      });
+      const queryBuilder = this.repository.createQueryBuilder('curso');
+
+      if (!temAcessoIrrestritoEmCursos(usuario)) {
+        queryBuilder
+          .innerJoin(
+            'planos_curso',
+            'plano',
+            'plano.curso_id = curso.id AND plano.deletado_em IS NULL',
+          )
+          .innerJoin(
+            'turmas',
+            'turma',
+            'turma.plano_curso_id = plano.id AND turma.deletado_em IS NULL',
+          )
+          .innerJoin(
+            'turmas_professores',
+            'tp',
+            'tp.turma_id = turma.id AND tp.deletado_em IS NULL',
+          )
+          .andWhere('tp.professor_id = :professorId', {
+            professorId: usuario.voluntarioId,
+          })
+          .distinct(true);
+      }
+
+      queryBuilder.orderBy('curso.nome', 'ASC').skip(skip).take(take);
+
+      const [cursos, total] = await queryBuilder.getManyAndCount();
 
       return new PaginacaoRespostaDto<Curso>(
         cursos,
@@ -74,7 +101,10 @@ export class CursosService {
         pagina,
       );
     } catch (erro) {
-      if (erro instanceof BadRequestException) {
+      if (
+        erro instanceof BadRequestException ||
+        erro instanceof ForbiddenException
+      ) {
         throw erro;
       }
 
@@ -95,12 +125,63 @@ export class CursosService {
     }
   }
 
-  async buscarPorId(id: string): Promise<Curso> {
+  async validarPermissaoAcesso(
+    id: string,
+    usuario: PayloadJwtDto,
+  ): Promise<void> {
+    if (!temAcessoIrrestritoEmCursos(usuario)) {
+      const temVinculo = await this.repository
+        .createQueryBuilder('curso')
+        .innerJoin(
+          'planos_curso',
+          'plano',
+          'plano.curso_id = curso.id AND plano.deletado_em IS NULL',
+        )
+        .innerJoin(
+          'turmas',
+          'turma',
+          'turma.plano_curso_id = plano.id AND turma.deletado_em IS NULL',
+        )
+        .innerJoin(
+          'turmas_professores',
+          'tp',
+          'tp.turma_id = turma.id AND tp.deletado_em IS NULL',
+        )
+        .where('curso.id = :id', { id })
+        .andWhere('tp.professor_id = :professorId', {
+          professorId: usuario.voluntarioId,
+        })
+        .getExists();
+
+      if (!temVinculo) {
+        await this.validarExistencia(id);
+        throw new ForbiddenException(
+          'Usuário não tem permissão para acessar ou manipular dados deste curso.',
+        );
+      }
+      return;
+    }
+
+    await this.validarExistencia(id);
+  }
+
+  async buscarPorId(id: string, usuario: PayloadJwtDto): Promise<Curso> {
     try {
-      return await this.repository.findOneByOrFail({
+      const curso = await this.repository.findOneByOrFail({
         id,
       });
+
+      await this.validarPermissaoAcesso(id, usuario);
+
+      return curso;
     } catch (erro) {
+      if (
+        erro instanceof ForbiddenException ||
+        erro instanceof NotFoundException
+      ) {
+        throw erro;
+      }
+
       if (erro instanceof EntityNotFoundError) {
         throw new NotFoundException(`Curso com ID ${id} não encontrado.`);
       }
@@ -118,8 +199,9 @@ export class CursosService {
   async atualizar(
     id: string,
     atualizarCursoDto: AtualizarCursoDto,
+    usuario: PayloadJwtDto,
   ): Promise<Curso> {
-    const curso = await this.buscarPorId(id);
+    const curso = await this.buscarPorId(id, usuario);
 
     if (atualizarCursoDto.nome && atualizarCursoDto.nome !== curso.nome) {
       await this.verificarDuplicidadeNome(atualizarCursoDto.nome, id);

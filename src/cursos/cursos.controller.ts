@@ -1,15 +1,15 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
+  DefaultValuePipe,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
   ParseIntPipe,
-  DefaultValuePipe,
+  Patch,
+  Post,
   Query,
 } from '@nestjs/common';
 import {
@@ -24,8 +24,10 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
 import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
 import { Perfis } from 'src/shared/decorators/perfis.decorator';
+import { UsuarioLogado } from 'src/shared/decorators/usuario-logado.decorator';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
@@ -84,8 +86,10 @@ export class CursosController {
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
     @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
     itensPorPagina: number,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<PaginacaoRespostaDto<CursoRespostaDto>> {
     const cursosPaginados = await this.cursosService.buscarTodos(
+      usuario,
       pagina,
       itensPorPagina,
     );
@@ -115,8 +119,11 @@ export class CursosController {
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar o curso.',
   })
-  async buscarPorId(@Param('id') id: string): Promise<CursoRespostaDto> {
-    const curso = await this.cursosService.buscarPorId(id);
+  async buscarPorId(
+    @Param('id') id: string,
+    @UsuarioLogado() usuario: PayloadJwtDto,
+  ): Promise<CursoRespostaDto> {
+    const curso = await this.cursosService.buscarPorId(id, usuario);
     return new CursoRespostaDto(curso);
   }
 
@@ -139,10 +146,12 @@ export class CursosController {
   async atualizar(
     @Param('id') id: string,
     @Body() atualizarCursoDto: AtualizarCursoDto,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<CursoRespostaDto> {
     const cursoAtualizado = await this.cursosService.atualizar(
       id,
       atualizarCursoDto,
+      usuario,
     );
     return new CursoRespostaDto(cursoAtualizado);
   }
