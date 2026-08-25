@@ -99,6 +99,16 @@ export class PlanosCursoService {
     }
   }
 
+  async validarExistencia(id: string): Promise<void> {
+    const existe = await this.repository.existsBy({ id });
+
+    if (!existe) {
+      throw new NotFoundException(
+        `Plano de curso com ID ${id} não encontrado.`,
+      );
+    }
+  }
+
   async buscarPorId(id: string): Promise<PlanoCurso> {
     try {
       return await this.repository.findOneOrFail({
@@ -160,7 +170,7 @@ export class PlanosCursoService {
   }
 
   async remover(id: string): Promise<void> {
-    await this.buscarPorId(id);
+    await this.validarExistencia(id);
 
     try {
       await this.repository.softDelete(id);

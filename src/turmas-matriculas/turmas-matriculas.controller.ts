@@ -24,8 +24,12 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
 import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
+import { Perfis } from 'src/shared/decorators/perfis.decorator';
+import { UsuarioLogado } from 'src/shared/decorators/usuario-logado.decorator';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
+import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
 import { ERROS_ATUALIZACAO_MATRICULA } from './constants/turmas-matriculas-erros.constant';
 import { AtualizarTurmaMatriculaDto } from './dto/atualizar-turma-matricula.dto';
@@ -41,6 +45,7 @@ export class TurmasMatriculasController {
   ) {}
 
   @Post()
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
   @ApiOperation({ summary: 'Matricular um beneficiário em uma turma' })
   @ApiCreatedResponse({
     description: 'A matrícula do beneficiário foi realizada com sucesso.',
@@ -61,17 +66,26 @@ export class TurmasMatriculasController {
     description: 'Ocorreu um erro inesperado ao processar a matrícula.',
   })
   async criar(
-    @Body() criarTurmasMatriculaDto: CriarTurmaMatriculaDto,
+    @Body() criarTurmaMatriculaDto: CriarTurmaMatriculaDto,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<TurmaMatriculaRespostaDto> {
     const matricula = await this.turmasMatriculasService.criar(
-      criarTurmasMatriculaDto,
+      criarTurmaMatriculaDto,
+      usuario,
     );
     return new TurmaMatriculaRespostaDto(matricula);
   }
 
   @Get()
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS, PerfilAcesso.PROFESSOR)
   @ApiOperation({ summary: 'Buscar uma lista paginada de matrículas' })
   @ApiPaginacaoResposta(TurmaMatriculaRespostaDto)
+  @ApiQuery({
+    name: 'turmaId',
+    required: true,
+    description: 'ID da turma para listar as matrículas',
+    example: '3',
+  })
   @ApiQuery({
     name: 'pagina',
     required: false,
@@ -84,12 +98,6 @@ export class TurmasMatriculasController {
     description: 'Número de itens por página (padrão: 10)',
     example: 10,
   })
-  @ApiQuery({
-    name: 'turmaId',
-    required: false,
-    description: 'Filtrar matrículas por uma turma específica',
-    example: '3',
-  })
   @ApiBadRequestResponse({
     description:
       'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
@@ -99,15 +107,17 @@ export class TurmasMatriculasController {
       'Ocorreu um erro inesperado ao buscar a listagem de matrículas.',
   })
   async buscarTodas(
+    @Query('turmaId') turmaId: string,
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
     @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
     itensPorPagina: number,
-    @Query('turmaId') turmaId?: string,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<PaginacaoRespostaDto<TurmaMatriculaRespostaDto>> {
     const matriculas = await this.turmasMatriculasService.buscarTodas(
+      turmaId,
+      usuario,
       pagina,
       itensPorPagina,
-      turmaId,
     );
 
     const matriculasMapeadasComPaginacao = matriculas.dados.map(
@@ -123,6 +133,7 @@ export class TurmasMatriculasController {
   }
 
   @Get(':id')
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS, PerfilAcesso.PROFESSOR)
   @ApiOperation({ summary: 'Buscar o registro de uma matrícula por ID' })
   @ApiOkResponse({
     description: 'O registro de matrícula foi encontrado com sucesso.',
@@ -137,12 +148,17 @@ export class TurmasMatriculasController {
   })
   async buscarPorId(
     @Param('id') id: string,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<TurmaMatriculaRespostaDto> {
-    const matricula = await this.turmasMatriculasService.buscarPorId(id);
+    const matricula = await this.turmasMatriculasService.buscarPorId(
+      id,
+      usuario,
+    );
     return new TurmaMatriculaRespostaDto(matricula);
   }
 
   @Patch(':id')
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS, PerfilAcesso.PROFESSOR)
   @ApiOperation({
     summary: 'Atualizar notas, pareceres ou status de uma matrícula',
     description:
@@ -202,18 +218,6 @@ export class TurmasMatriculasController {
               error: 'Bad Request',
             },
           },
-          turma_possui_aulas_agendadas: {
-            summary: 'Turma ainda possui aulas agendadas',
-            value: {
-              statusCode: 400,
-              codigo:
-                ERROS_ATUALIZACAO_MATRICULA.TURMA_POSSUI_AULAS_AGENDADAS.codigo,
-              message:
-                ERROS_ATUALIZACAO_MATRICULA.TURMA_POSSUI_AULAS_AGENDADAS
-                  .mensagem,
-              error: 'Bad Request',
-            },
-          },
           atividade_avaliativa_pendente: {
             summary: 'Atividade avaliativa pendente ou sem nota lançada',
             value: {
@@ -257,16 +261,19 @@ export class TurmasMatriculasController {
   })
   async atualizar(
     @Param('id') id: string,
-    @Body() atualizarTurmasMatriculaDto: AtualizarTurmaMatriculaDto,
+    @Body() atualizarTurmaMatriculaDto: AtualizarTurmaMatriculaDto,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<TurmaMatriculaRespostaDto> {
     const matricula = await this.turmasMatriculasService.atualizar(
       id,
-      atualizarTurmasMatriculaDto,
+      atualizarTurmaMatriculaDto,
+      usuario,
     );
     return new TurmaMatriculaRespostaDto(matricula);
   }
 
   @Delete(':id')
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remover logicamente uma matrícula pelo ID' })
   @ApiNoContentResponse({

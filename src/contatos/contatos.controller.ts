@@ -21,6 +21,8 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import { Perfis } from 'src/shared/decorators/perfis.decorator';
+import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
 import { ContatosService } from './contatos.service';
 import { AtualizarContatoDto } from './dto/atualizar-contato.dto';
@@ -28,6 +30,7 @@ import { ContatoDto } from './dto/contato.dto';
 import { CriarContatoDto } from './dto/criar-contato.dto';
 
 @ApiTags('Contatos')
+@Perfis(PerfilAcesso.ADMIN)
 @Controller('contatos')
 export class ContatosController {
   constructor(private readonly contatosService: ContatosService) {}

@@ -10,6 +10,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { PerfilAcesso } from '../enums/perfil-acesso.enum';
+
 @Entity({ name: 'usuarios' })
 export class Usuario {
   @PrimaryGeneratedColumn('identity', { type: 'bigint' })
@@ -21,6 +23,15 @@ export class Usuario {
   @OneToOne(() => Voluntario)
   @JoinColumn({ name: 'voluntario_id' })
   voluntario: Voluntario;
+
+  @Column({
+    name: 'perfis_acesso',
+    type: 'varchar',
+    length: 100,
+    array: true,
+    nullable: false,
+  })
+  perfisAcesso: PerfilAcesso[];
 
   @Column({
     name: 'email',

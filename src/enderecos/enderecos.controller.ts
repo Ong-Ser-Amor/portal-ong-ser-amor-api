@@ -6,12 +6,15 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { Perfis } from 'src/shared/decorators/perfis.decorator';
+import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
 import { AtualizarEnderecoDto } from './dto/atualizar-endereco.dto';
 import { EnderecoRespostaDto } from './dto/endereco-resposta.dto';
 import { EnderecosService } from './enderecos.service';
 
 @ApiTags('Endereços')
+@Perfis(PerfilAcesso.ADMIN)
 @Controller('enderecos')
 export class EnderecosController {
   constructor(private readonly enderecosService: EnderecosService) {}

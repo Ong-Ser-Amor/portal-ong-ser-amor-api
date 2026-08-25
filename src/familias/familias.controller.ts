@@ -6,12 +6,15 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { Perfis } from 'src/shared/decorators/perfis.decorator';
+import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
 import { AtualizarFamiliaDto } from './dto/atualizar-familia.dto';
 import { FamiliaRespostaDto } from './dto/familia-resposta.dto';
 import { FamiliasService } from './familias.service';
 
 @ApiTags('Famílias')
+@Perfis(PerfilAcesso.ADMIN)
 @Controller('familias')
 export class FamiliasController {
   constructor(private readonly familiasService: FamiliasService) {}

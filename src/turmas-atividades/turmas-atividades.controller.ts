@@ -1,12 +1,12 @@
 import {
-  Controller,
-  Post,
   Body,
+  Controller,
+  Get,
   HttpCode,
   HttpStatus,
-  Get,
   Param,
   Patch,
+  Post,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -18,6 +18,10 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
+import { Perfis } from 'src/shared/decorators/perfis.decorator';
+import { UsuarioLogado } from 'src/shared/decorators/usuario-logado.decorator';
+import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
 import { AtualizarTurmaAtividadeDto } from './dto/atualizar-turma-atividade.dto';
 import { CriarTurmaAtividadeDto } from './dto/criar-turma-atividade.dto';
@@ -27,6 +31,7 @@ import { TurmaAtividadeRespostaDto } from './dto/turma-atividade-resposta.dto';
 import { TurmasAtividadesService } from './turmas-atividades.service';
 
 @ApiTags('Atividades das Turmas')
+@Perfis(PerfilAcesso.COORDENADOR_CURSOS, PerfilAcesso.PROFESSOR)
 @Controller('turmas-atividades')
 export class TurmasAtividadesController {
   constructor(
@@ -53,10 +58,12 @@ export class TurmasAtividadesController {
   })
   async criar(
     @Body() criarTurmaAtividadeDto: CriarTurmaAtividadeDto,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<TurmaAtividadeRespostaDto> {
     const atividade =
       await this.turmasAtividadesService.criarAtividadeComPendenciasDeEntrega(
         criarTurmaAtividadeDto,
+        usuario,
       );
     return new TurmaAtividadeRespostaDto(atividade);
   }
@@ -77,9 +84,13 @@ export class TurmasAtividadesController {
   })
   async buscarAtividadesPorTurma(
     @Param('turmaId') turmaId: string,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<TurmaAtividadeRespostaDto[]> {
     const atividades =
-      await this.turmasAtividadesService.buscarAtividadesPorTurma(turmaId);
+      await this.turmasAtividadesService.buscarAtividadesPorTurma(
+        turmaId,
+        usuario,
+      );
     return atividades.map(
       (atividade) => new TurmaAtividadeRespostaDto(atividade),
     );
@@ -102,10 +113,12 @@ export class TurmasAtividadesController {
   })
   async buscarEntregasPorAtividade(
     @Param('atividadeId') atividadeId: string,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<TurmaAtividadeEntregaRespostaDto[]> {
     const entregas =
       await this.turmasAtividadesService.buscarEntregasPorAtividade(
         atividadeId,
+        usuario,
       );
     return entregas.map(
       (entrega) => new TurmaAtividadeEntregaRespostaDto(entrega),
@@ -139,9 +152,11 @@ export class TurmasAtividadesController {
   })
   async registrarEmLote(
     @Body() registrarEntregasLoteDto: RegistrarEntregasLoteDto,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<void> {
     await this.turmasAtividadesService.registrarEntregasEmLote(
       registrarEntregasLoteDto,
+      usuario,
     );
   }
 
@@ -166,10 +181,12 @@ export class TurmasAtividadesController {
   async atualizar(
     @Param('id') id: string,
     @Body() atualizarTurmaAtividadeDto: AtualizarTurmaAtividadeDto,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<TurmaAtividadeRespostaDto> {
     const atividade = await this.turmasAtividadesService.atualizar(
       id,
       atualizarTurmaAtividadeDto,
+      usuario,
     );
     return new TurmaAtividadeRespostaDto(atividade);
   }

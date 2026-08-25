@@ -5,7 +5,6 @@ export enum StatusFormacao {
 }
 
 export enum TipoVoluntario {
-  COORDENADOR = 'COORDENADOR',
+  COORDENADOR_CURSOS = 'COORDENADOR_CURSOS',
   PROFESSOR = 'PROFESSOR',
-  GERAL = 'GERAL',
 }

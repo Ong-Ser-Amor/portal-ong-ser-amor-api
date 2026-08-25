@@ -84,7 +84,8 @@ export class TurmaRespostaDto {
 
     if (turma.turmasProfessores) {
       this.professores = turma.turmasProfessores.map(
-        (tp) => new ProfessorResumoRespostaDto(tp.professor),
+        (turmaProfessor) =>
+          new ProfessorResumoRespostaDto(turmaProfessor.professor),
       );
     }
   }

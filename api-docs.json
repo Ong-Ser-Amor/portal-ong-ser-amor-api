@@ -1377,9 +1377,8 @@
                       "tipoVoluntario": {
                         "type": "string",
                         "enum": [
-                          "COORDENADOR",
-                          "PROFESSOR",
-                          "GERAL"
+                          "COORDENADOR_CURSOS",
+                          "PROFESSOR"
                         ]
                       },
                       "formacaoAcademica": {
@@ -1422,9 +1421,8 @@
                       "tipoVoluntario": {
                         "type": "string",
                         "enum": [
-                          "COORDENADOR",
-                          "PROFESSOR",
-                          "GERAL"
+                          "COORDENADOR_CURSOS",
+                          "PROFESSOR"
                         ]
                       },
                       "formacaoAcademica": {
@@ -1454,7 +1452,7 @@
                   "summary": "Pessoa já cadastrada (use pessoaId)",
                   "value": {
                     "pessoaId": "123456",
-                    "tipoVoluntario": "COORDENADOR",
+                    "tipoVoluntario": "COORDENADOR_CURSOS",
                     "formacaoAcademica": "Pedagogia",
                     "statusFormacao": "COMPLETO"
                   }
@@ -2228,16 +2226,19 @@
             }
           },
           "400": {
-            "description": "Dados de envio inválidos ou inconsistência nas regras e limites de avaliação."
+            "description": "Houve um erro de validação nos dados fornecidos (ex: datas inválidas ou campos numéricos fora dos limites permitidos)."
+          },
+          "404": {
+            "description": "O plano de curso informado pelo planoCursoId não foi encontrado."
           },
           "409": {
-            "description": "Já existe uma turma cadastrada com este nome para o plano de curso."
+            "description": "Já existe uma turma cadastrada com este nome para o plano de curso selecionado."
           },
           "500": {
-            "description": "Ocorreu um erro inesperado ao criar a turma."
+            "description": "Ocorreu um erro inesperado ao cadastrar a turma."
           }
         },
-        "summary": "Criar uma nova turma",
+        "summary": "Cadastrar uma nova turma",
         "tags": [
           "Turmas"
         ]
@@ -2660,6 +2661,16 @@
         "operationId": "AulasController_buscarTodas",
         "parameters": [
           {
+            "name": "turmaId",
+            "required": true,
+            "in": "query",
+            "description": "ID da turma para listar as aulas",
+            "schema": {
+              "example": "1",
+              "type": "string"
+            }
+          },
+          {
             "name": "pagina",
             "required": false,
             "in": "query",
@@ -2677,16 +2688,6 @@
             "schema": {
               "example": 10,
               "type": "number"
-            }
-          },
-          {
-            "name": "turmaId",
-            "required": false,
-            "in": "query",
-            "description": "Filtra opcionalmente as aulas pertencentes a uma turma específica",
-            "schema": {
-              "example": "1",
-              "type": "string"
             }
           }
         ],
@@ -2804,7 +2805,7 @@
               "application/json": {
                 "examples": {
                   "aula_com_chamada_nao_pode_agendar": {
-                    "summary": "Tentativa de reverter aula com chamada para AGENDADA",
+                    "summary": "Tentativa de reverter para AGENDADA com chamada existente",
                     "value": {
                       "statusCode": 400,
                       "codigo": "AULA_COM_CHAMADA_NAO_PODE_AGENDAR",
@@ -2813,7 +2814,7 @@
                     }
                   },
                   "aula_com_chamada_nao_pode_cancelar": {
-                    "summary": "Tentativa de cancelar aula que já possui chamada",
+                    "summary": "Tentativa de cancelar aula que já possui lista de chamada",
                     "value": {
                       "statusCode": 400,
                       "codigo": "AULA_COM_CHAMADA_NAO_PODE_CANCELAR",
@@ -2822,7 +2823,7 @@
                     }
                   },
                   "aula_realizada_sem_chamada": {
-                    "summary": "Tentativa de marcar como REALIZADA sem chamada",
+                    "summary": "Tentativa de marcar como REALIZADA sem chamada lançada",
                     "value": {
                       "statusCode": 400,
                       "codigo": "AULA_REALIZADA_SEM_CHAMADA",
@@ -2835,7 +2836,7 @@
                     "value": {
                       "statusCode": 400,
                       "codigo": "AULA_DATA_ANTERIOR_INICIO_TURMA",
-                      "message": "A data da aula não pode ser anterior à data de início da turma (2026-02-01).",
+                      "message": "A data da aula não pode ser anterior à data de início da turma.",
                       "error": "Bad Request"
                     }
                   },
@@ -2844,7 +2845,7 @@
                     "value": {
                       "statusCode": 400,
                       "codigo": "AULA_DATA_POSTERIOR_FIM_TURMA",
-                      "message": "A data da aula não pode ser posterior à data de encerramento da turma (2026-06-30).",
+                      "message": "A data da aula não pode ser posterior à data de encerramento da turma.",
                       "error": "Bad Request"
                     }
                   }
@@ -3074,6 +3075,16 @@
         "operationId": "TurmasMatriculasController_buscarTodas",
         "parameters": [
           {
+            "name": "turmaId",
+            "required": true,
+            "in": "query",
+            "description": "ID da turma para listar as matrículas",
+            "schema": {
+              "example": "3",
+              "type": "string"
+            }
+          },
+          {
             "name": "pagina",
             "required": false,
             "in": "query",
@@ -3091,16 +3102,6 @@
             "schema": {
               "example": 10,
               "type": "number"
-            }
-          },
-          {
-            "name": "turmaId",
-            "required": false,
-            "in": "query",
-            "description": "Filtrar matrículas por uma turma específica",
-            "schema": {
-              "example": "3",
-              "type": "string"
             }
           }
         ],
@@ -3241,15 +3242,6 @@
                       "statusCode": 400,
                       "codigo": "MATRICULA_NAO_CONCLUIDA_COM_NOTA",
                       "message": "Matrículas com status diferente de CONCLUIDA não podem possuir nota final. A nota final só deve ser informada quando a matrícula for concluída.",
-                      "error": "Bad Request"
-                    }
-                  },
-                  "turma_possui_aulas_agendadas": {
-                    "summary": "Turma ainda possui aulas agendadas",
-                    "value": {
-                      "statusCode": 400,
-                      "codigo": "MATRICULA_TURMA_POSSUI_AULAS_AGENDADAS",
-                      "message": "Não é possível concluir a matrícula pois a turma ainda possui aulas agendadas pendentes de realização ou cancelamento.",
                       "error": "Bad Request"
                     }
                   },
@@ -4380,27 +4372,60 @@
             "minLength": 8,
             "maxLength": 128,
             "example": "SenhaForte123"
+          },
+          "perfisAcesso": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "COORDENADOR_CURSOS",
+                "PROFESSOR"
+              ]
+            },
+            "example": [
+              "PROFESSOR"
+            ]
           }
         },
         "required": [
           "voluntarioId",
           "email",
-          "senha"
+          "senha",
+          "perfisAcesso"
         ]
       },
       "UsuarioRespostaDto": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "example": "1"
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "example": "carlos.santos@example.com"
+          },
+          "perfisAcesso": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "COORDENADOR_CURSOS",
+                "PROFESSOR"
+              ]
+            },
+            "example": [
+              "PROFESSOR"
+            ]
           }
         },
         "required": [
           "id",
-          "email"
+          "email",
+          "perfisAcesso"
         ]
       },
       "AtualizarUsuarioDto": {
@@ -4415,6 +4440,21 @@
             "maxLength": 255,
             "format": "email",
             "example": "carlos.santos@example.com"
+          },
+          "perfisAcesso": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "COORDENADOR_CURSOS",
+                "PROFESSOR"
+              ]
+            },
+            "example": [
+              "PROFESSOR"
+            ]
           }
         }
       },
@@ -4462,9 +4502,8 @@
           },
           "tipoVoluntario": {
             "enum": [
-              "COORDENADOR",
-              "PROFESSOR",
-              "GERAL"
+              "COORDENADOR_CURSOS",
+              "PROFESSOR"
             ],
             "type": "string",
             "example": "PROFESSOR"
@@ -4505,9 +4544,8 @@
           },
           "tipoVoluntario": {
             "enum": [
-              "COORDENADOR",
-              "PROFESSOR",
-              "GERAL"
+              "COORDENADOR_CURSOS",
+              "PROFESSOR"
             ],
             "type": "string",
             "example": "PROFESSOR"
@@ -4560,9 +4598,8 @@
           },
           "tipoVoluntario": {
             "enum": [
-              "COORDENADOR",
-              "PROFESSOR",
-              "GERAL"
+              "COORDENADOR_CURSOS",
+              "PROFESSOR"
             ],
             "type": "string",
             "example": "PROFESSOR"

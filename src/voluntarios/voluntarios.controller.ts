@@ -28,8 +28,10 @@ import {
 } from '@nestjs/swagger';
 import { PessoaDto } from 'src/pessoas/dto/pessoa.dto';
 import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
+import { Perfis } from 'src/shared/decorators/perfis.decorator';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { ValidarCpfPipe } from 'src/shared/pipes/validar-cpf.pipe';
+import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
 import { AtualizarVoluntarioDto } from './dto/atualizar-voluntario.dto';
 import { CriarVoluntarioDto } from './dto/criar-voluntario.dto';
@@ -39,6 +41,7 @@ import { StatusFormacao, TipoVoluntario } from './enums/voluntario.enum';
 import { VoluntariosService } from './voluntarios.service';
 
 @ApiTags('Voluntarios')
+@Perfis(PerfilAcesso.ADMIN)
 @Controller('voluntarios')
 export class VoluntariosController {
   constructor(private readonly voluntariosService: VoluntariosService) {}
@@ -99,7 +102,7 @@ export class VoluntariosController {
         summary: 'Pessoa já cadastrada (use pessoaId)',
         value: {
           pessoaId: '123456',
-          tipoVoluntario: TipoVoluntario.COORDENADOR,
+          tipoVoluntario: TipoVoluntario.COORDENADOR_CURSOS,
           formacaoAcademica: 'Pedagogia',
           statusFormacao: StatusFormacao.COMPLETO,
         },

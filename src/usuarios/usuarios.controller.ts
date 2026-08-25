@@ -20,12 +20,14 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Perfis } from 'src/shared/decorators/perfis.decorator';
 import { UsuarioDecorator } from 'src/shared/decorators/usuario.decorator';
 
 import { AtualizarSenhaDto } from './dto/atualizar-senha.dto';
 import { AtualizarUsuarioDto } from './dto/atualizar-usuario.dto';
 import { CriarUsuarioDto } from './dto/criar-usuario.dto';
 import { UsuarioRespostaDto } from './dto/usuario-resposta.dto';
+import { PerfilAcesso } from './enums/perfil-acesso.enum';
 import { UsuariosService } from './usuarios.service';
 
 @ApiTags('Usuarios')
@@ -34,6 +36,7 @@ export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Post()
+  @Perfis(PerfilAcesso.ADMIN)
   @ApiOperation({ summary: 'Criar um novo usuário' })
   @ApiCreatedResponse({
     description: 'O usuário foi criado com sucesso.',
@@ -53,6 +56,7 @@ export class UsuariosController {
   }
 
   @Get(':id')
+  @Perfis(PerfilAcesso.ADMIN)
   @ApiOperation({ summary: 'Buscar usuário pelo ID' })
   @ApiOkResponse({
     description: 'O usuário foi encontrado com sucesso.',
@@ -73,6 +77,7 @@ export class UsuariosController {
   }
 
   @Patch(':id')
+  @Perfis(PerfilAcesso.ADMIN)
   @ApiOperation({ summary: 'Atualizar usuário pelo ID' })
   @ApiOkResponse({
     description: 'O usuário foi atualizado com sucesso.',
@@ -124,6 +129,7 @@ export class UsuariosController {
   }
 
   @Delete(':id')
+  @Perfis(PerfilAcesso.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Deletar usuário pelo ID' })
   @ApiNoContentResponse({

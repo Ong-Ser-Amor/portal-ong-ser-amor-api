@@ -1,0 +1,5 @@
+export enum PerfilAcesso {
+  ADMIN = 'ADMIN',
+  COORDENADOR_CURSOS = 'COORDENADOR_CURSOS',
+  PROFESSOR = 'PROFESSOR',
+}

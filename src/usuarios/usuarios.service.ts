@@ -38,6 +38,7 @@ export class UsuariosService {
         email: criarUsuarioDto.email,
         senhaHash,
         voluntarioId: criarUsuarioDto.voluntarioId,
+        perfisAcesso: criarUsuarioDto.perfisAcesso,
       });
 
       return await this.repository.save(novoUsuario);

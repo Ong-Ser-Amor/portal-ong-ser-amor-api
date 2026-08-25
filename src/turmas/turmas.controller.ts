@@ -24,8 +24,12 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
 import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
+import { Perfis } from 'src/shared/decorators/perfis.decorator';
+import { UsuarioLogado } from 'src/shared/decorators/usuario-logado.decorator';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
+import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
 import { ERROS_ATUALIZACAO_TURMA } from './constants/turmas-erros.constant';
 import { AtualizarTurmaDto } from './dto/atualizar-turma.dto';
@@ -42,21 +46,26 @@ export class TurmasController {
   constructor(private readonly turmasService: TurmasService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Criar uma nova turma' })
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
+  @ApiOperation({ summary: 'Cadastrar uma nova turma' })
   @ApiCreatedResponse({
     description: 'A turma foi criada com sucesso.',
     type: TurmaRespostaDto,
   })
   @ApiBadRequestResponse({
     description:
-      'Dados de envio inválidos ou inconsistência nas regras e limites de avaliação.',
+      'Houve um erro de validação nos dados fornecidos (ex: datas inválidas ou campos numéricos fora dos limites permitidos).',
   })
   @ApiConflictResponse({
     description:
-      'Já existe uma turma cadastrada com este nome para o plano de curso.',
+      'Já existe uma turma cadastrada com este nome para o plano de curso selecionado.',
+  })
+  @ApiNotFoundResponse({
+    description:
+      'O plano de curso informado pelo planoCursoId não foi encontrado.',
   })
   @ApiInternalServerErrorResponse({
-    description: 'Ocorreu um erro inesperado ao criar a turma.',
+    description: 'Ocorreu um erro inesperado ao cadastrar a turma.',
   })
   async criar(@Body() criarTurmaDto: CriarTurmaDto): Promise<TurmaRespostaDto> {
     const turma = await this.turmasService.criar(criarTurmaDto);
@@ -64,6 +73,7 @@ export class TurmasController {
   }
 
   @Get()
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS, PerfilAcesso.PROFESSOR)
   @ApiOperation({ summary: 'Buscar uma lista paginada de turmas' })
   @ApiPaginacaoResposta(TurmaResumoDto)
   @ApiQuery({
@@ -101,10 +111,12 @@ export class TurmasController {
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
     @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
     itensPorPagina: number,
+    @UsuarioLogado() usuario: PayloadJwtDto,
     @Query('cursoId') cursoId?: string,
     @Query('planoCursoId') planoCursoId?: string,
   ): Promise<PaginacaoRespostaDto<TurmaResumoDto>> {
     const turmas = await this.turmasService.buscarTodos(
+      usuario,
       pagina,
       itensPorPagina,
       cursoId,
@@ -124,6 +136,7 @@ export class TurmasController {
   }
 
   @Get(':id')
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS, PerfilAcesso.PROFESSOR)
   @ApiOperation({ summary: 'Buscar uma turma por ID' })
   @ApiOkResponse({
     description: 'A turma foi encontrada com sucesso.',
@@ -135,12 +148,16 @@ export class TurmasController {
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar a turma.',
   })
-  async buscarPorId(@Param('id') id: string): Promise<TurmaRespostaDto> {
-    const turma = await this.turmasService.buscarPorId(id);
+  async buscarPorId(
+    @Param('id') id: string,
+    @UsuarioLogado() usuario: PayloadJwtDto,
+  ): Promise<TurmaRespostaDto> {
+    const turma = await this.turmasService.buscarPorId(id, usuario);
     return new TurmaRespostaDto(turma);
   }
 
   @Patch(':id')
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
   @ApiOperation({
     summary: 'Atualizar uma turma pelo ID',
     description:
@@ -274,12 +291,18 @@ export class TurmasController {
   async atualizar(
     @Param('id') id: string,
     @Body() atualizarTurmaDto: AtualizarTurmaDto,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ) {
-    const turma = await this.turmasService.atualizar(id, atualizarTurmaDto);
+    const turma = await this.turmasService.atualizar(
+      id,
+      atualizarTurmaDto,
+      usuario,
+    );
     return new TurmaRespostaDto(turma);
   }
 
   @Delete(':id')
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Deletar uma turma pelo ID' })
   @ApiNoContentResponse({
@@ -296,6 +319,7 @@ export class TurmasController {
   }
 
   @Post(':id/professores')
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
   @ApiOperation({ summary: 'Vincular um professor a uma turma' })
   @ApiOkResponse({
     description: 'O professor foi vinculado à turma com sucesso.',
@@ -323,6 +347,7 @@ export class TurmasController {
   }
 
   @Delete(':id/professores/:professorId')
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Desvincular um professor de uma turma' })
   @ApiNoContentResponse({

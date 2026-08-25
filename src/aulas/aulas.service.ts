@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   forwardRef,
   Inject,
   Injectable,
@@ -9,6 +10,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
 import { ChamadasService } from 'src/chamadas/chamadas.service';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { StatusTurma } from 'src/turmas/enums/status-turma.enum';
@@ -32,10 +34,16 @@ export class AulasService {
     private readonly chamadasService: ChamadasService,
     @Inject(forwardRef(() => TurmasService))
     private readonly turmasService: TurmasService,
-  ) { }
+  ) {}
 
-  async criar(criarAulaDto: CriarAulaDto): Promise<Aula> {
-    const turma = await this.turmasService.buscarPorId(criarAulaDto.turmaId);
+  async criar(
+    criarAulaDto: CriarAulaDto,
+    usuario: PayloadJwtDto,
+  ): Promise<Aula> {
+    const turma = await this.turmasService.buscarPorId(
+      criarAulaDto.turmaId,
+      usuario,
+    );
 
     if (turma.status !== StatusTurma.EM_ANDAMENTO) {
       throw new BadRequestException(
@@ -62,8 +70,8 @@ export class AulasService {
 
       return await this.repository.save(novaAula);
     } catch (erro) {
-      const mensajeErro = erro instanceof Error ? erro.message : String(erro);
-      this.logger.error(`Erro ao criar aula: ${mensajeErro}`);
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(`Erro ao criar aula: ${mensagemErro}`);
       throw new InternalServerErrorException(
         'Erro interno ao processar o cadastro da aula.',
       );
@@ -71,9 +79,10 @@ export class AulasService {
   }
 
   async buscarTodas(
+    turmaId: string,
+    usuario: PayloadJwtDto,
     pagina = 1,
     itensPorPagina = 10,
-    turmaId?: string,
   ): Promise<PaginacaoRespostaDto<Aula>> {
     try {
       if (pagina < 1) {
@@ -88,13 +97,13 @@ export class AulasService {
         );
       }
 
+      await this.turmasService.validarPermissaoAcesso(turmaId, usuario);
+
       const take = itensPorPagina;
       const skip = (pagina - 1) * itensPorPagina;
 
-      const whereCondition = turmaId ? { turmaId } : {};
-
       const [aulas, total] = await this.repository.findAndCount({
-        where: whereCondition,
+        where: { turmaId },
         order: { data: 'ASC' },
         take,
         skip,
@@ -107,12 +116,16 @@ export class AulasService {
         pagina,
       );
     } catch (erro) {
-      if (erro instanceof BadRequestException) {
+      if (
+        erro instanceof BadRequestException ||
+        erro instanceof ForbiddenException ||
+        erro instanceof NotFoundException
+      ) {
         throw erro;
       }
 
-      const mensajeErro = erro instanceof Error ? erro.message : String(erro);
-      this.logger.error(`Erro ao buscar listagem de aulas: ${mensajeErro}`);
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(`Erro ao buscar listagem de aulas: ${mensagemErro}`);
       throw new InternalServerErrorException(
         'Erro ao buscar listagem de aulas.',
       );
@@ -121,23 +134,35 @@ export class AulasService {
 
   async buscarPorId(
     id: string,
+    usuario: PayloadJwtDto,
     gerenciadorTransacao?: EntityManager,
   ): Promise<Aula> {
     const manager = gerenciadorTransacao || this.repository.manager;
 
     try {
-      return await manager.findOneOrFail(Aula, {
+      const aula = await manager.findOneOrFail(Aula, {
         where: { id },
         relations: ['turma'],
       });
+
+      await this.turmasService.validarPermissaoAcesso(aula.turmaId, usuario);
+
+      return aula;
     } catch (erro) {
+      if (
+        erro instanceof ForbiddenException ||
+        erro instanceof NotFoundException
+      ) {
+        throw erro;
+      }
+
       if (erro instanceof EntityNotFoundError) {
         throw new NotFoundException(
           `Aula com ID ${id} não encontrada no diário de classe.`,
         );
       }
-      const mensajeErro = erro instanceof Error ? erro.message : String(erro);
-      this.logger.error(`Erro ao buscar aula por ID: ${mensajeErro}`);
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(`Erro ao buscar aula por ID: ${mensagemErro}`);
       throw new InternalServerErrorException(
         'Erro ao buscar registro de aula.',
       );
@@ -147,12 +172,12 @@ export class AulasService {
   async atualizar(
     id: string,
     atualizarAulaDto: AtualizarAulaDto,
+    usuario: PayloadJwtDto,
     gerenciadorTransacao?: EntityManager,
   ): Promise<Aula> {
-    // Define qual manager usar (o da transação ativa ou o padrão do repositório)
     const manager = gerenciadorTransacao || this.repository.manager;
 
-    const aulaAtual = await this.buscarPorId(id, manager);
+    const aulaAtual = await this.buscarPorId(id, usuario, manager);
 
     const possuiChamadaSalva = await this.chamadasService.existeChamadaParaAula(
       id,
@@ -207,16 +232,16 @@ export class AulasService {
       this.repository.merge(aulaAtual, atualizarAulaDto);
       return await manager.save(Aula, aulaAtual);
     } catch (erro) {
-      const mensajeErro = erro instanceof Error ? erro.message : String(erro);
-      this.logger.error(`Erro ao atualizar registro de aula: ${mensajeErro}`);
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(`Erro ao atualizar registro de aula: ${mensagemErro}`);
       throw new InternalServerErrorException(
         'Erro ao salvar as modificações da aula.',
       );
     }
   }
 
-  async remover(id: string): Promise<void> {
-    await this.buscarPorId(id);
+  async remover(id: string, usuario: PayloadJwtDto): Promise<void> {
+    await this.buscarPorId(id, usuario);
 
     const possuiChamadaSalva =
       await this.chamadasService.existeChamadaParaAula(id);
@@ -230,8 +255,8 @@ export class AulasService {
     try {
       await this.repository.softDelete(id);
     } catch (erro) {
-      const mensajeErro = erro instanceof Error ? erro.message : String(erro);
-      this.logger.error(`Erro ao remover aula: ${mensajeErro}`);
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(`Erro ao remover aula: ${mensagemErro}`);
       throw new InternalServerErrorException(
         'Erro ao remover o registro de aula.',
       );

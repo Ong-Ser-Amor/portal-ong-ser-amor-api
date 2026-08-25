@@ -73,17 +73,25 @@ export class CursosService {
         itensPorPagina,
         pagina,
       );
-    } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw error;
+    } catch (erro) {
+      if (erro instanceof BadRequestException) {
+        throw erro;
       }
 
       const mensagemErro =
-        error instanceof Error
-          ? error.message
-          : `Ocorreu um erro inesperado: ${String(error)}`;
+        erro instanceof Error
+          ? erro.message
+          : `Ocorreu um erro inesperado: ${String(erro)}`;
       this.logger.error(`Erro ao buscar cursos: ${mensagemErro}`);
       throw new InternalServerErrorException('Erro ao buscar cursos.');
+    }
+  }
+
+  async validarExistencia(id: string): Promise<void> {
+    const existe = await this.repository.existsBy({ id });
+
+    if (!existe) {
+      throw new NotFoundException(`Curso com ID ${id} não encontrado.`);
     }
   }
 
@@ -127,12 +135,12 @@ export class CursosService {
           : `Ocorreu um erro inesperado: ${String(erro)}`;
       this.logger.error(`Erro ao atualizar curso: ${mensagemErro}`);
 
-      throw new InternalServerErrorException('Erro ao atualizar curso');
+      throw new InternalServerErrorException('Erro ao atualizar curso.');
     }
   }
 
   async remover(id: string): Promise<void> {
-    await this.buscarPorId(id);
+    await this.validarExistencia(id);
 
     try {
       await this.repository.softDelete(id);
@@ -142,7 +150,7 @@ export class CursosService {
           ? erro.message
           : `Ocorreu um erro inesperado: ${String(erro)}`;
       this.logger.error(`Erro ao remover curso: ${mensagemErro}`);
-      throw new InternalServerErrorException('Erro ao remover curso');
+      throw new InternalServerErrorException('Erro ao remover curso.');
     }
   }
 

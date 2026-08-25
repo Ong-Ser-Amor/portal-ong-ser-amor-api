@@ -24,8 +24,12 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
 import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
+import { Perfis } from 'src/shared/decorators/perfis.decorator';
+import { UsuarioLogado } from 'src/shared/decorators/usuario-logado.decorator';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
+import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
 import { AulasService } from './aulas.service';
 import { ERROS_ATUALIZACAO_AULA } from './constants/aulas-erros.constant';
@@ -34,6 +38,7 @@ import { AulaRespostaDto } from './dto/aula-resposta.dto';
 import { CriarAulaDto } from './dto/criar-aula.dto';
 
 @ApiTags('Aulas')
+@Perfis(PerfilAcesso.COORDENADOR_CURSOS, PerfilAcesso.PROFESSOR)
 @Controller('aulas')
 export class AulasController {
   constructor(private readonly aulasService: AulasService) {}
@@ -57,14 +62,23 @@ export class AulasController {
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao cadastrar a aula.',
   })
-  async criar(@Body() criarAulaDto: CriarAulaDto): Promise<AulaRespostaDto> {
-    const aula = await this.aulasService.criar(criarAulaDto);
+  async criar(
+    @Body() criarAulaDto: CriarAulaDto,
+    @UsuarioLogado() usuario: PayloadJwtDto,
+  ): Promise<AulaRespostaDto> {
+    const aula = await this.aulasService.criar(criarAulaDto, usuario);
     return new AulaRespostaDto(aula);
   }
 
   @Get()
   @ApiOperation({ summary: 'Buscar uma lista paginada de aulas registradas' })
   @ApiPaginacaoResposta(AulaRespostaDto)
+  @ApiQuery({
+    name: 'turmaId',
+    required: true,
+    description: 'ID da turma para listar as aulas',
+    example: '1',
+  })
   @ApiQuery({
     name: 'pagina',
     required: false,
@@ -77,13 +91,6 @@ export class AulasController {
     description: 'Número de itens por página (padrão: 10)',
     example: 10,
   })
-  @ApiQuery({
-    name: 'turmaId',
-    required: false,
-    description:
-      'Filtra opcionalmente as aulas pertencentes a uma turma específica',
-    example: '1',
-  })
   @ApiBadRequestResponse({
     description:
       'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
@@ -92,15 +99,17 @@ export class AulasController {
     description: 'Ocorreu um erro inesperado ao buscar a listagem de aulas.',
   })
   async buscarTodas(
+    @Query('turmaId') turmaId: string,
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
     @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
     itensPorPagina: number,
-    @Query('turmaId') turmaId?: string,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<PaginacaoRespostaDto<AulaRespostaDto>> {
     const aulas = await this.aulasService.buscarTodas(
+      turmaId,
+      usuario,
       pagina,
       itensPorPagina,
-      turmaId,
     );
 
     const aulasMapeadas = aulas.dados.map((aula) => new AulaRespostaDto(aula));
@@ -125,8 +134,11 @@ export class AulasController {
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar a aula.',
   })
-  async buscarPorId(@Param('id') id: string): Promise<AulaRespostaDto> {
-    const aula = await this.aulasService.buscarPorId(id);
+  async buscarPorId(
+    @Param('id') id: string,
+    @UsuarioLogado() usuario: PayloadJwtDto,
+  ): Promise<AulaRespostaDto> {
+    const aula = await this.aulasService.buscarPorId(id, usuario);
     return new AulaRespostaDto(aula);
   }
 
@@ -154,7 +166,8 @@ export class AulasController {
       'application/json': {
         examples: {
           aula_com_chamada_nao_pode_agendar: {
-            summary: 'Tentativa de reverter aula com chamada para AGENDADA',
+            summary:
+              'Tentativa de reverter para AGENDADA com chamada existente',
             value: {
               statusCode: 400,
               codigo:
@@ -166,7 +179,8 @@ export class AulasController {
             },
           },
           aula_com_chamada_nao_pode_cancelar: {
-            summary: 'Tentativa de cancelar aula que já possui chamada',
+            summary:
+              'Tentativa de cancelar aula que já possui lista de chamada',
             value: {
               statusCode: 400,
               codigo:
@@ -179,7 +193,7 @@ export class AulasController {
             },
           },
           aula_realizada_sem_chamada: {
-            summary: 'Tentativa de marcar como REALIZADA sem chamada',
+            summary: 'Tentativa de marcar como REALIZADA sem chamada lançada',
             value: {
               statusCode: 400,
               codigo: ERROS_ATUALIZACAO_AULA.AULA_REALIZADA_SEM_CHAMADA.codigo,
@@ -195,7 +209,7 @@ export class AulasController {
               codigo:
                 ERROS_ATUALIZACAO_AULA.AULA_DATA_ANTERIOR_INICIO_TURMA.codigo,
               message:
-                'A data da aula não pode ser anterior à data de início da turma (2026-02-01).',
+                ERROS_ATUALIZACAO_AULA.AULA_DATA_ANTERIOR_INICIO_TURMA.mensagem,
               error: 'Bad Request',
             },
           },
@@ -206,7 +220,7 @@ export class AulasController {
               codigo:
                 ERROS_ATUALIZACAO_AULA.AULA_DATA_POSTERIOR_FIM_TURMA.codigo,
               message:
-                'A data da aula não pode ser posterior à data de encerramento da turma (2026-06-30).',
+                ERROS_ATUALIZACAO_AULA.AULA_DATA_POSTERIOR_FIM_TURMA.mensagem,
               error: 'Bad Request',
             },
           },
@@ -238,8 +252,13 @@ export class AulasController {
   async atualizar(
     @Param('id') id: string,
     @Body() atualizarAulaDto: AtualizarAulaDto,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<AulaRespostaDto> {
-    const aula = await this.aulasService.atualizar(id, atualizarAulaDto);
+    const aula = await this.aulasService.atualizar(
+      id,
+      atualizarAulaDto,
+      usuario,
+    );
     return new AulaRespostaDto(aula);
   }
 
@@ -261,7 +280,10 @@ export class AulasController {
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao remover a aula.',
   })
-  async remover(@Param('id') id: string): Promise<void> {
-    await this.aulasService.remover(id);
+  async remover(
+    @Param('id') id: string,
+    @UsuarioLogado() usuario: PayloadJwtDto,
+  ): Promise<void> {
+    await this.aulasService.remover(id, usuario);
   }
 }

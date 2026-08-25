@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   forwardRef,
   Inject,
   Injectable,
@@ -10,6 +11,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { AulasService } from 'src/aulas/aulas.service';
 import { StatusAula } from 'src/aulas/enums/status-aula.enum';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
 import { TurmasMatriculasService } from 'src/turmas-matriculas/turmas-matriculas.service';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 
@@ -38,9 +40,11 @@ export class ChamadasService {
    */
   async salvarChamadaLote(
     criarChamadaLoteDto: CriarChamadaLoteDto,
+    usuario: PayloadJwtDto,
   ): Promise<Chamada[]> {
     const aula = await this.aulasService.buscarPorId(
       criarChamadaLoteDto.aulaId,
+      usuario,
     );
 
     if (aula.status === StatusAula.CANCELADA) {
@@ -105,6 +109,7 @@ export class ChamadasService {
         await this.aulasService.atualizar(
           criarChamadaLoteDto.aulaId,
           { status: StatusAula.REALIZADA },
+          usuario,
           queryRunner.manager, // Repassando o manager para unificar a transação
         );
       }
@@ -115,12 +120,16 @@ export class ChamadasService {
     } catch (erro) {
       await queryRunner.rollbackTransaction();
 
-      const msg = erro instanceof Error ? erro.message : String(erro);
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
       this.logger.error(
-        `Erro ao processar o lote de chamadas para a aula ${criarChamadaLoteDto.aulaId}: ${msg}`,
+        `Erro ao processar o lote de chamadas para a aula ${criarChamadaLoteDto.aulaId}: ${mensagemErro}`,
       );
 
-      if (erro instanceof BadRequestException) {
+      if (
+        erro instanceof BadRequestException ||
+        erro instanceof NotFoundException ||
+        erro instanceof ForbiddenException
+      ) {
         throw erro;
       }
 
@@ -132,7 +141,12 @@ export class ChamadasService {
     }
   }
 
-  async buscarPorAula(aulaId: string): Promise<Chamada[]> {
+  async buscarPorAula(
+    aulaId: string,
+    usuario: PayloadJwtDto,
+  ): Promise<Chamada[]> {
+    await this.aulasService.buscarPorId(aulaId, usuario);
+
     try {
       return await this.repository.find({
         where: { aulaId },
@@ -144,8 +158,10 @@ export class ChamadasService {
         order: { matricula: { beneficiario: { pessoa: { nome: 'ASC' } } } },
       });
     } catch (erro) {
-      const msg = erro instanceof Error ? erro.message : String(erro);
-      this.logger.error(`Erro ao buscar chamadas da aula ${aulaId}: ${msg}`);
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro ao buscar chamadas da aula ${aulaId}: ${mensagemErro}`,
+      );
       throw new InternalServerErrorException(
         'Erro ao buscar a lista de presenças da aula.',
       );
@@ -156,7 +172,7 @@ export class ChamadasService {
    * Remove todo o lote de chamadas de uma aula (limpa a lista de presença lançada por engano).
    * Se a aula estiver como REALIZADA, reverte automaticamente para AGENDADA dentro da mesma transação.
    */
-  async removerPorAula(aulaId: string): Promise<void> {
+  async removerPorAula(aulaId: string, usuario: PayloadJwtDto): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -165,6 +181,7 @@ export class ChamadasService {
       // 1. Busca a aula dentro do contexto da transação
       const aula = await this.aulasService.buscarPorId(
         aulaId,
+        usuario,
         queryRunner.manager,
       );
 
@@ -188,6 +205,7 @@ export class ChamadasService {
         await this.aulasService.atualizar(
           aulaId,
           { status: StatusAula.AGENDADA },
+          usuario,
           queryRunner.manager,
         );
       }
@@ -196,12 +214,15 @@ export class ChamadasService {
     } catch (erro) {
       await queryRunner.rollbackTransaction();
 
-      const msg = erro instanceof Error ? erro.message : String(erro);
-      this.logger.error(`Erro ao remover chamadas da aula ${aulaId}: ${msg}`);
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      this.logger.error(
+        `Erro ao remover chamadas da aula ${aulaId}: ${mensagemErro}`,
+      );
 
       if (
         erro instanceof BadRequestException ||
-        erro instanceof NotFoundException
+        erro instanceof NotFoundException ||
+        erro instanceof ForbiddenException
       ) {
         throw erro;
       }
@@ -230,9 +251,9 @@ export class ChamadasService {
         where: { aulaId },
       });
     } catch (erro) {
-      const msg = erro instanceof Error ? erro.message : String(erro);
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
       this.logger.error(
-        `Erro ao verificar existência de chamada para a aula ${aulaId}: ${msg}`,
+        `Erro ao verificar existência de chamada para a aula ${aulaId}: ${mensagemErro}`,
       );
       throw new InternalServerErrorException(
         'Erro ao validar histórico de presenças da aula.',

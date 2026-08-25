@@ -34,8 +34,10 @@ import { FaixaRenda } from 'src/familias/enums/faixa-renda.enum';
 import { TipoMoradia } from 'src/familias/enums/tipo-moradia.enum';
 import { PessoaDto } from 'src/pessoas/dto/pessoa.dto';
 import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
+import { Perfis } from 'src/shared/decorators/perfis.decorator';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { ValidarCpfPipe } from 'src/shared/pipes/validar-cpf.pipe';
+import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
 import { BeneficiariosService } from './beneficiarios.service';
 import { AtualizarBeneficiarioDto } from './dto/atualizar-beneficiario.dto';
@@ -51,6 +53,7 @@ import {
 
 @ApiTags('Beneficiarios')
 @ApiExtraModels(CriarFamiliaDto)
+@Perfis(PerfilAcesso.ADMIN)
 @Controller('beneficiarios')
 export class BeneficiariosController {
   constructor(private readonly beneficiariosService: BeneficiariosService) {}

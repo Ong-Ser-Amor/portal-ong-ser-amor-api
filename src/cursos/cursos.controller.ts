@@ -25,7 +25,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
+import { Perfis } from 'src/shared/decorators/perfis.decorator';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
+import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
 import { CursosService } from './cursos.service';
 import { AtualizarCursoDto } from './dto/atualizar-curso.dto';
@@ -38,6 +40,7 @@ export class CursosController {
   constructor(private readonly cursosService: CursosService) {}
 
   @Post()
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
   @ApiOperation({ summary: 'Criar um novo curso' })
   @ApiCreatedResponse({
     description: 'O curso foi criado com sucesso.',
@@ -55,6 +58,7 @@ export class CursosController {
   }
 
   @Get()
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS, PerfilAcesso.PROFESSOR)
   @ApiOperation({ summary: 'Buscar uma lista paginada de cursos' })
   @ApiPaginacaoResposta(CursoRespostaDto)
   @ApiQuery({
@@ -99,6 +103,7 @@ export class CursosController {
   }
 
   @Get(':id')
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS, PerfilAcesso.PROFESSOR)
   @ApiOperation({ summary: 'Buscar curso pelo ID' })
   @ApiOkResponse({
     description: 'O curso foi encontrado com sucesso.',
@@ -116,6 +121,7 @@ export class CursosController {
   }
 
   @Patch(':id')
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
   @ApiOperation({ summary: 'Atualizar curso pelo ID' })
   @ApiOkResponse({
     description: 'O curso foi atualizado com sucesso.',
@@ -142,6 +148,7 @@ export class CursosController {
   }
 
   @Delete(':id')
+  @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Deletar curso pelo ID' })
   @ApiNoContentResponse({

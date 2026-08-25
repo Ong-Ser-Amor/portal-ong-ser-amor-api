@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 import { Voluntario } from 'src/voluntarios/entities/voluntario.entity';
 import { TipoVoluntario } from 'src/voluntarios/enums/voluntario.enum';
 import { DataSource } from 'typeorm';
@@ -64,7 +65,7 @@ async function seed() {
         nome,
         cpf,
         dataNascimento,
-        tipoVoluntario: TipoVoluntario.COORDENADOR,
+        tipoVoluntario: TipoVoluntario.COORDENADOR_CURSOS,
         formacaoAcademica: null,
         statusFormacao: null,
       });
@@ -77,6 +78,7 @@ async function seed() {
       email,
       senha,
       voluntarioId: voluntarioAdmin.id,
+      perfisAcesso: [PerfilAcesso.ADMIN],
     });
     logger.log(`Usuário admin criado com sucesso: ${email}`);
   }

@@ -7,6 +7,7 @@ import { UsuariosModule } from 'src/usuarios/usuarios.module';
 import { AutenticacaoController } from './autenticacao.controller';
 import { AutenticacaoService } from './autenticacao.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [
@@ -28,6 +29,10 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

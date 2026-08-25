@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   forwardRef,
   Inject,
   Injectable,
@@ -10,7 +11,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AulasService } from 'src/aulas/aulas.service';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
+import { temAcessoIrrestritoEmCursos } from 'src/shared/utils/permissao-cursos.util';
 import { TurmasMatriculasService } from 'src/turmas-matriculas/turmas-matriculas.service';
 import { EntityNotFoundError, FindOptionsWhere, Repository } from 'typeorm';
 
@@ -32,10 +35,10 @@ export class TurmasService {
     private readonly repository: Repository<Turma>,
     @InjectRepository(TurmaProfessor)
     private readonly turmaProfessorRepository: Repository<TurmaProfessor>,
-    @Inject(forwardRef(() => AulasService))
-    private readonly aulasService: AulasService,
     @Inject(forwardRef(() => TurmasMatriculasService))
     private readonly matriculasService: TurmasMatriculasService,
+    @Inject(forwardRef(() => AulasService))
+    private readonly aulasService: AulasService,
   ) {}
 
   async criar(criarTurmaDto: CriarTurmaDto): Promise<Turma> {
@@ -51,20 +54,22 @@ export class TurmasService {
     );
 
     try {
-      const turma = this.repository.create(criarTurmaDto);
-      return this.repository.save(turma);
+      const novaTurma = this.repository.create(criarTurmaDto);
+
+      return await this.repository.save(novaTurma);
     } catch (erro) {
       const mensagemErro =
         erro instanceof Error
           ? erro.message
           : `Ocorreu um erro inesperado: ${String(erro)}`;
-      this.logger.error(`Erro ao criar turma: ${mensagemErro}`);
+      this.logger.error(`Erro ao cadastrar turma: ${mensagemErro}`);
 
-      throw new InternalServerErrorException('Erro ao criar turma.');
+      throw new InternalServerErrorException('Erro ao cadastrar turma.');
     }
   }
 
   async buscarTodos(
+    usuario: PayloadJwtDto,
     pagina = 1,
     itensPorPagina = 10,
     cursoId?: string,
@@ -98,6 +103,12 @@ export class TurmasService {
         };
       }
 
+      if (!temAcessoIrrestritoEmCursos(usuario)) {
+        where.turmasProfessores = {
+          professorId: usuario.voluntarioId,
+        };
+      }
+
       const [turmas, total] = await this.repository.findAndCount({
         where,
         relations: ['planoCurso'],
@@ -113,7 +124,10 @@ export class TurmasService {
         pagina,
       );
     } catch (erro) {
-      if (erro instanceof BadRequestException) {
+      if (
+        erro instanceof BadRequestException ||
+        erro instanceof ForbiddenException
+      ) {
         throw erro;
       }
 
@@ -127,9 +141,39 @@ export class TurmasService {
     }
   }
 
-  async buscarPorId(id: string): Promise<Turma> {
+  async validarExistencia(id: string): Promise<void> {
+    const existe = await this.repository.existsBy({ id });
+
+    if (!existe) {
+      throw new NotFoundException(`Turma com ID ${id} não encontrada.`);
+    }
+  }
+
+  async validarPermissaoAcesso(
+    turmaId: string,
+    usuario: PayloadJwtDto,
+  ): Promise<void> {
+    if (!temAcessoIrrestritoEmCursos(usuario)) {
+      const temVinculo = await this.turmaProfessorRepository.existsBy({
+        turmaId,
+        professorId: usuario.voluntarioId,
+      });
+
+      if (!temVinculo) {
+        await this.validarExistencia(turmaId);
+        throw new ForbiddenException(
+          'Usuário não tem permissão para acessar ou manipular dados desta turma.',
+        );
+      }
+      return;
+    }
+
+    await this.validarExistencia(turmaId);
+  }
+
+  async buscarPorId(id: string, usuario: PayloadJwtDto): Promise<Turma> {
     try {
-      return await this.repository.findOneOrFail({
+      const turma = await this.repository.findOneOrFail({
         where: { id },
         relations: [
           'planoCurso',
@@ -139,7 +183,26 @@ export class TurmasService {
           'turmasProfessores.professor.pessoa',
         ],
       });
+
+      if (!temAcessoIrrestritoEmCursos(usuario)) {
+        const ehProfessorDaTurma = turma.turmasProfessores?.some(
+          (turmaProfessor) =>
+            turmaProfessor.professorId === usuario.voluntarioId,
+        );
+
+        if (!ehProfessorDaTurma) {
+          throw new ForbiddenException(
+            'Usuário não tem permissão para acessar ou manipular dados desta turma.',
+          );
+        }
+      }
+
+      return turma;
     } catch (erro) {
+      if (erro instanceof ForbiddenException) {
+        throw erro;
+      }
+
       if (erro instanceof EntityNotFoundError) {
         throw new NotFoundException(`Turma com ID ${id} não encontrada.`);
       }
@@ -157,8 +220,9 @@ export class TurmasService {
   async atualizar(
     id: string,
     atualizarTurmaDto: AtualizarTurmaDto,
+    usuario: PayloadJwtDto,
   ): Promise<Turma> {
-    const turmaAtual = await this.buscarPorId(id);
+    const turmaAtual = await this.buscarPorId(id, usuario);
 
     if (
       atualizarTurmaDto.status === StatusTurma.FINALIZADA &&
@@ -262,7 +326,7 @@ export class TurmasService {
   }
 
   async remover(id: string): Promise<void> {
-    await this.buscarPorId(id);
+    await this.validarExistencia(id);
 
     try {
       await this.repository.softDelete(id);
@@ -340,7 +404,7 @@ export class TurmasService {
     turmaId: string,
     vincularProfessorDto: VincularProfessorDto,
   ): Promise<TurmaProfessor> {
-    await this.buscarPorId(turmaId);
+    await this.validarExistencia(turmaId);
 
     const vinculoExistente = await this.turmaProfessorRepository.existsBy({
       turmaId,

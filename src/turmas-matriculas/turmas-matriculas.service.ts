@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   forwardRef,
   Inject,
   Injectable,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AulasService } from 'src/aulas/aulas.service';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
 import { BeneficiariosService } from 'src/beneficiarios/beneficiarios.service';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { CriterioAvaliacao } from 'src/turmas/enums/criterio-avaliacao.enum';
@@ -17,7 +19,7 @@ import { StatusTurma } from 'src/turmas/enums/status-turma.enum';
 import { TurmasService } from 'src/turmas/turmas.service';
 import { TurmaAtividadeEntrega } from 'src/turmas-atividades/entities/turma-atividade-entrega.entity';
 import { StatusEntrega } from 'src/turmas-atividades/enums/status-entrega.enum';
-import { EntityNotFoundError, FindOptionsWhere, Repository } from 'typeorm';
+import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { ERROS_ATUALIZACAO_MATRICULA } from './constants/turmas-matriculas-erros.constant';
 import { AtualizarTurmaMatriculaDto } from './dto/atualizar-turma-matricula.dto';
@@ -45,10 +47,12 @@ export class TurmasMatriculasService {
 
   async criar(
     criarTurmaMatriculaDto: CriarTurmaMatriculaDto,
+    usuario: PayloadJwtDto,
   ): Promise<TurmaMatricula> {
     // Busca a turma dona do domínio e valida o seu status atual
     const turma = await this.turmasService.buscarPorId(
       criarTurmaMatriculaDto.turmaId,
+      usuario,
     );
 
     if (turma.status === StatusTurma.FINALIZADA) {
@@ -98,9 +102,10 @@ export class TurmasMatriculasService {
   }
 
   async buscarTodas(
+    turmaId: string,
+    usuario: PayloadJwtDto,
     pagina = 1,
     itensPorPagina = 10,
-    turmaId?: string,
   ): Promise<PaginacaoRespostaDto<TurmaMatricula>> {
     try {
       if (pagina < 1) {
@@ -115,16 +120,13 @@ export class TurmasMatriculasService {
         );
       }
 
-      const where: FindOptionsWhere<TurmaMatricula> = {};
-      if (turmaId) {
-        where.turmaId = turmaId;
-      }
+      await this.turmasService.validarPermissaoAcesso(turmaId, usuario);
 
       const take = itensPorPagina;
       const skip = (pagina - 1) * itensPorPagina;
 
       const [matriculas, total] = await this.repository.findAndCount({
-        where,
+        where: { turmaId },
         relations: ['turma', 'beneficiario', 'beneficiario.pessoa'],
         take,
         skip,
@@ -138,7 +140,11 @@ export class TurmasMatriculasService {
         pagina,
       );
     } catch (erro) {
-      if (erro instanceof BadRequestException) {
+      if (
+        erro instanceof BadRequestException ||
+        erro instanceof ForbiddenException ||
+        erro instanceof NotFoundException
+      ) {
         throw erro;
       }
 
@@ -152,13 +158,40 @@ export class TurmasMatriculasService {
     }
   }
 
-  async buscarPorId(id: string): Promise<TurmaMatricula> {
+  async validarExistencia(id: string): Promise<void> {
+    const existe = await this.repository.existsBy({ id });
+
+    if (!existe) {
+      throw new NotFoundException(
+        `Registro de matrícula com ID ${id} não encontrado.`,
+      );
+    }
+  }
+
+  async buscarPorId(
+    id: string,
+    usuario: PayloadJwtDto,
+  ): Promise<TurmaMatricula> {
     try {
-      return await this.repository.findOneOrFail({
+      const matricula = await this.repository.findOneOrFail({
         where: { id },
         relations: ['turma', 'beneficiario', 'beneficiario.pessoa'],
       });
+
+      await this.turmasService.validarPermissaoAcesso(
+        matricula.turmaId,
+        usuario,
+      );
+
+      return matricula;
     } catch (erro) {
+      if (
+        erro instanceof ForbiddenException ||
+        erro instanceof NotFoundException
+      ) {
+        throw erro;
+      }
+
       if (erro instanceof EntityNotFoundError) {
         throw new NotFoundException(
           `Registro de matrícula com ID ${id} não encontrado.`,
@@ -175,13 +208,14 @@ export class TurmasMatriculasService {
   async atualizar(
     id: string,
     atualizarTurmaMatriculaDto: AtualizarTurmaMatriculaDto,
+    usuario: PayloadJwtDto,
   ): Promise<TurmaMatricula> {
-    const matriculaAtual = await this.buscarPorId(id);
+    const matriculaAtual = await this.buscarPorId(id, usuario);
 
     if (matriculaAtual.turma.status !== StatusTurma.EM_ANDAMENTO) {
       throw new BadRequestException({
         codigo: ERROS_ATUALIZACAO_MATRICULA.TURMA_NAO_EM_ANDAMENTO.codigo,
-        message: `${ERROS_ATUALIZACAO_MATRICULA.TURMA_NAO_EM_ANDAMENTO.mensagem} Status atual da turma: ${matriculaAtual.turma.status}`,
+        message: `Não é permitido modificar notas, pareceres ou dados cadastrais de matrículas quando a turma está com o status diferente de EM_ANDAMENTO. Status atual da turma: ${matriculaAtual.turma.status}`,
       });
     }
 
@@ -222,7 +256,7 @@ export class TurmasMatriculasService {
   }
 
   async remover(id: string): Promise<void> {
-    await this.buscarPorId(id);
+    await this.validarExistencia(id);
     try {
       await this.repository.softDelete(id);
     } catch (erro) {
@@ -259,7 +293,7 @@ export class TurmasMatriculasService {
    * Valida previamente se a turma informada existe no sistema antes de listar os estudantes.
    */
   async buscarIdsMatriculasAtivasPorTurma(turmaId: string): Promise<string[]> {
-    await this.turmasService.buscarPorId(turmaId);
+    await this.turmasService.validarExistencia(turmaId);
 
     try {
       const matriculas = await this.repository.find({

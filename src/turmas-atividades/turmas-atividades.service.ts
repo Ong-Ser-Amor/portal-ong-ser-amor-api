@@ -1,11 +1,13 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
 import { CriterioAvaliacao } from 'src/turmas/enums/criterio-avaliacao.enum';
 import { TurmasService } from 'src/turmas/turmas.service';
 import { TurmasMatriculasService } from 'src/turmas-matriculas/turmas-matriculas.service';
@@ -34,9 +36,11 @@ export class TurmasAtividadesService {
 
   async criarAtividadeComPendenciasDeEntrega(
     criarTurmaAtividadeDto: CriarTurmaAtividadeDto,
+    usuario: PayloadJwtDto,
   ): Promise<TurmaAtividade> {
     const turma = await this.turmasService.buscarPorId(
       criarTurmaAtividadeDto.turmaId,
+      usuario,
     );
 
     this.validarRegrasAtividadeConformeTurma(
@@ -104,6 +108,7 @@ export class TurmasAtividadesService {
 
   async registrarEntregasEmLote(
     registrarEntregasLoteDto: RegistrarEntregasLoteDto,
+    usuario: PayloadJwtDto,
   ): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -124,6 +129,11 @@ export class TurmasAtividadesService {
             `Registro de entrega com ID ${entregaAtualizadaDto.entregaId} não localizado.`,
           );
         }
+
+        await this.turmasService.validarPermissaoAcesso(
+          entregaAtual.atividade.turmaId,
+          usuario,
+        );
 
         const atividade = entregaAtual.atividade;
         let notaNumerica: number | null = null;
@@ -173,23 +183,29 @@ export class TurmasAtividadesService {
       await queryRunner.commitTransaction();
     } catch (erro) {
       await queryRunner.rollbackTransaction();
+
       if (
         erro instanceof BadRequestException ||
-        erro instanceof NotFoundException
+        erro instanceof NotFoundException ||
+        erro instanceof ForbiddenException
       ) {
         throw erro;
       }
+
       this.logger.error(`Erro ao salvar notas em lote: ${String(erro)}`);
       throw new InternalServerErrorException(
-        'Erro crítico ao processar o lote de avaliações.',
+        'Erro ao processar as entregas das atividades.',
       );
     } finally {
       await queryRunner.release();
     }
   }
 
-  async buscarAtividadesPorTurma(turmaId: string): Promise<TurmaAtividade[]> {
-    await this.turmasService.buscarPorId(turmaId);
+  async buscarAtividadesPorTurma(
+    turmaId: string,
+    usuario: PayloadJwtDto,
+  ): Promise<TurmaAtividade[]> {
+    await this.turmasService.validarPermissaoAcesso(turmaId, usuario);
 
     try {
       return await this.atividadeRepository.find({
@@ -209,17 +225,23 @@ export class TurmasAtividadesService {
 
   async buscarEntregasPorAtividade(
     atividadeId: string,
+    usuario: PayloadJwtDto,
   ): Promise<TurmaAtividadeEntrega[]> {
     try {
-      // Verifica se a atividade pai de fato existe
-      const atividadeExiste = await this.atividadeRepository.existsBy({
-        id: atividadeId,
+      const atividade = await this.atividadeRepository.findOne({
+        select: ['id', 'turmaId'],
+        where: { id: atividadeId },
       });
-      if (!atividadeExiste) {
+      if (!atividade) {
         throw new NotFoundException(
           `Atividade com ID ${atividadeId} não encontrada.`,
         );
       }
+
+      await this.turmasService.validarPermissaoAcesso(
+        atividade.turmaId,
+        usuario,
+      );
 
       return await this.entregaRepository.find({
         where: { atividadeId },
@@ -239,7 +261,10 @@ export class TurmasAtividadesService {
         },
       });
     } catch (erro) {
-      if (erro instanceof NotFoundException) {
+      if (
+        erro instanceof NotFoundException ||
+        erro instanceof ForbiddenException
+      ) {
         throw erro;
       }
       const mensagemErro = erro instanceof Error ? erro.message : String(erro);
@@ -255,6 +280,7 @@ export class TurmasAtividadesService {
   async atualizar(
     id: string,
     atualizarAtividadeDto: AtualizarTurmaAtividadeDto,
+    usuario: PayloadJwtDto,
   ): Promise<TurmaAtividade> {
     const atividadeAtual = await this.atividadeRepository.findOne({
       where: { id },
@@ -264,6 +290,11 @@ export class TurmasAtividadesService {
     if (!atividadeAtual) {
       throw new NotFoundException(`Atividade com ID ${id} não encontrada.`);
     }
+
+    await this.turmasService.validarPermissaoAcesso(
+      atividadeAtual.turmaId,
+      usuario,
+    );
 
     // Consolida os dados novos com os já existentes para validação
     const valeNotaConsolidado =
@@ -359,7 +390,8 @@ export class TurmasAtividadesService {
       await queryRunner.rollbackTransaction();
       if (
         erro instanceof BadRequestException ||
-        erro instanceof NotFoundException
+        erro instanceof NotFoundException ||
+        erro instanceof ForbiddenException
       ) {
         throw erro;
       }

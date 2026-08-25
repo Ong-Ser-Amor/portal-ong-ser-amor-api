@@ -17,12 +17,17 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
+import { Perfis } from 'src/shared/decorators/perfis.decorator';
+import { UsuarioLogado } from 'src/shared/decorators/usuario-logado.decorator';
+import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
 import { ChamadasService } from './chamadas.service';
 import { ChamadaRespostaDto } from './dto/chamada-resposta.dto';
 import { CriarChamadaLoteDto } from './dto/criar-chamada.dto';
 
 @ApiTags('Chamadas (presença nas aulas)')
+@Perfis(PerfilAcesso.COORDENADOR_CURSOS, PerfilAcesso.PROFESSOR)
 @Controller('chamadas')
 export class ChamadasController {
   constructor(private readonly chamadasService: ChamadasService) {}
@@ -49,9 +54,12 @@ export class ChamadasController {
   })
   async salvarLote(
     @Body() criarChamadaLoteDto: CriarChamadaLoteDto,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<ChamadaRespostaDto[]> {
-    const chamadas =
-      await this.chamadasService.salvarChamadaLote(criarChamadaLoteDto);
+    const chamadas = await this.chamadasService.salvarChamadaLote(
+      criarChamadaLoteDto,
+      usuario,
+    );
 
     // Transforma o array de entidades resultantes utilizando o DTO de resposta padronizado
     return chamadas.map((chamada) => new ChamadaRespostaDto(chamada));
@@ -74,8 +82,9 @@ export class ChamadasController {
   })
   async buscarPorAula(
     @Param('aulaId') aulaId: string,
+    @UsuarioLogado() usuario: PayloadJwtDto,
   ): Promise<ChamadaRespostaDto[]> {
-    const chamadas = await this.chamadasService.buscarPorAula(aulaId);
+    const chamadas = await this.chamadasService.buscarPorAula(aulaId, usuario);
 
     return chamadas.map((chamada) => new ChamadaRespostaDto(chamada));
   }
@@ -99,7 +108,10 @@ export class ChamadasController {
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao remover a lista de chamadas.',
   })
-  async removerPorAula(@Param('aulaId') aulaId: string): Promise<void> {
-    await this.chamadasService.removerPorAula(aulaId);
+  async removerPorAula(
+    @Param('aulaId') aulaId: string,
+    @UsuarioLogado() usuario: PayloadJwtDto,
+  ): Promise<void> {
+    await this.chamadasService.removerPorAula(aulaId, usuario);
   }
 }
