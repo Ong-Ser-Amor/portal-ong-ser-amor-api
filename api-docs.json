@@ -521,6 +521,9 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "409": {
             "description": "Já existe uma pessoa com este CPF ou a pessoa informada já possui um benefício ativo."
           },
@@ -625,6 +628,9 @@
           "400": {
             "description": "Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1."
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "500": {
             "description": "Ocorreu um erro inesperado ao buscar os beneficiários."
           }
@@ -663,6 +669,9 @@
           },
           "400": {
             "description": "CPF inválido."
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
           },
           "404": {
             "description": "Pessoa não encontrada."
@@ -703,6 +712,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
           },
           "404": {
             "description": "Beneficiário não encontrado."
@@ -749,6 +761,9 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "404": {
             "description": "Beneficiário não encontrado."
           },
@@ -779,6 +794,9 @@
         "responses": {
           "204": {
             "description": "O beneficiário foi deletado com sucesso."
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
           },
           "404": {
             "description": "Beneficiário não encontrado."
@@ -882,6 +900,9 @@
           },
           "400": {
             "description": "O beneficiário já pertence a esta família ou os dados enviados são inválidos."
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
           },
           "404": {
             "description": "Beneficiário ou família destino não encontrados."
