@@ -1,16 +1,16 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
-  Delete,
-  ParseIntPipe,
+  Controller,
   DefaultValuePipe,
-  Query,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -24,8 +24,10 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
 import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
 import { Perfis } from 'src/shared/decorators/perfis.decorator';
+import { UsuarioLogado } from 'src/shared/decorators/usuario-logado.decorator';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
 import { PerfilAcesso } from 'src/usuarios/enums/perfil-acesso.enum';
 
@@ -92,9 +94,11 @@ export class PlanosCursoController {
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
     @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
     itensPorPagina: number,
+    @UsuarioLogado() usuario: PayloadJwtDto,
     @Query('cursoId') cursoId?: string,
   ): Promise<PaginacaoRespostaDto<PlanoCursoRespostaDto>> {
     const planosCursoPaginados = await this.planosCursoService.buscarTodos(
+      usuario,
       pagina,
       itensPorPagina,
       cursoId,
@@ -125,8 +129,11 @@ export class PlanosCursoController {
   @ApiInternalServerErrorResponse({
     description: 'Ocorreu um erro inesperado ao buscar o plano de curso.',
   })
-  async buscarPorId(@Param('id') id: string): Promise<PlanoCursoRespostaDto> {
-    const planoCurso = await this.planosCursoService.buscarPorId(id);
+  async buscarPorId(
+    @Param('id') id: string,
+    @UsuarioLogado() usuario: PayloadJwtDto,
+  ): Promise<PlanoCursoRespostaDto> {
+    const planoCurso = await this.planosCursoService.buscarPorId(id, usuario);
     return new PlanoCursoRespostaDto(planoCurso);
   }
 
@@ -149,10 +156,12 @@ export class PlanosCursoController {
   async atualizar(
     @Param('id') id: string,
     @Body() atualizarPlanoCursoDto: AtualizarPlanoCursoDto,
-  ) {
+    @UsuarioLogado() usuario: PayloadJwtDto,
+  ): Promise<PlanoCursoRespostaDto> {
     const planoCurso = await this.planosCursoService.atualizar(
       id,
       atualizarPlanoCursoDto,
+      usuario,
     );
     return new PlanoCursoRespostaDto(planoCurso);
   }
