@@ -2365,6 +2365,7 @@
     },
     "/turmas": {
       "post": {
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nCadastra uma nova turma associada a um plano de curso.",
         "operationId": "TurmasController_criar",
         "parameters": [],
         "requestBody": {
@@ -2391,6 +2392,9 @@
           "400": {
             "description": "Houve um erro de validação nos dados fornecidos (ex: datas inválidas ou campos numéricos fora dos limites permitidos)."
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+          },
           "404": {
             "description": "O plano de curso informado pelo planoCursoId não foi encontrado."
           },
@@ -2407,6 +2411,7 @@
         ]
       },
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Retorna todas as turmas cadastradas.\n- **PROFESSOR**: Retorna apenas as turmas em que está vinculado como professor.",
         "operationId": "TurmasController_buscarTodos",
         "parameters": [
           {
@@ -2490,12 +2495,14 @@
     },
     "/turmas/{id}": {
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer turma.\n- **PROFESSOR**: Pode consultar apenas turmas em que leciona.",
         "operationId": "TurmasController_buscarPorId",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID da turma",
             "schema": {
               "type": "string"
             }
@@ -2512,6 +2519,9 @@
               }
             }
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar os dados desta turma."
+          },
           "404": {
             "description": "Turma com o ID especificado não foi encontrada."
           },
@@ -2525,13 +2535,14 @@
         ]
       },
       "patch": {
-        "description": "Atualiza campos cadastrais, limites de período letivo, status e critérios de avaliação de uma turma existente.\n\n**Regras de Negócio e Bloqueios Específicos:**\n- **Alunos Ativos**: Não é permitido alterar o status para `FINALIZADA` se houver matrículas no status `ATIVA`.\n- **Choque de Data Inicial**: Não é permitido postergar `dataInicio` para uma data posterior a aulas já agendadas/realizadas.\n- **Choque de Data Final**: Não é permitido adiantar `dataFim` para uma data anterior a aulas já agendadas/realizadas.\n- **Ordem das Datas**: A nova data final consolidada não pode ser anterior à data de início.\n- **Critérios de Avaliação**: As notas e frequências consolidadas devem respeitar o critério configurado.",
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nAtualiza campos cadastrais, limites de período letivo, status e critérios de avaliação de uma turma existente.\n\n**Regras de Negócio e Bloqueios Específicos:**\n- **Alunos Ativos**: Não é permitido alterar o status para `FINALIZADA` se houver matrículas no status `ATIVA`.\n- **Choque de Data Inicial**: Não é permitido postergar `dataInicio` para uma data posterior a aulas já agendadas/realizadas.\n- **Choque de Data Final**: Não é permitido adiantar `dataFim` para uma data anterior a aulas já agendadas/realizadas.\n- **Ordem das Datas**: A nova data final consolidada não pode ser anterior à data de início.\n- **Critérios de Avaliação**: As notas e frequências consolidadas devem respeitar o critério configurado.",
         "operationId": "TurmasController_atualizar",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID da turma",
             "schema": {
               "type": "string"
             }
@@ -2648,6 +2659,9 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+          },
           "404": {
             "description": "Turma com o ID especificado não foi encontrada."
           },
@@ -2664,12 +2678,14 @@
         ]
       },
       "delete": {
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nRemove logicamente (soft delete) uma turma do sistema.",
         "operationId": "TurmasController_remover",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID da turma",
             "schema": {
               "type": "string"
             }
@@ -2678,6 +2694,9 @@
         "responses": {
           "204": {
             "description": "A turma foi removida com sucesso."
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Turma com o ID especificado não encontrada."
@@ -2694,12 +2713,14 @@
     },
     "/turmas/{id}/professores": {
       "post": {
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nVincula um professor voluntário a uma turma existente.",
         "operationId": "TurmasController_vincularProfessor",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID da turma",
             "schema": {
               "type": "string"
             }
@@ -2726,6 +2747,19 @@
               }
             }
           },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TurmaProfessorRespostaDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+          },
           "404": {
             "description": "Turma ou professor com o ID especificado não foram encontrados."
           },
@@ -2744,12 +2778,14 @@
     },
     "/turmas/{id}/professores/{professorId}": {
       "delete": {
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nRemove o vínculo de um professor voluntário com a turma.",
         "operationId": "TurmasController_desvincularProfessor",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID da turma",
             "schema": {
               "type": "string"
             }
@@ -2758,6 +2794,7 @@
             "name": "professorId",
             "required": true,
             "in": "path",
+            "description": "ID do professor voluntário",
             "schema": {
               "type": "string"
             }
@@ -2766,6 +2803,9 @@
         "responses": {
           "204": {
             "description": "O professor foi desvinculado da turma com sucesso."
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Turma ou professor com o ID especificado não foram encontrados, ou o professor não está vinculado a esta turma."
