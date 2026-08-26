@@ -3579,6 +3579,7 @@
     },
     "/turmas-atividades": {
       "post": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem criar atividades em qualquer turma.\n- **PROFESSOR**: Pode criar atividades apenas nas turmas em que leciona.",
         "operationId": "TurmasAtividadesController_criar",
         "parameters": [],
         "requestBody": {
@@ -3605,6 +3606,9 @@
           "400": {
             "description": "Houve quebra nas regras de consistência de datas (fora do limite da turma) ou tentativa de atribuir nota em turmas com critérios qualitativos/livres."
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular atividades desta turma."
+          },
           "404": {
             "description": "A turma informada no id não existe no sistema."
           },
@@ -3620,12 +3624,14 @@
     },
     "/turmas-atividades/turmas/{turmaId}": {
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem listar atividades de qualquer turma.\n- **PROFESSOR**: Pode listar atividades apenas das turmas em que leciona.",
         "operationId": "TurmasAtividadesController_buscarAtividadesPorTurma",
         "parameters": [
           {
             "name": "turmaId",
             "required": true,
             "in": "path",
+            "description": "ID da turma",
             "schema": {
               "type": "string"
             }
@@ -3645,6 +3651,9 @@
               }
             }
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular atividades desta turma."
+          },
           "404": {
             "description": "A turma informada no id não existe no sistema."
           },
@@ -3660,12 +3669,14 @@
     },
     "/turmas-atividades/{atividadeId}/entregas": {
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem visualizar entregas de qualquer atividade.\n- **PROFESSOR**: Pode visualizar entregas apenas de atividades das turmas em que leciona.",
         "operationId": "TurmasAtividadesController_buscarEntregasPorAtividade",
         "parameters": [
           {
             "name": "atividadeId",
             "required": true,
             "in": "path",
+            "description": "ID da atividade",
             "schema": {
               "type": "string"
             }
@@ -3685,6 +3696,9 @@
               }
             }
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular atividades desta turma."
+          },
           "404": {
             "description": "A atividade com o ID especificado não foi encontrada."
           },
@@ -3700,6 +3714,7 @@
     },
     "/turmas-atividades/entregas/lote": {
       "patch": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem lançar notas em qualquer atividade.\n- **PROFESSOR**: Pode lançar notas apenas em atividades das turmas em que leciona.",
         "operationId": "TurmasAtividadesController_registrarEmLote",
         "parameters": [],
         "requestBody": {
@@ -3719,6 +3734,9 @@
           "400": {
             "description": "Tentativa de lançar nota em atividade não avaliativa ou a nota informada ultrapassou o limite máximo da atividade."
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular atividades desta turma."
+          },
           "404": {
             "description": "Um ou mais IDs de registros de entregas informados na lista não foram localizados."
           },
@@ -3734,12 +3752,14 @@
     },
     "/turmas-atividades/{id}": {
       "patch": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem atualizar atividades de qualquer turma.\n- **PROFESSOR**: Pode atualizar atividades apenas das turmas em que leciona.",
         "operationId": "TurmasAtividadesController_atualizar",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID da atividade",
             "schema": {
               "type": "string"
             }
@@ -3768,6 +3788,9 @@
           },
           "400": {
             "description": "Houve quebra nas regras de consistência de datas, tentativa de atribuir nota em turmas com critérios não avaliativos ou tentativa de reduzir a nota máxima com notas já lançadas acima do novo limite."
+          },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular atividades desta turma."
           },
           "404": {
             "description": "Atividade com o ID especificado não foi encontrada."
