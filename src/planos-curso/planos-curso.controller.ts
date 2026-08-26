@@ -12,20 +12,8 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import {
-  ApiBadRequestResponse,
-  ApiConflictResponse,
-  ApiCreatedResponse,
-  ApiInternalServerErrorResponse,
-  ApiNoContentResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { PayloadJwtDto } from 'src/autenticacao/dto/payload-jwt.dto';
-import { ApiPaginacaoResposta } from 'src/shared/decorators/api-paginacao-resposta.decorator';
 import { Perfis } from 'src/shared/decorators/perfis.decorator';
 import { UsuarioLogado } from 'src/shared/decorators/usuario-logado.decorator';
 import { PaginacaoRespostaDto } from 'src/shared/dtos/paginacao-resposta.dto';
@@ -35,6 +23,13 @@ import { AtualizarPlanoCursoDto } from './dto/atualizar-planos-curso.dto';
 import { CriarPlanoCursoDto } from './dto/criar-plano-curso.dto';
 import { PlanoCursoRespostaDto } from './dto/plano-curso-resposta.dto';
 import { PlanosCursoService } from './planos-curso.service';
+import {
+  ApiDocAtualizarPlanoCurso,
+  ApiDocBuscarPlanoCursoPorId,
+  ApiDocBuscarPlanosCurso,
+  ApiDocCriarPlanoCurso,
+  ApiDocRemoverPlanoCurso,
+} from './planos-curso.swagger';
 
 @ApiTags('Planos de Curso')
 @Controller('planos-curso')
@@ -43,17 +38,7 @@ export class PlanosCursoController {
 
   @Post()
   @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
-  @ApiOperation({ summary: 'Criar um novo plano de curso' })
-  @ApiCreatedResponse({
-    description: 'O plano de curso foi criado com sucesso.',
-    type: PlanoCursoRespostaDto,
-  })
-  @ApiConflictResponse({
-    description: 'Já existe um plano de curso cadastrado com este nome.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Ocorreu um erro inesperado ao criar o plano de curso.',
-  })
+  @ApiDocCriarPlanoCurso()
   async criar(
     @Body() criarPlanoCursoDto: CriarPlanoCursoDto,
   ): Promise<PlanoCursoRespostaDto> {
@@ -63,33 +48,7 @@ export class PlanosCursoController {
 
   @Get()
   @Perfis(PerfilAcesso.COORDENADOR_CURSOS, PerfilAcesso.PROFESSOR)
-  @ApiOperation({ summary: 'Buscar uma lista paginada de planos de curso' })
-  @ApiPaginacaoResposta(PlanoCursoRespostaDto)
-  @ApiQuery({
-    name: 'pagina',
-    required: false,
-    description: 'Número da página atual (padrão: 1)',
-    example: 1,
-  })
-  @ApiQuery({
-    name: 'itensPorPagina',
-    required: false,
-    description: 'Número de itens por página (padrão: 10)',
-    example: 10,
-  })
-  @ApiQuery({
-    name: 'cursoId',
-    required: false,
-    description: 'Filtra os planos de curso pertencentes a um curso específico',
-    example: '1',
-  })
-  @ApiBadRequestResponse({
-    description:
-      'Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Ocorreu um erro inesperado ao buscar os planos de curso.',
-  })
+  @ApiDocBuscarPlanosCurso()
   async buscarTodos(
     @Query('pagina', new DefaultValuePipe(1), ParseIntPipe) pagina: number,
     @Query('itensPorPagina', new DefaultValuePipe(10), ParseIntPipe)
@@ -118,17 +77,7 @@ export class PlanosCursoController {
 
   @Get(':id')
   @Perfis(PerfilAcesso.COORDENADOR_CURSOS, PerfilAcesso.PROFESSOR)
-  @ApiOperation({ summary: 'Buscar um plano de curso pelo ID' })
-  @ApiOkResponse({
-    description: 'O plano de curso foi encontrado com sucesso.',
-    type: PlanoCursoRespostaDto,
-  })
-  @ApiNotFoundResponse({
-    description: 'Plano de curso com o ID especificado não encontrado.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Ocorreu um erro inesperado ao buscar o plano de curso.',
-  })
+  @ApiDocBuscarPlanoCursoPorId()
   async buscarPorId(
     @Param('id') id: string,
     @UsuarioLogado() usuario: PayloadJwtDto,
@@ -139,20 +88,7 @@ export class PlanosCursoController {
 
   @Patch(':id')
   @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
-  @ApiOperation({ summary: 'Atualizar um plano de curso pelo ID' })
-  @ApiOkResponse({
-    description: 'O plano de curso foi atualizado com sucesso.',
-    type: PlanoCursoRespostaDto,
-  })
-  @ApiNotFoundResponse({
-    description: 'Plano de curso com o ID especificado não encontrado.',
-  })
-  @ApiConflictResponse({
-    description: 'Já existe um plano de curso cadastrado com este nome.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Ocorreu um erro inesperado ao atualizar o plano de curso.',
-  })
+  @ApiDocAtualizarPlanoCurso()
   async atualizar(
     @Param('id') id: string,
     @Body() atualizarPlanoCursoDto: AtualizarPlanoCursoDto,
@@ -169,16 +105,7 @@ export class PlanosCursoController {
   @Delete(':id')
   @Perfis(PerfilAcesso.COORDENADOR_CURSOS)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Deletar um plano de curso pelo ID' })
-  @ApiNoContentResponse({
-    description: 'O plano de curso foi removido com sucesso.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Plano de curso com o ID especificado não encontrado.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Ocorreu um erro inesperado ao remover o plano de curso.',
-  })
+  @ApiDocRemoverPlanoCurso()
   async remover(@Param('id') id: string): Promise<void> {
     await this.planosCursoService.remover(id);
   }

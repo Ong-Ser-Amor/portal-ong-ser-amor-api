@@ -2123,6 +2123,7 @@
     },
     "/planos-curso": {
       "post": {
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nCadastra um novo plano de curso associado a um curso existente.",
         "operationId": "PlanosCursoController_criar",
         "parameters": [],
         "requestBody": {
@@ -2146,6 +2147,9 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+          },
           "409": {
             "description": "Já existe um plano de curso cadastrado com este nome."
           },
@@ -2159,6 +2163,7 @@
         ]
       },
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Retorna todos os planos de curso cadastrados.\n- **PROFESSOR**: Retorna apenas os planos de curso que possuem turmas vinculadas ao professor logado.",
         "operationId": "PlanosCursoController_buscarTodos",
         "parameters": [
           {
@@ -2232,12 +2237,14 @@
     },
     "/planos-curso/{id}": {
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer plano de curso.\n- **PROFESSOR**: Pode consultar apenas planos de curso vinculados às turmas que leciona.",
         "operationId": "PlanosCursoController_buscarPorId",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID do plano de curso",
             "schema": {
               "type": "string"
             }
@@ -2254,6 +2261,9 @@
               }
             }
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar os dados deste plano de curso."
+          },
           "404": {
             "description": "Plano de curso com o ID especificado não encontrado."
           },
@@ -2267,12 +2277,14 @@
         ]
       },
       "patch": {
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nAtualiza as informações de um plano de curso existente.",
         "operationId": "PlanosCursoController_atualizar",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID do plano de curso",
             "schema": {
               "type": "string"
             }
@@ -2299,6 +2311,9 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+          },
           "404": {
             "description": "Plano de curso com o ID especificado não encontrado."
           },
@@ -2315,12 +2330,14 @@
         ]
       },
       "delete": {
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nRemove logicamente (soft delete) um plano de curso do sistema.",
         "operationId": "PlanosCursoController_remover",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID do plano de curso",
             "schema": {
               "type": "string"
             }
@@ -2329,6 +2346,9 @@
         "responses": {
           "204": {
             "description": "O plano de curso foi removido com sucesso."
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Plano de curso com o ID especificado não encontrado."
