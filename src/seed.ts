@@ -78,7 +78,7 @@ async function seed() {
       email,
       senha,
       voluntarioId: voluntarioAdmin.id,
-      perfisAcesso: [PerfilAcesso.ADMIN],
+      perfisAcesso: [PerfilAcesso.ADMINISTRADOR],
     });
     logger.log(`Usuário admin criado com sucesso: ${email}`);
   }

@@ -14,7 +14,7 @@ import { EnderecoRespostaDto } from './dto/endereco-resposta.dto';
 import { EnderecosService } from './enderecos.service';
 
 @ApiTags('Endereços')
-@Perfis(PerfilAcesso.ADMIN)
+@Perfis(PerfilAcesso.ADMINISTRADOR)
 @Controller('enderecos')
 export class EnderecosController {
   constructor(private readonly enderecosService: EnderecosService) {}

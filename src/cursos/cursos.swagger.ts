@@ -21,7 +21,7 @@ export function ApiDocCriarCurso() {
     ApiOperation({
       summary: 'Criar um novo curso',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Cadastra um novo curso no sistema.',
     }),
     ApiCreatedResponse({
@@ -33,7 +33,7 @@ export function ApiDocCriarCurso() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao criar o curso.',
@@ -46,9 +46,9 @@ export function ApiDocBuscarCursos() {
     ApiOperation({
       summary: 'Buscar uma lista paginada de cursos',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade por Perfil:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Retorna todos os cursos cadastrados.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Retorna todos os cursos cadastrados.\n' +
         '- **PROFESSOR**: Retorna apenas os cursos que possuem turmas vinculadas ao professor logado.',
     }),
     ApiPaginacaoResposta(CursoRespostaDto),
@@ -79,9 +79,9 @@ export function ApiDocBuscarCursoPorId() {
     ApiOperation({
       summary: 'Buscar curso pelo ID',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade por Perfil:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer curso.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem consultar qualquer curso.\n' +
         '- **PROFESSOR**: Pode consultar apenas cursos vinculados às turmas que leciona.',
     }),
     ApiParam({ name: 'id', description: 'ID do curso', type: String }),
@@ -107,7 +107,7 @@ export function ApiDocAtualizarCurso() {
     ApiOperation({
       summary: 'Atualizar curso pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Atualiza as informações de um curso existente.',
     }),
     ApiParam({ name: 'id', description: 'ID do curso', type: String }),
@@ -123,7 +123,7 @@ export function ApiDocAtualizarCurso() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao atualizar o curso.',
@@ -136,7 +136,7 @@ export function ApiDocRemoverCurso() {
     ApiOperation({
       summary: 'Deletar curso pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Remove logicamente (soft delete) um curso do sistema.',
     }),
     ApiParam({ name: 'id', description: 'ID do curso', type: String }),
@@ -148,7 +148,7 @@ export function ApiDocRemoverCurso() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao deletar o curso.',

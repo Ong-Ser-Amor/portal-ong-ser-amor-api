@@ -18,9 +18,9 @@ export function ApiDocCriarTurmaAtividade() {
     ApiOperation({
       summary: 'Cadastrar uma nova atividade para uma turma',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Acesso:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem criar atividades em qualquer turma.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem criar atividades em qualquer turma.\n' +
         '- **PROFESSOR**: Pode criar atividades apenas nas turmas em que leciona.',
     }),
     ApiCreatedResponse({
@@ -47,9 +47,9 @@ export function ApiDocBuscarAtividadesPorTurma() {
     ApiOperation({
       summary: 'Buscar todas as atividades de uma turma específica',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem listar atividades de qualquer turma.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem listar atividades de qualquer turma.\n' +
         '- **PROFESSOR**: Pode listar atividades apenas das turmas em que leciona.',
     }),
     ApiParam({ name: 'turmaId', description: 'ID da turma', type: String }),
@@ -72,9 +72,9 @@ export function ApiDocBuscarEntregasPorAtividade() {
     ApiOperation({
       summary: 'Buscar todas as entregas e notas de alunos por atividade',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem visualizar entregas de qualquer atividade.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem visualizar entregas de qualquer atividade.\n' +
         '- **PROFESSOR**: Pode visualizar entregas apenas de atividades das turmas em que leciona.',
     }),
     ApiParam({
@@ -102,9 +102,9 @@ export function ApiDocRegistrarEntregasEmLote() {
     ApiOperation({
       summary: 'Registrar notas e status de entregas de alunos em lote',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Acesso:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem lançar notas em qualquer atividade.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem lançar notas em qualquer atividade.\n' +
         '- **PROFESSOR**: Pode lançar notas apenas em atividades das turmas em que leciona.',
     }),
     ApiNoContentResponse({
@@ -131,9 +131,9 @@ export function ApiDocAtualizarTurmaAtividade() {
     ApiOperation({
       summary: 'Atualizar dados de uma atividade cadastrada',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Acesso:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem atualizar atividades de qualquer turma.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem atualizar atividades de qualquer turma.\n' +
         '- **PROFESSOR**: Pode atualizar atividades apenas das turmas em que leciona.',
     }),
     ApiParam({ name: 'id', description: 'ID da atividade', type: String }),

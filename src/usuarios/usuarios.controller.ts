@@ -33,7 +33,7 @@ export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Post()
-  @Perfis(PerfilAcesso.ADMIN)
+  @Perfis(PerfilAcesso.ADMINISTRADOR)
   @ApiDocCriarUsuario()
   async criar(
     @Body() criarUsuarioDto: CriarUsuarioDto,
@@ -43,7 +43,7 @@ export class UsuariosController {
   }
 
   @Get(':id')
-  @Perfis(PerfilAcesso.ADMIN)
+  @Perfis(PerfilAcesso.ADMINISTRADOR)
   @ApiDocBuscarUsuarioPorId()
   async buscarPorId(@Param('id') id: string): Promise<UsuarioRespostaDto> {
     const usuario = await this.usuariosService.buscarPorId(id);
@@ -51,7 +51,7 @@ export class UsuariosController {
   }
 
   @Patch(':id')
-  @Perfis(PerfilAcesso.ADMIN)
+  @Perfis(PerfilAcesso.ADMINISTRADOR)
   @ApiDocAtualizarUsuario()
   async atualizar(
     @Param('id') id: string,
@@ -75,7 +75,7 @@ export class UsuariosController {
   }
 
   @Delete(':id')
-  @Perfis(PerfilAcesso.ADMIN)
+  @Perfis(PerfilAcesso.ADMINISTRADOR)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiDocRemoverUsuario()
   async remover(@Param('id') id: string): Promise<void> {

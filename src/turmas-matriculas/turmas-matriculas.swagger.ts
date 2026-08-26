@@ -22,7 +22,7 @@ export function ApiDocCriarTurmaMatricula() {
     ApiOperation({
       summary: 'Matricular um beneficiário em uma turma',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Realiza a matrícula de um beneficiário ativo em uma turma em andamento.',
     }),
     ApiCreatedResponse({
@@ -43,7 +43,7 @@ export function ApiDocCriarTurmaMatricula() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao processar a matrícula.',
@@ -56,9 +56,9 @@ export function ApiDocBuscarTurmasMatriculas() {
     ApiOperation({
       summary: 'Buscar uma lista paginada de matrículas',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade por Perfil:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem listar matrículas de qualquer turma.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem listar matrículas de qualquer turma.\n' +
         '- **PROFESSOR**: Pode listar matrículas apenas das turmas em que leciona.',
     }),
     ApiPaginacaoResposta(TurmaMatriculaRespostaDto),
@@ -100,9 +100,9 @@ export function ApiDocBuscarTurmaMatriculaPorId() {
     ApiOperation({
       summary: 'Buscar o registro de uma matrícula por ID',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade por Perfil:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer matrícula.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem consultar qualquer matrícula.\n' +
         '- **PROFESSOR**: Pode consultar apenas matrículas de turmas em que leciona.',
     }),
     ApiParam({ name: 'id', description: 'ID da matrícula', type: String }),
@@ -129,7 +129,7 @@ export function ApiDocAtualizarTurmaMatricula() {
     ApiOperation({
       summary: 'Atualizar notas, pareceres ou status de uma matrícula',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         'Permite atualizar os dados pedagógicos, parecer descritivo e o status da matrícula.\n\n' +
         '**Regras de Negócio e Conclusão de Matrícula:**\n' +
         '- **Turma em Andamento**: Só é permitido alterar matrículas quando a turma estiver com o status `EM_ANDAMENTO`.\n' +
@@ -244,7 +244,7 @@ export function ApiDocRemoverTurmaMatricula() {
     ApiOperation({
       summary: 'Remover logicamente uma matrícula pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Remove logicamente (soft delete) uma matrícula do sistema.',
     }),
     ApiParam({ name: 'id', description: 'ID da matrícula', type: String }),
@@ -257,7 +257,7 @@ export function ApiDocRemoverTurmaMatricula() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao remover a matrícula.',

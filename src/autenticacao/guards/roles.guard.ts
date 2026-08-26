@@ -32,7 +32,7 @@ export class RolesGuard implements CanActivate {
       );
     }
 
-    if (user.perfis.includes(PerfilAcesso.ADMIN)) {
+    if (user.perfis.includes(PerfilAcesso.ADMINISTRADOR)) {
       return true;
     }
 

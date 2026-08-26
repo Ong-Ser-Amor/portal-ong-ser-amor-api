@@ -19,7 +19,7 @@ export function ApiDocCriarUsuario() {
     ApiOperation({
       summary: 'Criar um novo usuário',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Cadastra um novo usuário de acesso ao sistema com seus respectivos perfis.',
     }),
     ApiCreatedResponse({
@@ -31,7 +31,7 @@ export function ApiDocCriarUsuario() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao criar o usuário.',
@@ -44,7 +44,7 @@ export function ApiDocBuscarUsuarioPorId() {
     ApiOperation({
       summary: 'Buscar usuário pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Busca as informações detalhadas de um usuário pelo seu ID.',
     }),
     ApiParam({ name: 'id', description: 'ID do usuário', type: String }),
@@ -60,7 +60,7 @@ export function ApiDocBuscarUsuarioPorId() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao buscar o usuário.',
@@ -73,7 +73,7 @@ export function ApiDocAtualizarUsuario() {
     ApiOperation({
       summary: 'Atualizar usuário pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Atualiza os dados de um usuário existente.',
     }),
     ApiParam({ name: 'id', description: 'ID do usuário', type: String }),
@@ -92,7 +92,7 @@ export function ApiDocAtualizarUsuario() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao atualizar o usuário.',
@@ -128,7 +128,7 @@ export function ApiDocRemoverUsuario() {
     ApiOperation({
       summary: 'Deletar usuário pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Remove logicamente (soft delete) um usuário do sistema.',
     }),
     ApiParam({ name: 'id', description: 'ID do usuário', type: String }),
@@ -143,7 +143,7 @@ export function ApiDocRemoverUsuario() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao deletar o usuário.',

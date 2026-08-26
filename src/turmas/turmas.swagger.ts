@@ -24,7 +24,7 @@ export function ApiDocCriarTurma() {
     ApiOperation({
       summary: 'Cadastrar uma nova turma',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Cadastra uma nova turma associada a um plano de curso.',
     }),
     ApiCreatedResponse({
@@ -45,7 +45,7 @@ export function ApiDocCriarTurma() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao cadastrar a turma.',
@@ -58,9 +58,9 @@ export function ApiDocBuscarTurmas() {
     ApiOperation({
       summary: 'Buscar uma lista paginada de turmas',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade por Perfil:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Retorna todas as turmas cadastradas.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Retorna todas as turmas cadastradas.\n' +
         '- **PROFESSOR**: Retorna apenas as turmas em que está vinculado como professor.',
     }),
     ApiPaginacaoResposta(TurmaResumoDto),
@@ -104,9 +104,9 @@ export function ApiDocBuscarTurmaPorId() {
     ApiOperation({
       summary: 'Buscar uma turma por ID',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade por Perfil:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer turma.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem consultar qualquer turma.\n' +
         '- **PROFESSOR**: Pode consultar apenas turmas em que leciona.',
     }),
     ApiParam({ name: 'id', description: 'ID da turma', type: String }),
@@ -132,7 +132,7 @@ export function ApiDocAtualizarTurma() {
     ApiOperation({
       summary: 'Atualizar uma turma pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Atualiza campos cadastrais, limites de período letivo, status e critérios de avaliação de uma turma existente.\n\n' +
         '**Regras de Negócio e Bloqueios Específicos:**\n' +
         '- **Alunos Ativos**: Não é permitido alterar o status para `FINALIZADA` se houver matrículas no status `ATIVA`.\n' +
@@ -265,7 +265,7 @@ export function ApiDocAtualizarTurma() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao atualizar a turma.',
@@ -278,7 +278,7 @@ export function ApiDocRemoverTurma() {
     ApiOperation({
       summary: 'Deletar uma turma pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Remove logicamente (soft delete) uma turma do sistema.',
     }),
     ApiParam({ name: 'id', description: 'ID da turma', type: String }),
@@ -290,7 +290,7 @@ export function ApiDocRemoverTurma() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao remover a turma.',
@@ -303,7 +303,7 @@ export function ApiDocVincularProfessor() {
     ApiOperation({
       summary: 'Vincular um professor a uma turma',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Vincula um professor voluntário a uma turma existente.',
     }),
     ApiParam({ name: 'id', description: 'ID da turma', type: String }),
@@ -320,7 +320,7 @@ export function ApiDocVincularProfessor() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao vincular o professor.',
@@ -333,7 +333,7 @@ export function ApiDocDesvincularProfessor() {
     ApiOperation({
       summary: 'Desvincular um professor de uma turma',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Remove o vínculo de um professor voluntário com a turma.',
     }),
     ApiParam({ name: 'id', description: 'ID da turma', type: String }),
@@ -351,7 +351,7 @@ export function ApiDocDesvincularProfessor() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao desvincular o professor.',

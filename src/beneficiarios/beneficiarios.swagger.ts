@@ -31,7 +31,7 @@ export function ApiDocCriarBeneficiario() {
     ApiOperation({
       summary: 'Criar um novo beneficiário',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Cadastra um novo beneficiário vinculando uma pessoa (nova ou existente) e sua família.\n\n' +
         '**Regras por Idade e Emancipação:**\n' +
         '- **Menor de idade não emancipado (< 18 anos)**: Os campos `responsavelId` e `podeSairSozinho` são **obrigatórios** (a pessoa responsável informada deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). A lista de `contatos` própria do menor é opcional.\n' +
@@ -56,7 +56,7 @@ export function ApiDocVerificarCadastroPorCpf() {
     ApiOperation({
       summary: 'Verificar cadastro de beneficiário pelo CPF',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Verifica se uma pessoa já possui cadastro no sistema e se já é beneficiária ativa.',
     }),
     ApiParam({
@@ -90,7 +90,7 @@ export function ApiDocBuscarBeneficiarios() {
     ApiOperation({
       summary: 'Buscar uma lista paginada de beneficiários',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Retorna a lista paginada de todos os beneficiários cadastrados na ONG.',
     }),
     ApiPaginacaoResposta(BeneficiarioResumoDto),
@@ -147,7 +147,7 @@ export function ApiDocBuscarBeneficiarioPorId() {
     ApiOperation({
       summary: 'Buscar um beneficiário pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Busca os dados detalhados de um beneficiário específico pelo ID.',
     }),
     ApiOkResponse({
@@ -168,7 +168,7 @@ export function ApiDocAtualizarBeneficiario() {
     ApiOperation({
       summary: 'Atualizar os dados de um beneficiário',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Atualiza as informações cadastrais de um beneficiário.',
     }),
     ApiOkResponse({
@@ -195,7 +195,7 @@ export function ApiDocTransferirFamilia() {
       summary:
         'Transfere o beneficiário para uma nova família (existente ou recém-criada)',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Transfere o beneficiário para uma nova família (existente ou recém-criada).',
     }),
     ApiOkResponse({
@@ -220,7 +220,7 @@ export function ApiDocRemoverBeneficiario() {
     ApiOperation({
       summary: 'Deletar beneficiário pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Remove logicamente (soft delete) um beneficiário do sistema.',
     }),
     ApiNoContentResponse({

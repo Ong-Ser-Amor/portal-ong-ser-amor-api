@@ -21,7 +21,7 @@ export function ApiDocCriarPlanoCurso() {
     ApiOperation({
       summary: 'Criar um novo plano de curso',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Cadastra um novo plano de curso associado a um curso existente.',
     }),
     ApiCreatedResponse({
@@ -33,7 +33,7 @@ export function ApiDocCriarPlanoCurso() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao criar o plano de curso.',
@@ -46,9 +46,9 @@ export function ApiDocBuscarPlanosCurso() {
     ApiOperation({
       summary: 'Buscar uma lista paginada de planos de curso',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade por Perfil:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Retorna todos os planos de curso cadastrados.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Retorna todos os planos de curso cadastrados.\n' +
         '- **PROFESSOR**: Retorna apenas os planos de curso que possuem turmas vinculadas ao professor logado.',
     }),
     ApiPaginacaoResposta(PlanoCursoRespostaDto),
@@ -86,9 +86,9 @@ export function ApiDocBuscarPlanoCursoPorId() {
     ApiOperation({
       summary: 'Buscar um plano de curso pelo ID',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade por Perfil:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer plano de curso.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem consultar qualquer plano de curso.\n' +
         '- **PROFESSOR**: Pode consultar apenas planos de curso vinculados às turmas que leciona.',
     }),
     ApiParam({ name: 'id', description: 'ID do plano de curso', type: String }),
@@ -114,7 +114,7 @@ export function ApiDocAtualizarPlanoCurso() {
     ApiOperation({
       summary: 'Atualizar um plano de curso pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Atualiza as informações de um plano de curso existente.',
     }),
     ApiParam({ name: 'id', description: 'ID do plano de curso', type: String }),
@@ -130,7 +130,7 @@ export function ApiDocAtualizarPlanoCurso() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao atualizar o plano de curso.',
@@ -143,7 +143,7 @@ export function ApiDocRemoverPlanoCurso() {
     ApiOperation({
       summary: 'Deletar um plano de curso pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\n' +
         'Remove logicamente (soft delete) um plano de curso do sistema.',
     }),
     ApiParam({ name: 'id', description: 'ID do plano de curso', type: String }),
@@ -155,7 +155,7 @@ export function ApiDocRemoverPlanoCurso() {
     }),
     ApiForbiddenResponse({
       description:
-        'Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS).',
+        'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS).',
     }),
     ApiInternalServerErrorResponse({
       description: 'Ocorreu um erro inesperado ao remover o plano de curso.',

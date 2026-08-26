@@ -37,9 +37,10 @@ import { TransferirFamiliaDto } from './dto/transferir-familia.dto';
 
 @ApiTags('Beneficiarios')
 @ApiForbiddenResponse({
-  description: 'Acesso não autorizado para o perfil do usuário (requer ADMIN).',
+  description:
+    'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR).',
 })
-@Perfis(PerfilAcesso.ADMIN)
+@Perfis(PerfilAcesso.ADMINISTRADOR)
 @Controller('beneficiarios')
 export class BeneficiariosController {
   constructor(private readonly beneficiariosService: BeneficiariosService) {}

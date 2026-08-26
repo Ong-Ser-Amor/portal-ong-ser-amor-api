@@ -14,7 +14,7 @@ import { FamiliaRespostaDto } from './dto/familia-resposta.dto';
 import { FamiliasService } from './familias.service';
 
 @ApiTags('Famílias')
-@Perfis(PerfilAcesso.ADMIN)
+@Perfis(PerfilAcesso.ADMINISTRADOR)
 @Controller('familias')
 export class FamiliasController {
   constructor(private readonly familiasService: FamiliasService) {}

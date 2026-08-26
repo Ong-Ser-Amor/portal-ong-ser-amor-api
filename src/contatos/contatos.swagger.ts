@@ -18,7 +18,7 @@ export function ApiDocCriarContato() {
     ApiOperation({
       summary: 'Cadastrar um novo contato para uma pessoa',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Cadastra um novo contato para uma pessoa vinculada ao sistema.',
     }),
     ApiCreatedResponse({
@@ -46,7 +46,7 @@ export function ApiDocBuscarContatosPorPessoaId() {
     ApiOperation({
       summary: 'Buscar todos os contatos de uma pessoa',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Retorna todos os contatos vinculados a uma pessoa específica.',
     }),
     ApiParam({ name: 'pessoaId', description: 'ID da pessoa', type: String }),
@@ -68,7 +68,7 @@ export function ApiDocAtualizarContato() {
     ApiOperation({
       summary: 'Atualizar os dados de um contato existente',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Atualiza as informações de um contato existente.',
     }),
     ApiParam({ name: 'id', description: 'ID do contato', type: String }),
@@ -98,7 +98,7 @@ export function ApiDocRemoverContato() {
     ApiOperation({
       summary: 'Remover um contato existente',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Remove um contato existente do sistema.',
     }),
     ApiParam({ name: 'id', description: 'ID do contato', type: String }),

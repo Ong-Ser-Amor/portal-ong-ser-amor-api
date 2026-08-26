@@ -26,9 +26,10 @@ import { CriarContatoDto } from './dto/criar-contato.dto';
 
 @ApiTags('Contatos')
 @ApiForbiddenResponse({
-  description: 'Acesso não autorizado para o perfil do usuário (requer ADMIN).',
+  description:
+    'Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR).',
 })
-@Perfis(PerfilAcesso.ADMIN)
+@Perfis(PerfilAcesso.ADMINISTRADOR)
 @Controller('contatos')
 export class ContatosController {
   constructor(private readonly contatosService: ContatosService) {}

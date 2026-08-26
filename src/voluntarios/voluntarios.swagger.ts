@@ -25,7 +25,7 @@ export function ApiDocCriarVoluntario() {
     ApiOperation({
       summary: 'Criar um novo voluntário',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Cadastra um novo voluntário vinculando a uma pessoa existente ou criando um novo registro de pessoa.',
     }),
     ApiCreatedResponse({
@@ -47,7 +47,7 @@ export function ApiDocVerificarCadastroPorCpf() {
     ApiOperation({
       summary: 'Verificar cadastro de voluntário pelo CPF',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Verifica se uma pessoa já possui cadastro e se já está vinculada como voluntária.',
     }),
     ApiParam({
@@ -80,7 +80,7 @@ export function ApiDocBuscarVoluntarios() {
     ApiOperation({
       summary: 'Buscar uma lista paginada de voluntários',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Retorna a listagem paginada de todos os voluntários da ONG.',
     }),
     ApiPaginacaoResposta(VoluntarioResumoDto),
@@ -117,7 +117,7 @@ export function ApiDocBuscarVoluntarioPorId() {
     ApiOperation({
       summary: 'Buscar voluntário pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Busca as informações detalhadas de um voluntário específico pelo seu ID.',
     }),
     ApiParam({ name: 'id', description: 'ID do voluntário', type: String }),
@@ -139,7 +139,7 @@ export function ApiDocAtualizarVoluntario() {
     ApiOperation({
       summary: 'Atualizar voluntário pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Atualiza os dados de um voluntário existente.',
     }),
     ApiParam({ name: 'id', description: 'ID do voluntário', type: String }),
@@ -164,7 +164,7 @@ export function ApiDocRemoverVoluntario() {
     ApiOperation({
       summary: 'Deletar voluntário pelo ID',
       description:
-        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        '**Perfil com Acesso:** `ADMINISTRADOR`.\n\n' +
         'Remove logicamente (soft delete) um voluntário do sistema.',
     }),
     ApiParam({ name: 'id', description: 'ID do voluntário', type: String }),

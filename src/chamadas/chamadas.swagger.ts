@@ -17,9 +17,9 @@ export function ApiDocSalvarChamadaLote() {
       summary:
         'Registrar ou atualizar a lista de chamada (presenças/faltas) de uma aula em lote',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Acesso:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem registrar e editar chamadas em qualquer turma.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem registrar e editar chamadas em qualquer turma.\n' +
         '- **PROFESSOR**: Pode registrar e editar chamadas apenas em turmas em que leciona.',
     }),
     ApiOkResponse({
@@ -45,9 +45,9 @@ export function ApiDocBuscarChamadasPorAula() {
     ApiOperation({
       summary: 'Buscar a lista de chamadas preenchida de uma aula específica',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem consultar chamadas de qualquer aula.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem consultar chamadas de qualquer aula.\n' +
         '- **PROFESSOR**: Pode consultar chamadas apenas de aulas das turmas em que leciona.',
     }),
     ApiParam({ name: 'aulaId', description: 'ID da aula', type: String }),
@@ -70,11 +70,11 @@ export function ApiDocRemoverChamadasPorAula() {
     ApiOperation({
       summary: 'Remover o lote de chamadas de uma aula (limpar presenças)',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         'Exclui todas as presenças/faltas registradas para a aula especificada (soft delete).\n' +
         'Se a aula estiver com status `REALIZADA`, o status é revertido automaticamente para `AGENDADA`.\n\n' +
         '**Regras de Acesso:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem remover chamadas de qualquer aula.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem remover chamadas de qualquer aula.\n' +
         '- **PROFESSOR**: Pode remover chamadas apenas de aulas das turmas em que leciona.',
     }),
     ApiParam({ name: 'aulaId', description: 'ID da aula', type: String }),

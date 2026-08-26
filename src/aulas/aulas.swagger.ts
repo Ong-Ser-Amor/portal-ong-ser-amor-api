@@ -21,9 +21,9 @@ export function ApiDocCriarAula() {
     ApiOperation({
       summary: 'Cadastrar ou agendar uma nova aula para uma turma',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Acesso:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem agendar aulas em qualquer turma.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem agendar aulas em qualquer turma.\n' +
         '- **PROFESSOR**: Pode agendar aulas apenas nas turmas em que leciona.',
     }),
     ApiCreatedResponse({
@@ -49,9 +49,9 @@ export function ApiDocBuscarAulas() {
     ApiOperation({
       summary: 'Buscar uma lista paginada de aulas registradas',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem listar aulas de qualquer turma.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem listar aulas de qualquer turma.\n' +
         '- **PROFESSOR**: Pode listar aulas apenas das turmas em que leciona.',
     }),
     ApiPaginacaoResposta(AulaRespostaDto),
@@ -88,9 +88,9 @@ export function ApiDocBuscarAulaPorId() {
     ApiOperation({
       summary: 'Buscar o registro de uma aula por ID',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         '**Regras de Visibilidade:**\n' +
-        '- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer aula.\n' +
+        '- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem consultar qualquer aula.\n' +
         '- **PROFESSOR**: Pode consultar apenas aulas das turmas em que leciona.',
     }),
     ApiParam({ name: 'id', description: 'ID da aula', type: String }),
@@ -112,7 +112,7 @@ export function ApiDocAtualizarAula() {
     ApiOperation({
       summary: 'Atualizar dados ou o status de uma aula pelo ID',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         'Permite atualizar o tema, a data e o status de uma aula existente.\n\n' +
         '**Regras de Negócio e Transições de Status:**\n' +
         '- **Presenças Registradas**: Uma aula com chamadas salvas não pode retornar ao status `AGENDADA` nem ser alterada para `CANCELADA` (é necessário excluir o lote de chamadas primeiro caso tenha sido feito por engano).\n' +
@@ -230,7 +230,7 @@ export function ApiDocRemoverAula() {
     ApiOperation({
       summary: 'Remover logicamente uma aula do cronograma pelo ID',
       description:
-        '**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
+        '**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n' +
         'Remove logicamente (soft delete) uma aula do cronograma da turma.',
     }),
     ApiParam({ name: 'id', description: 'ID da aula', type: String }),
