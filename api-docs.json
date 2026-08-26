@@ -1891,6 +1891,7 @@
     },
     "/cursos": {
       "post": {
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nCadastra um novo curso no sistema.",
         "operationId": "CursosController_criar",
         "parameters": [],
         "requestBody": {
@@ -1914,6 +1915,9 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+          },
           "409": {
             "description": "Já existe um curso cadastrado com este nome."
           },
@@ -1927,6 +1931,7 @@
         ]
       },
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Retorna todos os cursos cadastrados.\n- **PROFESSOR**: Retorna apenas os cursos que possuem turmas vinculadas ao professor logado.",
         "operationId": "CursosController_buscarTodos",
         "parameters": [
           {
@@ -1990,12 +1995,14 @@
     },
     "/cursos/{id}": {
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer curso.\n- **PROFESSOR**: Pode consultar apenas cursos vinculados às turmas que leciona.",
         "operationId": "CursosController_buscarPorId",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID do curso",
             "schema": {
               "type": "string"
             }
@@ -2012,6 +2019,9 @@
               }
             }
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar os dados deste curso."
+          },
           "404": {
             "description": "Curso com o ID especificado não encontrado."
           },
@@ -2025,12 +2035,14 @@
         ]
       },
       "patch": {
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nAtualiza as informações de um curso existente.",
         "operationId": "CursosController_atualizar",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID do curso",
             "schema": {
               "type": "string"
             }
@@ -2057,6 +2069,9 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+          },
           "404": {
             "description": "Curso não encontrado."
           },
@@ -2073,12 +2088,14 @@
         ]
       },
       "delete": {
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nRemove logicamente (soft delete) um curso do sistema.",
         "operationId": "CursosController_remover",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID do curso",
             "schema": {
               "type": "string"
             }
@@ -2087,6 +2104,9 @@
         "responses": {
           "204": {
             "description": "O curso foi deletado com sucesso."
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Curso não encontrado."
