@@ -42,7 +42,7 @@ import { TransferirFamiliaDto } from './dto/transferir-familia.dto';
 @Perfis(PerfilAcesso.ADMIN)
 @Controller('beneficiarios')
 export class BeneficiariosController {
-  constructor(private readonly beneficiariosService: BeneficiariosService) { }
+  constructor(private readonly beneficiariosService: BeneficiariosService) {}
 
   @Post()
   @ApiDocCriarBeneficiario()

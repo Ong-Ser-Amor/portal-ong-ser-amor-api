@@ -54,8 +54,7 @@ export function ApiDocBuscarAtividadesPorTurma() {
     }),
     ApiParam({ name: 'turmaId', description: 'ID da turma', type: String }),
     ApiOkResponse({
-      description:
-        'A lista de atividades da turma foi recuperada com sucesso.',
+      description: 'A lista de atividades da turma foi recuperada com sucesso.',
       type: [TurmaAtividadeRespostaDto],
     }),
     ApiNotFoundResponse({

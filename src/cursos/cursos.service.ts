@@ -24,7 +24,7 @@ export class CursosService {
   constructor(
     @InjectRepository(Curso)
     private readonly repository: Repository<Curso>,
-  ) { }
+  ) {}
 
   async criar(criarCursoDto: CriarCursoDto): Promise<Curso> {
     // 1. Valida duplicidade ANTES de tentar salvar
