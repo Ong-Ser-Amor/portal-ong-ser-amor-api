@@ -3142,6 +3142,7 @@
     },
     "/chamadas/lote": {
       "post": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem registrar e editar chamadas em qualquer turma.\n- **PROFESSOR**: Pode registrar e editar chamadas apenas em turmas em que leciona.",
         "operationId": "ChamadasController_salvarLote",
         "parameters": [],
         "requestBody": {
@@ -3171,6 +3172,9 @@
           "400": {
             "description": "A lista enviada está incompleta, contém alunos não ativos/não pertencentes à turma, a aula está CANCELADA ou houve inconsistência nas justificativas de falta."
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular presenças de aulas desta turma."
+          },
           "404": {
             "description": "A aula informada pelo ID não foi encontrada no sistema."
           },
@@ -3186,12 +3190,14 @@
     },
     "/chamadas/aula/{aulaId}": {
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem consultar chamadas de qualquer aula.\n- **PROFESSOR**: Pode consultar chamadas apenas de aulas das turmas em que leciona.",
         "operationId": "ChamadasController_buscarPorAula",
         "parameters": [
           {
             "name": "aulaId",
             "required": true,
             "in": "path",
+            "description": "ID da aula",
             "schema": {
               "type": "string"
             }
@@ -3211,6 +3217,9 @@
               }
             }
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular presenças de aulas desta turma."
+          },
           "404": {
             "description": "A aula especificada não possui registros de chamada ou não foi encontrada."
           },
@@ -3224,13 +3233,14 @@
         ]
       },
       "delete": {
-        "description": "Exclui todas as presenças/faltas registradas para a aula especificada (soft delete).\nSe a aula estiver com status REALIZADA, o status é revertido automaticamente para AGENDADA.",
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\nExclui todas as presenças/faltas registradas para a aula especificada (soft delete).\nSe a aula estiver com status `REALIZADA`, o status é revertido automaticamente para `AGENDADA`.\n\n**Regras de Acesso:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem remover chamadas de qualquer aula.\n- **PROFESSOR**: Pode remover chamadas apenas de aulas das turmas em que leciona.",
         "operationId": "ChamadasController_removerPorAula",
         "parameters": [
           {
             "name": "aulaId",
             "required": true,
             "in": "path",
+            "description": "ID da aula",
             "schema": {
               "type": "string"
             }
@@ -3239,6 +3249,9 @@
         "responses": {
           "204": {
             "description": "As presenças da aula foram removidas com sucesso e o status da aula foi revertido para AGENDADA."
+          },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular presenças de aulas desta turma."
           },
           "404": {
             "description": "A aula informada não foi encontrada ou não possui registros de chamada para serem removidos."
