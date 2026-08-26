@@ -2822,6 +2822,7 @@
     },
     "/aulas": {
       "post": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem agendar aulas em qualquer turma.\n- **PROFESSOR**: Pode agendar aulas apenas nas turmas em que leciona.",
         "operationId": "AulasController_criar",
         "parameters": [],
         "requestBody": {
@@ -2848,6 +2849,9 @@
           "400": {
             "description": "A turma não está EM_ANDAMENTO ou a data enviada está fora do período letivo estabelecido."
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular dados das aulas desta turma."
+          },
           "409": {
             "description": "Já existe uma aula cadastrada nesta mesma data para a turma informada."
           },
@@ -2861,6 +2865,7 @@
         ]
       },
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem listar aulas de qualquer turma.\n- **PROFESSOR**: Pode listar aulas apenas das turmas em que leciona.",
         "operationId": "AulasController_buscarTodas",
         "parameters": [
           {
@@ -2922,6 +2927,9 @@
           "400": {
             "description": "Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1."
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular dados das aulas desta turma."
+          },
           "500": {
             "description": "Ocorreu um erro inesperado ao buscar a listagem de aulas."
           }
@@ -2934,12 +2942,14 @@
     },
     "/aulas/{id}": {
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer aula.\n- **PROFESSOR**: Pode consultar apenas aulas das turmas em que leciona.",
         "operationId": "AulasController_buscarPorId",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID da aula",
             "schema": {
               "type": "string"
             }
@@ -2956,6 +2966,9 @@
               }
             }
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular dados das aulas desta turma."
+          },
           "404": {
             "description": "Aula com o ID especificado não foi encontrada."
           },
@@ -2969,13 +2982,14 @@
         ]
       },
       "patch": {
-        "description": "Permite atualizar o tema, a data e o status de uma aula existente.\n\n**Regras de Negócio e Transições de Status:**\n- **Presenças Registradas**: Uma aula com chamadas salvas não pode retornar ao status `AGENDADA` nem ser alterada para `CANCELADA` (é necessário excluir o lote de chamadas primeiro caso tenha sido feito por engano).\n- **Marcação de Realização**: Uma aula só pode ser marcada como `REALIZADA` se possuir chamadas registradas.\n- **Limites do Calendário**: A data da aula deve estar estritamente contida entre a data de início e de término da turma correspondente.\n- **Unicidade de Data**: Não é permitido agendar duas aulas na mesma data para a mesma turma.",
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\nPermite atualizar o tema, a data e o status de uma aula existente.\n\n**Regras de Negócio e Transições de Status:**\n- **Presenças Registradas**: Uma aula com chamadas salvas não pode retornar ao status `AGENDADA` nem ser alterada para `CANCELADA` (é necessário excluir o lote de chamadas primeiro caso tenha sido feito por engano).\n- **Marcação de Realização**: Uma aula só pode ser marcada como `REALIZADA` se possuir chamadas registradas.\n- **Limites do Calendário**: A data da aula deve estar estritamente contida entre a data de início e de término da turma correspondente.\n- **Unicidade de Data**: Não é permitido agendar duas aulas na mesma data para a mesma turma.\n- **Controle de Escopo**: Professores só podem atualizar aulas das suas próprias turmas.",
         "operationId": "AulasController_atualizar",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID da aula",
             "schema": {
               "type": "string"
             }
@@ -3056,6 +3070,9 @@
               }
             }
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular dados das aulas desta turma."
+          },
           "404": {
             "description": "Aula com o ID especificado não foi encontrada."
           },
@@ -3087,12 +3104,14 @@
         ]
       },
       "delete": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\nRemove logicamente (soft delete) uma aula do cronograma da turma.",
         "operationId": "AulasController_remover",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID da aula",
             "schema": {
               "type": "string"
             }
@@ -3104,6 +3123,9 @@
           },
           "400": {
             "description": "Esta aula não pode ser removida pois possui um lote de chamadas ativo e vinculado a ela."
+          },
+          "403": {
+            "description": "Usuário não tem permissão para acessar ou manipular dados das aulas desta turma."
           },
           "404": {
             "description": "Aula com o ID especificado não foi encontrada."
