@@ -3268,6 +3268,7 @@
     },
     "/turmas-matriculas": {
       "post": {
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nRealiza a matrícula de um beneficiário ativo em uma turma em andamento.",
         "operationId": "TurmasMatriculasController_criar",
         "parameters": [],
         "requestBody": {
@@ -3294,6 +3295,9 @@
           "400": {
             "description": "A turma selecionada já está finalizada ou foi cancelada no sistema."
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+          },
           "404": {
             "description": "A turma ou o beneficiário informado não existem no sistema."
           },
@@ -3310,6 +3314,7 @@
         ]
       },
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem listar matrículas de qualquer turma.\n- **PROFESSOR**: Pode listar matrículas apenas das turmas em que leciona.",
         "operationId": "TurmasMatriculasController_buscarTodas",
         "parameters": [
           {
@@ -3371,6 +3376,9 @@
           "400": {
             "description": "Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1."
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar as matrículas desta turma."
+          },
           "500": {
             "description": "Ocorreu um erro inesperado ao buscar a listagem de matrículas."
           }
@@ -3383,12 +3391,14 @@
     },
     "/turmas-matriculas/{id}": {
       "get": {
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer matrícula.\n- **PROFESSOR**: Pode consultar apenas matrículas de turmas em que leciona.",
         "operationId": "TurmasMatriculasController_buscarPorId",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID da matrícula",
             "schema": {
               "type": "string"
             }
@@ -3405,6 +3415,9 @@
               }
             }
           },
+          "403": {
+            "description": "Usuário não tem permissão para acessar os dados desta matrícula."
+          },
           "404": {
             "description": "Registro de matrícula com o ID especificado não foi encontrado."
           },
@@ -3418,13 +3431,14 @@
         ]
       },
       "patch": {
-        "description": "Permite atualizar os dados pedagógicos, parecer descritivo e o status da matrícula.\n\n**Regras de Negócio e Conclusão de Matrícula:**\n- **Turma em Andamento**: Só é permitido alterar matrículas quando a turma estiver com o status `EM_ANDAMENTO`.\n- **Atividades Avaliativas Concluídas**: Para concluir uma matrícula (`status: CONCLUIDA`) em turmas avaliadas por nota, todas as atividades avaliativas (`valeNota: true`) devem estar entregues e com nota lançada para o estudante.\n- **Resultado e Nota Final**: Em turmas por nota, a definição de `resultadoFinal` e `notaFinal` é obrigatória ao concluir.",
+        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\nPermite atualizar os dados pedagógicos, parecer descritivo e o status da matrícula.\n\n**Regras de Negócio e Conclusão de Matrícula:**\n- **Turma em Andamento**: Só é permitido alterar matrículas quando a turma estiver com o status `EM_ANDAMENTO`.\n- **Atividades Avaliativas Concluídas**: Para concluir uma matrícula (`status: CONCLUIDA`) em turmas avaliadas por nota, todas as atividades avaliativas (`valeNota: true`) devem estar entregues e com nota lançada para o estudante.\n- **Resultado e Nota Final**: Em turmas por nota, a definição de `resultadoFinal` e `notaFinal` é obrigatória ao concluir.\n- **Controle de Escopo**: Professores só podem atualizar matrículas de turmas em que lecionam.",
         "operationId": "TurmasMatriculasController_atualizar",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID da matrícula",
             "schema": {
               "type": "string"
             }
@@ -3514,6 +3528,9 @@
               }
             }
           },
+          "403": {
+            "description": "Usuário não tem permissão para atualizar os dados desta matrícula."
+          },
           "404": {
             "description": "Registro de matrícula com o ID especificado não foi encontrado."
           },
@@ -3527,12 +3544,14 @@
         ]
       },
       "delete": {
+        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nRemove logicamente (soft delete) uma matrícula do sistema.",
         "operationId": "TurmasMatriculasController_remover",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID da matrícula",
             "schema": {
               "type": "string"
             }
@@ -3541,6 +3560,9 @@
         "responses": {
           "204": {
             "description": "A matrícula foi removida com sucesso (soft delete)."
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Registro de matrícula com o ID especificado não foi encontrado."
