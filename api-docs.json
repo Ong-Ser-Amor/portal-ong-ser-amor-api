@@ -17,7 +17,7 @@
     },
     "/beneficiarios": {
       "post": {
-        "description": "Cadastra um novo beneficiário vinculando uma pessoa (nova ou existente) e sua família.\n\n**Regras por Idade e Emancipação:**\n- **Menor de idade não emancipado (< 18 anos)**: Os campos `responsavelId` e `podeSairSozinho` são **obrigatórios** (a pessoa responsável informada deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). A lista de `contatos` própria do menor é opcional.\n- **Adulto (≥ 18 anos) ou Menor Emancipado (≥ 16 anos)**: A lista de `contatos` é **obrigatória** (mínimo 1 contato, com exatamente 1 contato marcado como `ehPrincipal: true`). Os campos `responsavelId` e `podeSairSozinho` não devem ser informados.",
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nCadastra um novo beneficiário vinculando uma pessoa (nova ou existente) e sua família.\n\n**Regras por Idade e Emancipação:**\n- **Menor de idade não emancipado (< 18 anos)**: Os campos `responsavelId` e `podeSairSozinho` são **obrigatórios** (a pessoa responsável informada deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). A lista de `contatos` própria do menor é opcional.\n- **Adulto (≥ 18 anos) ou Menor Emancipado (≥ 16 anos)**: A lista de `contatos` é **obrigatória** (mínimo 1 contato, com exatamente 1 contato marcado como `ehPrincipal: true`). Os campos `responsavelId` e `podeSairSozinho` não devem ser informados.",
         "operationId": "BeneficiariosController_criar",
         "parameters": [],
         "requestBody": {
@@ -569,6 +569,7 @@
         ]
       },
       "get": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRetorna a lista paginada de todos os beneficiários cadastrados na ONG.",
         "operationId": "BeneficiariosController_buscarTodos",
         "parameters": [
           {
@@ -675,6 +676,7 @@
     },
     "/beneficiarios/verificar-cadastro/cpf/{cpf}": {
       "get": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nVerifica se uma pessoa já possui cadastro no sistema e se já é beneficiária ativa.",
         "operationId": "BeneficiariosController_verificarCadastroPorCpf",
         "parameters": [
           {
@@ -723,6 +725,7 @@
     },
     "/beneficiarios/{id}": {
       "get": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nBusca os dados detalhados de um beneficiário específico pelo ID.",
         "operationId": "BeneficiariosController_buscarPorId",
         "parameters": [
           {
@@ -761,6 +764,7 @@
         ]
       },
       "patch": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nAtualiza as informações cadastrais de um beneficiário.",
         "operationId": "BeneficiariosController_atualizar",
         "parameters": [
           {
@@ -812,6 +816,7 @@
         ]
       },
       "delete": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRemove logicamente (soft delete) um beneficiário do sistema.",
         "operationId": "BeneficiariosController_remover",
         "parameters": [
           {
@@ -845,6 +850,7 @@
     },
     "/beneficiarios/{id}/transferir-familia": {
       "patch": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nTransfere o beneficiário para uma nova família (existente ou recém-criada).",
         "operationId": "BeneficiariosController_transferirFamilia",
         "parameters": [
           {

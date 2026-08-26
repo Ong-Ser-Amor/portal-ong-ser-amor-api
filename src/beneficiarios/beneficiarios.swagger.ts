@@ -31,6 +31,7 @@ export function ApiDocCriarBeneficiario() {
     ApiOperation({
       summary: 'Criar um novo beneficiário',
       description:
+        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
         'Cadastra um novo beneficiário vinculando uma pessoa (nova ou existente) e sua família.\n\n' +
         '**Regras por Idade e Emancipação:**\n' +
         '- **Menor de idade não emancipado (< 18 anos)**: Os campos `responsavelId` e `podeSairSozinho` são **obrigatórios** (a pessoa responsável informada deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). A lista de `contatos` própria do menor é opcional.\n' +
@@ -54,6 +55,9 @@ export function ApiDocVerificarCadastroPorCpf() {
   return applyDecorators(
     ApiOperation({
       summary: 'Verificar cadastro de beneficiário pelo CPF',
+      description:
+        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        'Verifica se uma pessoa já possui cadastro no sistema e se já é beneficiária ativa.',
     }),
     ApiParam({
       name: 'cpf',
@@ -83,7 +87,12 @@ export function ApiDocVerificarCadastroPorCpf() {
 
 export function ApiDocBuscarBeneficiarios() {
   return applyDecorators(
-    ApiOperation({ summary: 'Buscar uma lista paginada de beneficiários' }),
+    ApiOperation({
+      summary: 'Buscar uma lista paginada de beneficiários',
+      description:
+        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        'Retorna a lista paginada de todos os beneficiários cadastrados na ONG.',
+    }),
     ApiPaginacaoResposta(BeneficiarioResumoDto),
     ApiQuery({
       name: 'pagina',
@@ -135,7 +144,12 @@ export function ApiDocBuscarBeneficiarios() {
 
 export function ApiDocBuscarBeneficiarioPorId() {
   return applyDecorators(
-    ApiOperation({ summary: 'Buscar um beneficiário pelo ID' }),
+    ApiOperation({
+      summary: 'Buscar um beneficiário pelo ID',
+      description:
+        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        'Busca os dados detalhados de um beneficiário específico pelo ID.',
+    }),
     ApiOkResponse({
       description: 'O beneficiário foi encontrado com sucesso.',
       type: BeneficiarioDto,
@@ -151,7 +165,12 @@ export function ApiDocBuscarBeneficiarioPorId() {
 
 export function ApiDocAtualizarBeneficiario() {
   return applyDecorators(
-    ApiOperation({ summary: 'Atualizar os dados de um beneficiário' }),
+    ApiOperation({
+      summary: 'Atualizar os dados de um beneficiário',
+      description:
+        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        'Atualiza as informações cadastrais de um beneficiário.',
+    }),
     ApiOkResponse({
       description: 'O beneficiário foi atualizado com sucesso.',
       type: BeneficiarioDto,
@@ -175,6 +194,9 @@ export function ApiDocTransferirFamilia() {
     ApiOperation({
       summary:
         'Transfere o beneficiário para uma nova família (existente ou recém-criada)',
+      description:
+        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        'Transfere o beneficiário para uma nova família (existente ou recém-criada).',
     }),
     ApiOkResponse({
       description: 'O beneficiário foi transferido com sucesso.',
@@ -195,7 +217,12 @@ export function ApiDocTransferirFamilia() {
 
 export function ApiDocRemoverBeneficiario() {
   return applyDecorators(
-    ApiOperation({ summary: 'Deletar beneficiário pelo ID' }),
+    ApiOperation({
+      summary: 'Deletar beneficiário pelo ID',
+      description:
+        '**Perfil com Acesso:** `ADMIN` (Administrador).\n\n' +
+        'Remove logicamente (soft delete) um beneficiário do sistema.',
+    }),
     ApiNoContentResponse({
       description: 'O beneficiário foi deletado com sucesso.',
     }),
