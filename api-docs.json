@@ -17,7 +17,7 @@
     },
     "/beneficiarios": {
       "post": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nCadastra um novo beneficiário vinculando uma pessoa (nova ou existente) e sua família.\n\n**Regras por Idade e Emancipação:**\n- **Menor de idade não emancipado (< 18 anos)**: Os campos `responsavelId` e `podeSairSozinho` são **obrigatórios** (a pessoa responsável informada deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). A lista de `contatos` própria do menor é opcional.\n- **Adulto (≥ 18 anos) ou Menor Emancipado (≥ 16 anos)**: A lista de `contatos` é **obrigatória** (mínimo 1 contato, com exatamente 1 contato marcado como `ehPrincipal: true`). Os campos `responsavelId` e `podeSairSozinho` não devem ser informados.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nCadastra um novo beneficiário vinculando uma pessoa (nova ou existente) e sua família.\n\n**Regras por Idade e Emancipação:**\n- **Menor de idade não emancipado (< 18 anos)**: Os campos `responsavelId` e `podeSairSozinho` são **obrigatórios** (a pessoa responsável informada deve possuir pelo menos 1 contato do tipo CELULAR cadastrado). A lista de `contatos` própria do menor é opcional.\n- **Adulto (≥ 18 anos) ou Menor Emancipado (≥ 16 anos)**: A lista de `contatos` é **obrigatória** (mínimo 1 contato, com exatamente 1 contato marcado como `ehPrincipal: true`). Os campos `responsavelId` e `podeSairSozinho` não devem ser informados.",
         "operationId": "BeneficiariosController_criar",
         "parameters": [],
         "requestBody": {
@@ -554,7 +554,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "409": {
             "description": "Já existe uma pessoa com este CPF ou a pessoa informada já possui um benefício ativo."
@@ -569,7 +569,7 @@
         ]
       },
       "get": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRetorna a lista paginada de todos os beneficiários cadastrados na ONG.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nRetorna a lista paginada de todos os beneficiários cadastrados na ONG.",
         "operationId": "BeneficiariosController_buscarTodos",
         "parameters": [
           {
@@ -662,7 +662,7 @@
             "description": "Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "500": {
             "description": "Ocorreu um erro inesperado ao buscar os beneficiários."
@@ -676,7 +676,7 @@
     },
     "/beneficiarios/verificar-cadastro/cpf/{cpf}": {
       "get": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nVerifica se uma pessoa já possui cadastro no sistema e se já é beneficiária ativa.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nVerifica se uma pessoa já possui cadastro no sistema e se já é beneficiária ativa.",
         "operationId": "BeneficiariosController_verificarCadastroPorCpf",
         "parameters": [
           {
@@ -705,7 +705,7 @@
             "description": "CPF inválido."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Pessoa não encontrada."
@@ -725,7 +725,7 @@
     },
     "/beneficiarios/{id}": {
       "get": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nBusca os dados detalhados de um beneficiário específico pelo ID.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nBusca os dados detalhados de um beneficiário específico pelo ID.",
         "operationId": "BeneficiariosController_buscarPorId",
         "parameters": [
           {
@@ -749,7 +749,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Beneficiário não encontrado."
@@ -764,7 +764,7 @@
         ]
       },
       "patch": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nAtualiza as informações cadastrais de um beneficiário.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nAtualiza as informações cadastrais de um beneficiário.",
         "operationId": "BeneficiariosController_atualizar",
         "parameters": [
           {
@@ -798,7 +798,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Beneficiário não encontrado."
@@ -816,7 +816,7 @@
         ]
       },
       "delete": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRemove logicamente (soft delete) um beneficiário do sistema.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nRemove logicamente (soft delete) um beneficiário do sistema.",
         "operationId": "BeneficiariosController_remover",
         "parameters": [
           {
@@ -833,7 +833,7 @@
             "description": "O beneficiário foi deletado com sucesso."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Beneficiário não encontrado."
@@ -850,7 +850,7 @@
     },
     "/beneficiarios/{id}/transferir-familia": {
       "patch": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nTransfere o beneficiário para uma nova família (existente ou recém-criada).",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nTransfere o beneficiário para uma nova família (existente ou recém-criada).",
         "operationId": "BeneficiariosController_transferirFamilia",
         "parameters": [
           {
@@ -941,7 +941,7 @@
             "description": "O beneficiário já pertence a esta família ou os dados enviados são inválidos."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Beneficiário ou família destino não encontrados."
@@ -958,7 +958,7 @@
     },
     "/contatos": {
       "post": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nCadastra um novo contato para uma pessoa vinculada ao sistema.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nCadastra um novo contato para uma pessoa vinculada ao sistema.",
         "operationId": "ContatosController_criar",
         "parameters": [],
         "requestBody": {
@@ -986,7 +986,7 @@
             "description": "Dados inválidos enviados na requisição ou violação das regras de negócio (ex: máximo de 3 contatos por pessoa, máximo de 2 celulares/1 email/1 fixo, exatamente 1 contato principal)."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Pessoa não encontrada."
@@ -1006,7 +1006,7 @@
     },
     "/contatos/pessoa/{pessoaId}": {
       "get": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRetorna todos os contatos vinculados a uma pessoa específica.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nRetorna todos os contatos vinculados a uma pessoa específica.",
         "operationId": "ContatosController_buscarPorPessoaId",
         "parameters": [
           {
@@ -1034,7 +1034,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Pessoa não encontrada."
@@ -1051,7 +1051,7 @@
     },
     "/contatos/{id}": {
       "patch": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nAtualiza as informações de um contato existente.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nAtualiza as informações de um contato existente.",
         "operationId": "ContatosController_atualizar",
         "parameters": [
           {
@@ -1089,7 +1089,7 @@
             "description": "Dados inválidos enviados na requisição ou violação das regras de negócio de contatos."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Contato não encontrado."
@@ -1107,7 +1107,7 @@
         ]
       },
       "delete": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRemove um contato existente do sistema.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nRemove um contato existente do sistema.",
         "operationId": "ContatosController_remover",
         "parameters": [
           {
@@ -1128,7 +1128,7 @@
             "description": "Não é permitido remover o contato se a pessoa (adulto/emancipado) ficar sem contatos ou se for o único contato principal."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Contato não encontrado."
@@ -1239,7 +1239,7 @@
     },
     "/usuarios": {
       "post": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nCadastra um novo usuário de acesso ao sistema com seus respectivos perfis.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nCadastra um novo usuário de acesso ao sistema com seus respectivos perfis.",
         "operationId": "UsuariosController_criar",
         "parameters": [],
         "requestBody": {
@@ -1264,7 +1264,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "409": {
             "description": "Já existe um usuário cadastrado com este e-mail."
@@ -1281,7 +1281,7 @@
     },
     "/usuarios/{id}": {
       "get": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nBusca as informações detalhadas de um usuário pelo seu ID.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nBusca as informações detalhadas de um usuário pelo seu ID.",
         "operationId": "UsuariosController_buscarPorId",
         "parameters": [
           {
@@ -1309,7 +1309,7 @@
             "description": "Não autorizado."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Usuário não encontrado."
@@ -1324,7 +1324,7 @@
         ]
       },
       "patch": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nAtualiza os dados de um usuário existente.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nAtualiza os dados de um usuário existente.",
         "operationId": "UsuariosController_atualizar",
         "parameters": [
           {
@@ -1362,7 +1362,7 @@
             "description": "Não autorizado."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Usuário não encontrado."
@@ -1380,7 +1380,7 @@
         ]
       },
       "delete": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRemove logicamente (soft delete) um usuário do sistema.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nRemove logicamente (soft delete) um usuário do sistema.",
         "operationId": "UsuariosController_remover",
         "parameters": [
           {
@@ -1401,7 +1401,7 @@
             "description": "Não autorizado."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Usuário não encontrado."
@@ -1453,7 +1453,7 @@
     },
     "/voluntarios": {
       "post": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nCadastra um novo voluntário vinculando a uma pessoa existente ou criando um novo registro de pessoa.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nCadastra um novo voluntário vinculando a uma pessoa existente ou criando um novo registro de pessoa.",
         "operationId": "VoluntariosController_criar",
         "parameters": [],
         "requestBody": {
@@ -1581,7 +1581,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "409": {
             "description": "Já existe uma pessoa com este CPF ou a pessoa informada já possui um cadastro de voluntário ativo."
@@ -1596,7 +1596,7 @@
         ]
       },
       "get": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRetorna a listagem paginada de todos os voluntários da ONG.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nRetorna a listagem paginada de todos os voluntários da ONG.",
         "operationId": "VoluntariosController_buscarTodos",
         "parameters": [
           {
@@ -1659,7 +1659,7 @@
             "description": "Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "500": {
             "description": "Ocorreu um erro inesperado ao buscar os voluntários."
@@ -1673,7 +1673,7 @@
     },
     "/voluntarios/verificar-cadastro/cpf/{cpf}": {
       "get": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nVerifica se uma pessoa já possui cadastro e se já está vinculada como voluntária.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nVerifica se uma pessoa já possui cadastro e se já está vinculada como voluntária.",
         "operationId": "VoluntariosController_verificarCadastroPorCpf",
         "parameters": [
           {
@@ -1702,7 +1702,7 @@
             "description": "CPF inválido."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Pessoa não encontrada."
@@ -1722,7 +1722,7 @@
     },
     "/voluntarios/{id}": {
       "get": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nBusca as informações detalhadas de um voluntário específico pelo seu ID.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nBusca as informações detalhadas de um voluntário específico pelo seu ID.",
         "operationId": "VoluntariosController_buscarPorId",
         "parameters": [
           {
@@ -1747,7 +1747,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Voluntário não encontrado."
@@ -1762,7 +1762,7 @@
         ]
       },
       "patch": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nAtualiza os dados de um voluntário existente.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nAtualiza os dados de um voluntário existente.",
         "operationId": "VoluntariosController_atualizar",
         "parameters": [
           {
@@ -1797,7 +1797,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Voluntário não encontrado."
@@ -1815,7 +1815,7 @@
         ]
       },
       "delete": {
-        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRemove logicamente (soft delete) um voluntário do sistema.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR`.\n\nRemove logicamente (soft delete) um voluntário do sistema.",
         "operationId": "VoluntariosController_remover",
         "parameters": [
           {
@@ -1833,7 +1833,7 @@
             "description": "O voluntário foi deletado com sucesso."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR)."
           },
           "404": {
             "description": "Voluntário não encontrado."
@@ -1891,7 +1891,7 @@
     },
     "/cursos": {
       "post": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nCadastra um novo curso no sistema.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nCadastra um novo curso no sistema.",
         "operationId": "CursosController_criar",
         "parameters": [],
         "requestBody": {
@@ -1916,7 +1916,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "409": {
             "description": "Já existe um curso cadastrado com este nome."
@@ -1931,7 +1931,7 @@
         ]
       },
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Retorna todos os cursos cadastrados.\n- **PROFESSOR**: Retorna apenas os cursos que possuem turmas vinculadas ao professor logado.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Retorna todos os cursos cadastrados.\n- **PROFESSOR**: Retorna apenas os cursos que possuem turmas vinculadas ao professor logado.",
         "operationId": "CursosController_buscarTodos",
         "parameters": [
           {
@@ -1995,7 +1995,7 @@
     },
     "/cursos/{id}": {
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer curso.\n- **PROFESSOR**: Pode consultar apenas cursos vinculados às turmas que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem consultar qualquer curso.\n- **PROFESSOR**: Pode consultar apenas cursos vinculados às turmas que leciona.",
         "operationId": "CursosController_buscarPorId",
         "parameters": [
           {
@@ -2035,7 +2035,7 @@
         ]
       },
       "patch": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nAtualiza as informações de um curso existente.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nAtualiza as informações de um curso existente.",
         "operationId": "CursosController_atualizar",
         "parameters": [
           {
@@ -2070,7 +2070,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Curso não encontrado."
@@ -2088,7 +2088,7 @@
         ]
       },
       "delete": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nRemove logicamente (soft delete) um curso do sistema.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nRemove logicamente (soft delete) um curso do sistema.",
         "operationId": "CursosController_remover",
         "parameters": [
           {
@@ -2106,7 +2106,7 @@
             "description": "O curso foi deletado com sucesso."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Curso não encontrado."
@@ -2123,7 +2123,7 @@
     },
     "/planos-curso": {
       "post": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nCadastra um novo plano de curso associado a um curso existente.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nCadastra um novo plano de curso associado a um curso existente.",
         "operationId": "PlanosCursoController_criar",
         "parameters": [],
         "requestBody": {
@@ -2148,7 +2148,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "409": {
             "description": "Já existe um plano de curso cadastrado com este nome."
@@ -2163,7 +2163,7 @@
         ]
       },
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Retorna todos os planos de curso cadastrados.\n- **PROFESSOR**: Retorna apenas os planos de curso que possuem turmas vinculadas ao professor logado.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Retorna todos os planos de curso cadastrados.\n- **PROFESSOR**: Retorna apenas os planos de curso que possuem turmas vinculadas ao professor logado.",
         "operationId": "PlanosCursoController_buscarTodos",
         "parameters": [
           {
@@ -2237,7 +2237,7 @@
     },
     "/planos-curso/{id}": {
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer plano de curso.\n- **PROFESSOR**: Pode consultar apenas planos de curso vinculados às turmas que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem consultar qualquer plano de curso.\n- **PROFESSOR**: Pode consultar apenas planos de curso vinculados às turmas que leciona.",
         "operationId": "PlanosCursoController_buscarPorId",
         "parameters": [
           {
@@ -2277,7 +2277,7 @@
         ]
       },
       "patch": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nAtualiza as informações de um plano de curso existente.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nAtualiza as informações de um plano de curso existente.",
         "operationId": "PlanosCursoController_atualizar",
         "parameters": [
           {
@@ -2312,7 +2312,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Plano de curso com o ID especificado não encontrado."
@@ -2330,7 +2330,7 @@
         ]
       },
       "delete": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nRemove logicamente (soft delete) um plano de curso do sistema.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nRemove logicamente (soft delete) um plano de curso do sistema.",
         "operationId": "PlanosCursoController_remover",
         "parameters": [
           {
@@ -2348,7 +2348,7 @@
             "description": "O plano de curso foi removido com sucesso."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Plano de curso com o ID especificado não encontrado."
@@ -2365,7 +2365,7 @@
     },
     "/turmas": {
       "post": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nCadastra uma nova turma associada a um plano de curso.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nCadastra uma nova turma associada a um plano de curso.",
         "operationId": "TurmasController_criar",
         "parameters": [],
         "requestBody": {
@@ -2393,7 +2393,7 @@
             "description": "Houve um erro de validação nos dados fornecidos (ex: datas inválidas ou campos numéricos fora dos limites permitidos)."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "O plano de curso informado pelo planoCursoId não foi encontrado."
@@ -2411,7 +2411,7 @@
         ]
       },
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Retorna todas as turmas cadastradas.\n- **PROFESSOR**: Retorna apenas as turmas em que está vinculado como professor.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Retorna todas as turmas cadastradas.\n- **PROFESSOR**: Retorna apenas as turmas em que está vinculado como professor.",
         "operationId": "TurmasController_buscarTodos",
         "parameters": [
           {
@@ -2495,7 +2495,7 @@
     },
     "/turmas/{id}": {
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer turma.\n- **PROFESSOR**: Pode consultar apenas turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem consultar qualquer turma.\n- **PROFESSOR**: Pode consultar apenas turmas em que leciona.",
         "operationId": "TurmasController_buscarPorId",
         "parameters": [
           {
@@ -2535,7 +2535,7 @@
         ]
       },
       "patch": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nAtualiza campos cadastrais, limites de período letivo, status e critérios de avaliação de uma turma existente.\n\n**Regras de Negócio e Bloqueios Específicos:**\n- **Alunos Ativos**: Não é permitido alterar o status para `FINALIZADA` se houver matrículas no status `ATIVA`.\n- **Choque de Data Inicial**: Não é permitido postergar `dataInicio` para uma data posterior a aulas já agendadas/realizadas.\n- **Choque de Data Final**: Não é permitido adiantar `dataFim` para uma data anterior a aulas já agendadas/realizadas.\n- **Ordem das Datas**: A nova data final consolidada não pode ser anterior à data de início.\n- **Critérios de Avaliação**: As notas e frequências consolidadas devem respeitar o critério configurado.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nAtualiza campos cadastrais, limites de período letivo, status e critérios de avaliação de uma turma existente.\n\n**Regras de Negócio e Bloqueios Específicos:**\n- **Alunos Ativos**: Não é permitido alterar o status para `FINALIZADA` se houver matrículas no status `ATIVA`.\n- **Choque de Data Inicial**: Não é permitido postergar `dataInicio` para uma data posterior a aulas já agendadas/realizadas.\n- **Choque de Data Final**: Não é permitido adiantar `dataFim` para uma data anterior a aulas já agendadas/realizadas.\n- **Ordem das Datas**: A nova data final consolidada não pode ser anterior à data de início.\n- **Critérios de Avaliação**: As notas e frequências consolidadas devem respeitar o critério configurado.",
         "operationId": "TurmasController_atualizar",
         "parameters": [
           {
@@ -2660,7 +2660,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Turma com o ID especificado não foi encontrada."
@@ -2678,7 +2678,7 @@
         ]
       },
       "delete": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nRemove logicamente (soft delete) uma turma do sistema.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nRemove logicamente (soft delete) uma turma do sistema.",
         "operationId": "TurmasController_remover",
         "parameters": [
           {
@@ -2696,7 +2696,7 @@
             "description": "A turma foi removida com sucesso."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Turma com o ID especificado não encontrada."
@@ -2713,7 +2713,7 @@
     },
     "/turmas/{id}/professores": {
       "post": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nVincula um professor voluntário a uma turma existente.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nVincula um professor voluntário a uma turma existente.",
         "operationId": "TurmasController_vincularProfessor",
         "parameters": [
           {
@@ -2758,7 +2758,7 @@
             }
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Turma ou professor com o ID especificado não foram encontrados."
@@ -2778,7 +2778,7 @@
     },
     "/turmas/{id}/professores/{professorId}": {
       "delete": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nRemove o vínculo de um professor voluntário com a turma.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nRemove o vínculo de um professor voluntário com a turma.",
         "operationId": "TurmasController_desvincularProfessor",
         "parameters": [
           {
@@ -2805,7 +2805,7 @@
             "description": "O professor foi desvinculado da turma com sucesso."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Turma ou professor com o ID especificado não foram encontrados, ou o professor não está vinculado a esta turma."
@@ -2822,7 +2822,7 @@
     },
     "/aulas": {
       "post": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem agendar aulas em qualquer turma.\n- **PROFESSOR**: Pode agendar aulas apenas nas turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem agendar aulas em qualquer turma.\n- **PROFESSOR**: Pode agendar aulas apenas nas turmas em que leciona.",
         "operationId": "AulasController_criar",
         "parameters": [],
         "requestBody": {
@@ -2865,7 +2865,7 @@
         ]
       },
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem listar aulas de qualquer turma.\n- **PROFESSOR**: Pode listar aulas apenas das turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem listar aulas de qualquer turma.\n- **PROFESSOR**: Pode listar aulas apenas das turmas em que leciona.",
         "operationId": "AulasController_buscarTodas",
         "parameters": [
           {
@@ -2942,7 +2942,7 @@
     },
     "/aulas/{id}": {
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer aula.\n- **PROFESSOR**: Pode consultar apenas aulas das turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem consultar qualquer aula.\n- **PROFESSOR**: Pode consultar apenas aulas das turmas em que leciona.",
         "operationId": "AulasController_buscarPorId",
         "parameters": [
           {
@@ -2982,7 +2982,7 @@
         ]
       },
       "patch": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\nPermite atualizar o tema, a data e o status de uma aula existente.\n\n**Regras de Negócio e Transições de Status:**\n- **Presenças Registradas**: Uma aula com chamadas salvas não pode retornar ao status `AGENDADA` nem ser alterada para `CANCELADA` (é necessário excluir o lote de chamadas primeiro caso tenha sido feito por engano).\n- **Marcação de Realização**: Uma aula só pode ser marcada como `REALIZADA` se possuir chamadas registradas.\n- **Limites do Calendário**: A data da aula deve estar estritamente contida entre a data de início e de término da turma correspondente.\n- **Unicidade de Data**: Não é permitido agendar duas aulas na mesma data para a mesma turma.\n- **Controle de Escopo**: Professores só podem atualizar aulas das suas próprias turmas.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\nPermite atualizar o tema, a data e o status de uma aula existente.\n\n**Regras de Negócio e Transições de Status:**\n- **Presenças Registradas**: Uma aula com chamadas salvas não pode retornar ao status `AGENDADA` nem ser alterada para `CANCELADA` (é necessário excluir o lote de chamadas primeiro caso tenha sido feito por engano).\n- **Marcação de Realização**: Uma aula só pode ser marcada como `REALIZADA` se possuir chamadas registradas.\n- **Limites do Calendário**: A data da aula deve estar estritamente contida entre a data de início e de término da turma correspondente.\n- **Unicidade de Data**: Não é permitido agendar duas aulas na mesma data para a mesma turma.\n- **Controle de Escopo**: Professores só podem atualizar aulas das suas próprias turmas.",
         "operationId": "AulasController_atualizar",
         "parameters": [
           {
@@ -3104,7 +3104,7 @@
         ]
       },
       "delete": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\nRemove logicamente (soft delete) uma aula do cronograma da turma.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\nRemove logicamente (soft delete) uma aula do cronograma da turma.",
         "operationId": "AulasController_remover",
         "parameters": [
           {
@@ -3142,7 +3142,7 @@
     },
     "/chamadas/lote": {
       "post": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem registrar e editar chamadas em qualquer turma.\n- **PROFESSOR**: Pode registrar e editar chamadas apenas em turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem registrar e editar chamadas em qualquer turma.\n- **PROFESSOR**: Pode registrar e editar chamadas apenas em turmas em que leciona.",
         "operationId": "ChamadasController_salvarLote",
         "parameters": [],
         "requestBody": {
@@ -3190,7 +3190,7 @@
     },
     "/chamadas/aula/{aulaId}": {
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem consultar chamadas de qualquer aula.\n- **PROFESSOR**: Pode consultar chamadas apenas de aulas das turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem consultar chamadas de qualquer aula.\n- **PROFESSOR**: Pode consultar chamadas apenas de aulas das turmas em que leciona.",
         "operationId": "ChamadasController_buscarPorAula",
         "parameters": [
           {
@@ -3233,7 +3233,7 @@
         ]
       },
       "delete": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\nExclui todas as presenças/faltas registradas para a aula especificada (soft delete).\nSe a aula estiver com status `REALIZADA`, o status é revertido automaticamente para `AGENDADA`.\n\n**Regras de Acesso:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem remover chamadas de qualquer aula.\n- **PROFESSOR**: Pode remover chamadas apenas de aulas das turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\nExclui todas as presenças/faltas registradas para a aula especificada (soft delete).\nSe a aula estiver com status `REALIZADA`, o status é revertido automaticamente para `AGENDADA`.\n\n**Regras de Acesso:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem remover chamadas de qualquer aula.\n- **PROFESSOR**: Pode remover chamadas apenas de aulas das turmas em que leciona.",
         "operationId": "ChamadasController_removerPorAula",
         "parameters": [
           {
@@ -3268,7 +3268,7 @@
     },
     "/turmas-matriculas": {
       "post": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nRealiza a matrícula de um beneficiário ativo em uma turma em andamento.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nRealiza a matrícula de um beneficiário ativo em uma turma em andamento.",
         "operationId": "TurmasMatriculasController_criar",
         "parameters": [],
         "requestBody": {
@@ -3296,7 +3296,7 @@
             "description": "A turma selecionada já está finalizada ou foi cancelada no sistema."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "A turma ou o beneficiário informado não existem no sistema."
@@ -3314,7 +3314,7 @@
         ]
       },
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem listar matrículas de qualquer turma.\n- **PROFESSOR**: Pode listar matrículas apenas das turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem listar matrículas de qualquer turma.\n- **PROFESSOR**: Pode listar matrículas apenas das turmas em que leciona.",
         "operationId": "TurmasMatriculasController_buscarTodas",
         "parameters": [
           {
@@ -3391,7 +3391,7 @@
     },
     "/turmas-matriculas/{id}": {
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem consultar qualquer matrícula.\n- **PROFESSOR**: Pode consultar apenas matrículas de turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade por Perfil:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem consultar qualquer matrícula.\n- **PROFESSOR**: Pode consultar apenas matrículas de turmas em que leciona.",
         "operationId": "TurmasMatriculasController_buscarPorId",
         "parameters": [
           {
@@ -3431,7 +3431,7 @@
         ]
       },
       "patch": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\nPermite atualizar os dados pedagógicos, parecer descritivo e o status da matrícula.\n\n**Regras de Negócio e Conclusão de Matrícula:**\n- **Turma em Andamento**: Só é permitido alterar matrículas quando a turma estiver com o status `EM_ANDAMENTO`.\n- **Atividades Avaliativas Concluídas**: Para concluir uma matrícula (`status: CONCLUIDA`) em turmas avaliadas por nota, todas as atividades avaliativas (`valeNota: true`) devem estar entregues e com nota lançada para o estudante.\n- **Resultado e Nota Final**: Em turmas por nota, a definição de `resultadoFinal` e `notaFinal` é obrigatória ao concluir.\n- **Controle de Escopo**: Professores só podem atualizar matrículas de turmas em que lecionam.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\nPermite atualizar os dados pedagógicos, parecer descritivo e o status da matrícula.\n\n**Regras de Negócio e Conclusão de Matrícula:**\n- **Turma em Andamento**: Só é permitido alterar matrículas quando a turma estiver com o status `EM_ANDAMENTO`.\n- **Atividades Avaliativas Concluídas**: Para concluir uma matrícula (`status: CONCLUIDA`) em turmas avaliadas por nota, todas as atividades avaliativas (`valeNota: true`) devem estar entregues e com nota lançada para o estudante.\n- **Resultado e Nota Final**: Em turmas por nota, a definição de `resultadoFinal` e `notaFinal` é obrigatória ao concluir.\n- **Controle de Escopo**: Professores só podem atualizar matrículas de turmas em que lecionam.",
         "operationId": "TurmasMatriculasController_atualizar",
         "parameters": [
           {
@@ -3544,7 +3544,7 @@
         ]
       },
       "delete": {
-        "description": "**Perfil com Acesso:** `ADMIN` ou `COORDENADOR_CURSOS`.\n\nRemove logicamente (soft delete) uma matrícula do sistema.",
+        "description": "**Perfil com Acesso:** `ADMINISTRADOR` ou `COORDENADOR_CURSOS`.\n\nRemove logicamente (soft delete) uma matrícula do sistema.",
         "operationId": "TurmasMatriculasController_remover",
         "parameters": [
           {
@@ -3562,7 +3562,7 @@
             "description": "A matrícula foi removida com sucesso (soft delete)."
           },
           "403": {
-            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN ou COORDENADOR_CURSOS)."
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMINISTRADOR ou COORDENADOR_CURSOS)."
           },
           "404": {
             "description": "Registro de matrícula com o ID especificado não foi encontrado."
@@ -3579,7 +3579,7 @@
     },
     "/turmas-atividades": {
       "post": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem criar atividades em qualquer turma.\n- **PROFESSOR**: Pode criar atividades apenas nas turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem criar atividades em qualquer turma.\n- **PROFESSOR**: Pode criar atividades apenas nas turmas em que leciona.",
         "operationId": "TurmasAtividadesController_criar",
         "parameters": [],
         "requestBody": {
@@ -3624,7 +3624,7 @@
     },
     "/turmas-atividades/turmas/{turmaId}": {
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem listar atividades de qualquer turma.\n- **PROFESSOR**: Pode listar atividades apenas das turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem listar atividades de qualquer turma.\n- **PROFESSOR**: Pode listar atividades apenas das turmas em que leciona.",
         "operationId": "TurmasAtividadesController_buscarAtividadesPorTurma",
         "parameters": [
           {
@@ -3669,7 +3669,7 @@
     },
     "/turmas-atividades/{atividadeId}/entregas": {
       "get": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem visualizar entregas de qualquer atividade.\n- **PROFESSOR**: Pode visualizar entregas apenas de atividades das turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Visibilidade:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem visualizar entregas de qualquer atividade.\n- **PROFESSOR**: Pode visualizar entregas apenas de atividades das turmas em que leciona.",
         "operationId": "TurmasAtividadesController_buscarEntregasPorAtividade",
         "parameters": [
           {
@@ -3714,7 +3714,7 @@
     },
     "/turmas-atividades/entregas/lote": {
       "patch": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem lançar notas em qualquer atividade.\n- **PROFESSOR**: Pode lançar notas apenas em atividades das turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem lançar notas em qualquer atividade.\n- **PROFESSOR**: Pode lançar notas apenas em atividades das turmas em que leciona.",
         "operationId": "TurmasAtividadesController_registrarEmLote",
         "parameters": [],
         "requestBody": {
@@ -3752,7 +3752,7 @@
     },
     "/turmas-atividades/{id}": {
       "patch": {
-        "description": "**Perfis com Acesso:** `ADMIN`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMIN / COORDENADOR_CURSOS**: Podem atualizar atividades de qualquer turma.\n- **PROFESSOR**: Pode atualizar atividades apenas das turmas em que leciona.",
+        "description": "**Perfis com Acesso:** `ADMINISTRADOR`, `COORDENADOR_CURSOS` e `PROFESSOR`.\n\n**Regras de Acesso:**\n- **ADMINISTRADOR / COORDENADOR_CURSOS**: Podem atualizar atividades de qualquer turma.\n- **PROFESSOR**: Pode atualizar atividades apenas das turmas em que leciona.",
         "operationId": "TurmasAtividadesController_atualizar",
         "parameters": [
           {
@@ -4662,7 +4662,7 @@
             "items": {
               "type": "string",
               "enum": [
-                "ADMIN",
+                "ADMINISTRADOR",
                 "COORDENADOR_CURSOS",
                 "PROFESSOR"
               ]
@@ -4695,7 +4695,7 @@
             "items": {
               "type": "string",
               "enum": [
-                "ADMIN",
+                "ADMINISTRADOR",
                 "COORDENADOR_CURSOS",
                 "PROFESSOR"
               ]
@@ -4730,7 +4730,7 @@
             "items": {
               "type": "string",
               "enum": [
-                "ADMIN",
+                "ADMINISTRADOR",
                 "COORDENADOR_CURSOS",
                 "PROFESSOR"
               ]

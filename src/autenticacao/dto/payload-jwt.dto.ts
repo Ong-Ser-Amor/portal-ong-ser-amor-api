@@ -6,13 +6,13 @@ export class PayloadJwtDto {
   voluntarioId: string;
   nome: string;
   email: string;
-  perfis: PerfilAcesso[];
+  perfisAcesso: PerfilAcesso[];
 
   constructor(usuario: Usuario) {
     this.sub = usuario.id;
     this.voluntarioId = usuario.voluntarioId;
     this.nome = usuario.voluntario?.pessoa?.nome;
     this.email = usuario.email;
-    this.perfis = usuario.perfisAcesso || [];
+    this.perfisAcesso = usuario.perfisAcesso || [];
   }
 }

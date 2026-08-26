@@ -26,18 +26,18 @@ export class RolesGuard implements CanActivate {
 
     const { user } = context.switchToHttp().getRequest<RequestComUsuario>();
 
-    if (!user || !user.perfis) {
+    if (!user || !user.perfisAcesso) {
       throw new ForbiddenException(
         'Acesso não autorizado para o perfil do usuário.',
       );
     }
 
-    if (user.perfis.includes(PerfilAcesso.ADMINISTRADOR)) {
+    if (user.perfisAcesso.includes(PerfilAcesso.ADMINISTRADOR)) {
       return true;
     }
 
     const possuiPerfil = perfisNecessarios.some((perfil) =>
-      user.perfis.includes(perfil),
+      user.perfisAcesso.includes(perfil),
     );
 
     if (!possuiPerfil) {

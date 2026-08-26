@@ -7,7 +7,7 @@ const PERFIS_COM_ACESSO_IRRESTRITO_EM_CURSOS: PerfilAcesso[] = [
 ];
 
 export function temAcessoIrrestritoEmCursos(usuario: PayloadJwtDto): boolean {
-  return usuario.perfis.some((perfil) =>
+  return usuario.perfisAcesso.some((perfil) =>
     PERFIS_COM_ACESSO_IRRESTRITO_EM_CURSOS.includes(perfil),
   );
 }
