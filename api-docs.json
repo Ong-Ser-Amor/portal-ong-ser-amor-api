@@ -958,6 +958,7 @@
     },
     "/contatos": {
       "post": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nCadastra um novo contato para uma pessoa vinculada ao sistema.",
         "operationId": "ContatosController_criar",
         "parameters": [],
         "requestBody": {
@@ -984,6 +985,9 @@
           "400": {
             "description": "Dados inválidos enviados na requisição ou violação das regras de negócio (ex: máximo de 3 contatos por pessoa, máximo de 2 celulares/1 email/1 fixo, exatamente 1 contato principal)."
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "404": {
             "description": "Pessoa não encontrada."
           },
@@ -1002,6 +1006,7 @@
     },
     "/contatos/pessoa/{pessoaId}": {
       "get": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRetorna todos os contatos vinculados a uma pessoa específica.",
         "operationId": "ContatosController_buscarPorPessoaId",
         "parameters": [
           {
@@ -1028,6 +1033,9 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "404": {
             "description": "Pessoa não encontrada."
           },
@@ -1043,6 +1051,7 @@
     },
     "/contatos/{id}": {
       "patch": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nAtualiza as informações de um contato existente.",
         "operationId": "ContatosController_atualizar",
         "parameters": [
           {
@@ -1079,6 +1088,9 @@
           "400": {
             "description": "Dados inválidos enviados na requisição ou violação das regras de negócio de contatos."
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "404": {
             "description": "Contato não encontrado."
           },
@@ -1095,6 +1107,7 @@
         ]
       },
       "delete": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRemove um contato existente do sistema.",
         "operationId": "ContatosController_remover",
         "parameters": [
           {
@@ -1113,6 +1126,9 @@
           },
           "400": {
             "description": "Não é permitido remover o contato se a pessoa (adulto/emancipado) ficar sem contatos ou se for o único contato principal."
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
           },
           "404": {
             "description": "Contato não encontrado."
