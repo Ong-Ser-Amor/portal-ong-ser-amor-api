@@ -35,6 +35,10 @@
                         "type": "string",
                         "example": "123456"
                       },
+                      "familiaId": {
+                        "type": "string",
+                        "example": "789012"
+                      },
                       "estadoCivil": {
                         "type": "string",
                         "enum": [
@@ -70,10 +74,6 @@
                           "ENSINO_SUPERIOR_COMPLETO",
                           "SEM_ESCOLARIDADE"
                         ]
-                      },
-                      "familiaId": {
-                        "type": "string",
-                        "example": "789012"
                       },
                       "contatos": {
                         "type": "array",
@@ -113,6 +113,13 @@
                         "type": "string",
                         "example": "123456"
                       },
+                      "novaFamilia": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/CriarFamiliaDto"
+                          }
+                        ]
+                      },
                       "estadoCivil": {
                         "type": "string",
                         "enum": [
@@ -149,13 +156,6 @@
                           "SEM_ESCOLARIDADE"
                         ]
                       },
-                      "novaFamilia": {
-                        "allOf": [
-                          {
-                            "$ref": "#/components/schemas/CriarFamiliaDto"
-                          }
-                        ]
-                      },
                       "contatos": {
                         "type": "array",
                         "items": {
@@ -190,6 +190,10 @@
                     "type": "object",
                     "title": "Nova pessoa + família existente",
                     "properties": {
+                      "familiaId": {
+                        "type": "string",
+                        "example": "789012"
+                      },
                       "nome": {
                         "type": "string",
                         "example": "João da Silva"
@@ -252,10 +256,6 @@
                           "ENSINO_SUPERIOR_COMPLETO",
                           "SEM_ESCOLARIDADE"
                         ]
-                      },
-                      "familiaId": {
-                        "type": "string",
-                        "example": "789012"
                       },
                       "contatos": {
                         "type": "array",
@@ -293,6 +293,13 @@
                     "type": "object",
                     "title": "Nova pessoa + criar nova família",
                     "properties": {
+                      "novaFamilia": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/CriarFamiliaDto"
+                          }
+                        ]
+                      },
                       "nome": {
                         "type": "string",
                         "example": "João da Silva"
@@ -354,13 +361,6 @@
                           "ENSINO_SUPERIOR_INCOMPLETO",
                           "ENSINO_SUPERIOR_COMPLETO",
                           "SEM_ESCOLARIDADE"
-                        ]
-                      },
-                      "novaFamilia": {
-                        "allOf": [
-                          {
-                            "$ref": "#/components/schemas/CriarFamiliaDto"
-                          }
                         ]
                       },
                       "contatos": {
@@ -403,15 +403,23 @@
                   "value": {
                     "pessoaId": "123456",
                     "familiaId": "789012",
+                    "nivelEscolaridade": "ENSINO_FUNDAMENTAL_COMPLETO",
                     "estadoCivil": "SOLTEIRO",
                     "vinculoEmpregaticio": "DESEMPREGADO",
                     "quantidadeFilhos": 2,
-                    "nivelEscolaridade": "ENSINO_FUNDAMENTAL_COMPLETO",
                     "contatos": [
                       {
                         "tipoContato": "CELULAR",
                         "valor": "11999998888",
                         "ehPrincipal": true
+                      },
+                      {
+                        "tipoContato": "TELEFONE_FIXO",
+                        "valor": "1141410000"
+                      },
+                      {
+                        "tipoContato": "EMAIL",
+                        "valor": "joao.silva@email.com"
                       }
                     ]
                   }
@@ -420,16 +428,6 @@
                   "summary": "Pessoa existente + criar nova família",
                   "value": {
                     "pessoaId": "123456",
-                    "estadoCivil": "SOLTEIRO",
-                    "vinculoEmpregaticio": "DESEMPREGADO",
-                    "quantidadeFilhos": 2,
-                    "contatos": [
-                      {
-                        "tipoContato": "CELULAR",
-                        "valor": "11999998888",
-                        "ehPrincipal": true
-                      }
-                    ],
                     "novaFamilia": {
                       "faixaRenda": "ATE_1_SALARIO",
                       "possuiBeneficioSocial": true,
@@ -444,16 +442,35 @@
                         "uf": "SP"
                       }
                     },
-                    "nivelEscolaridade": "ENSINO_FUNDAMENTAL_COMPLETO"
+                    "nivelEscolaridade": "ENSINO_FUNDAMENTAL_COMPLETO",
+                    "estadoCivil": "SOLTEIRO",
+                    "vinculoEmpregaticio": "DESEMPREGADO",
+                    "quantidadeFilhos": 2,
+                    "contatos": [
+                      {
+                        "tipoContato": "CELULAR",
+                        "valor": "11999998888",
+                        "ehPrincipal": true
+                      },
+                      {
+                        "tipoContato": "TELEFONE_FIXO",
+                        "valor": "1141410000"
+                      },
+                      {
+                        "tipoContato": "EMAIL",
+                        "valor": "joao.silva@email.com"
+                      }
+                    ]
                   }
                 },
                 "pessoa_nova_familia_existente": {
                   "summary": "Nova pessoa + família existente",
                   "value": {
+                    "familiaId": "789012",
+                    "nivelEscolaridade": "ENSINO_MEDIO_COMPLETO",
                     "nome": "João da Silva",
                     "cpf": "12345678900",
                     "dataNascimento": "1990-01-01",
-                    "familiaId": "789012",
                     "emancipado": false,
                     "podeSairSozinho": true,
                     "responsavelId": "10",
@@ -465,14 +482,36 @@
                         "tipoContato": "CELULAR",
                         "valor": "11999998888",
                         "ehPrincipal": true
+                      },
+                      {
+                        "tipoContato": "TELEFONE_FIXO",
+                        "valor": "1141410000"
+                      },
+                      {
+                        "tipoContato": "EMAIL",
+                        "valor": "joao.silva@email.com"
                       }
-                    ],
-                    "nivelEscolaridade": "ENSINO_MEDIO_COMPLETO"
+                    ]
                   }
                 },
                 "pessoa_nova_nova_familia": {
                   "summary": "Nova pessoa + criar nova família",
                   "value": {
+                    "novaFamilia": {
+                      "faixaRenda": "ATE_1_SALARIO",
+                      "possuiBeneficioSocial": true,
+                      "tipoMoradia": "ALUGADA",
+                      "endereco": {
+                        "logradouro": "Rua A",
+                        "numero": "123",
+                        "complemento": "Casa 1",
+                        "bairro": "Centro",
+                        "cep": "12345678",
+                        "cidade": "Cidade",
+                        "uf": "SP"
+                      }
+                    },
+                    "nivelEscolaridade": "ENSINO_MEDIO_COMPLETO",
                     "nome": "João da Silva",
                     "cpf": "12345678900",
                     "dataNascimento": "1990-01-01",
@@ -487,23 +526,16 @@
                         "tipoContato": "CELULAR",
                         "valor": "11999998888",
                         "ehPrincipal": true
+                      },
+                      {
+                        "tipoContato": "TELEFONE_FIXO",
+                        "valor": "1141410000"
+                      },
+                      {
+                        "tipoContato": "EMAIL",
+                        "valor": "joao.silva@email.com"
                       }
-                    ],
-                    "novaFamilia": {
-                      "faixaRenda": "ATE_1_SALARIO",
-                      "possuiBeneficioSocial": true,
-                      "tipoMoradia": "ALUGADA",
-                      "endereco": {
-                        "complemento": "Casa 1",
-                        "cep": "12345678",
-                        "logradouro": "Rua A",
-                        "numero": "123",
-                        "bairro": "Centro",
-                        "cidade": "Cidade",
-                        "uf": "SP"
-                      }
-                    },
-                    "nivelEscolaridade": "ENSINO_MEDIO_COMPLETO"
+                    ]
                   }
                 }
               }
@@ -873,12 +905,13 @@
                       "possuiBeneficioSocial": true,
                       "tipoMoradia": "ALUGADA",
                       "endereco": {
-                        "cep": "12345678",
                         "logradouro": "Rua A",
                         "numero": "123",
+                        "complemento": "Casa 1",
                         "bairro": "Centro",
+                        "cep": "12345678",
                         "cidade": "Cidade",
-                        "estado": "SP"
+                        "uf": "SP"
                       }
                     }
                   }
