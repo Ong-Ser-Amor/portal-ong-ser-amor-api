@@ -1239,6 +1239,7 @@
     },
     "/usuarios": {
       "post": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nCadastra um novo usuário de acesso ao sistema com seus respectivos perfis.",
         "operationId": "UsuariosController_criar",
         "parameters": [],
         "requestBody": {
@@ -1262,6 +1263,9 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "409": {
             "description": "Já existe um usuário cadastrado com este e-mail."
           },
@@ -1277,12 +1281,14 @@
     },
     "/usuarios/{id}": {
       "get": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nBusca as informações detalhadas de um usuário pelo seu ID.",
         "operationId": "UsuariosController_buscarPorId",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID do usuário",
             "schema": {
               "type": "string"
             }
@@ -1302,6 +1308,9 @@
           "401": {
             "description": "Não autorizado."
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "404": {
             "description": "Usuário não encontrado."
           },
@@ -1315,12 +1324,14 @@
         ]
       },
       "patch": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nAtualiza os dados de um usuário existente.",
         "operationId": "UsuariosController_atualizar",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID do usuário",
             "schema": {
               "type": "string"
             }
@@ -1350,6 +1361,9 @@
           "401": {
             "description": "Não autorizado."
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "404": {
             "description": "Usuário não encontrado."
           },
@@ -1366,12 +1380,14 @@
         ]
       },
       "delete": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRemove logicamente (soft delete) um usuário do sistema.",
         "operationId": "UsuariosController_remover",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID do usuário",
             "schema": {
               "type": "string"
             }
@@ -1383,6 +1399,9 @@
           },
           "401": {
             "description": "Não autorizado."
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
           },
           "404": {
             "description": "Usuário não encontrado."
@@ -1399,6 +1418,7 @@
     },
     "/usuarios/alterar-senha": {
       "patch": {
+        "description": "**Perfil com Acesso:** Qualquer usuário autenticado.\n\nPermite que o usuário autenticado altere sua própria senha de acesso.",
         "operationId": "UsuariosController_atualizarSenha",
         "parameters": [],
         "requestBody": {
@@ -1425,7 +1445,7 @@
             "description": "Ocorreu um erro inesperado ao atualizar a senha."
           }
         },
-        "summary": "Atualizar senha do usuário",
+        "summary": "Atualizar senha do usuário logado",
         "tags": [
           "Usuarios"
         ]
@@ -1433,18 +1453,19 @@
     },
     "/voluntarios": {
       "post": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nCadastra um novo voluntário vinculando a uma pessoa existente ou criando um novo registro de pessoa.",
         "operationId": "VoluntariosController_criar",
         "parameters": [],
         "requestBody": {
           "required": true,
-          "description": "Existem 2 cenários:\n1) Se o voluntário JÁ É beneficiário: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do voluntário.\n2) Se o voluntário NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do voluntário (não envie 'pessoaId').",
+          "description": "Existem 2 cenários:\n1) Se o voluntário JÁ É cadastrado como pessoa: envie 'pessoaId' (não envie 'nome', 'cpf' ou 'dataNascimento') + os campos do voluntário.\n2) Se o voluntário NÃO possui cadastro de pessoa: envie 'nome', 'cpf' e 'dataNascimento' + os campos do voluntário (não envie 'pessoaId').",
           "content": {
             "application/json": {
               "schema": {
                 "oneOf": [
                   {
                     "type": "object",
-                    "title": "Cenário com pessoa já cadastrada",
+                    "title": "Pessoa existente",
                     "properties": {
                       "pessoaId": {
                         "type": "string",
@@ -1477,7 +1498,7 @@
                   },
                   {
                     "type": "object",
-                    "title": "Cenário com nova pessoa",
+                    "title": "Nova pessoa",
                     "properties": {
                       "nome": {
                         "type": "string",
@@ -1559,6 +1580,9 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "409": {
             "description": "Já existe uma pessoa com este CPF ou a pessoa informada já possui um cadastro de voluntário ativo."
           },
@@ -1572,6 +1596,7 @@
         ]
       },
       "get": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRetorna a listagem paginada de todos os voluntários da ONG.",
         "operationId": "VoluntariosController_buscarTodos",
         "parameters": [
           {
@@ -1633,6 +1658,9 @@
           "400": {
             "description": "Os parâmetros de paginação (página ou itensPorPagina) devem ser maiores ou iguais a 1."
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "500": {
             "description": "Ocorreu um erro inesperado ao buscar os voluntários."
           }
@@ -1645,6 +1673,7 @@
     },
     "/voluntarios/verificar-cadastro/cpf/{cpf}": {
       "get": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nVerifica se uma pessoa já possui cadastro e se já está vinculada como voluntária.",
         "operationId": "VoluntariosController_verificarCadastroPorCpf",
         "parameters": [
           {
@@ -1672,6 +1701,9 @@
           "400": {
             "description": "CPF inválido."
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "404": {
             "description": "Pessoa não encontrada."
           },
@@ -1690,12 +1722,14 @@
     },
     "/voluntarios/{id}": {
       "get": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nBusca as informações detalhadas de um voluntário específico pelo seu ID.",
         "operationId": "VoluntariosController_buscarPorId",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID do voluntário",
             "schema": {
               "type": "string"
             }
@@ -1712,6 +1746,9 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "404": {
             "description": "Voluntário não encontrado."
           },
@@ -1725,12 +1762,14 @@
         ]
       },
       "patch": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nAtualiza os dados de um voluntário existente.",
         "operationId": "VoluntariosController_atualizar",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID do voluntário",
             "schema": {
               "type": "string"
             }
@@ -1757,6 +1796,9 @@
               }
             }
           },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
+          },
           "404": {
             "description": "Voluntário não encontrado."
           },
@@ -1773,12 +1815,14 @@
         ]
       },
       "delete": {
+        "description": "**Perfil com Acesso:** `ADMIN` (Administrador).\n\nRemove logicamente (soft delete) um voluntário do sistema.",
         "operationId": "VoluntariosController_remover",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "ID do voluntário",
             "schema": {
               "type": "string"
             }
@@ -1787,6 +1831,9 @@
         "responses": {
           "204": {
             "description": "O voluntário foi deletado com sucesso."
+          },
+          "403": {
+            "description": "Acesso não autorizado para o perfil do usuário (requer ADMIN)."
           },
           "404": {
             "description": "Voluntário não encontrado."

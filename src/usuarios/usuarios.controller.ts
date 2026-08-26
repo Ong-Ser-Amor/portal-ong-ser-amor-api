@@ -1,25 +1,15 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Patch,
+  Post,
 } from '@nestjs/common';
-import {
-  ApiConflictResponse,
-  ApiCreatedResponse,
-  ApiInternalServerErrorResponse,
-  ApiNoContentResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { Perfis } from 'src/shared/decorators/perfis.decorator';
 import { UsuarioDecorator } from 'src/shared/decorators/usuario.decorator';
 
@@ -29,6 +19,13 @@ import { CriarUsuarioDto } from './dto/criar-usuario.dto';
 import { UsuarioRespostaDto } from './dto/usuario-resposta.dto';
 import { PerfilAcesso } from './enums/perfil-acesso.enum';
 import { UsuariosService } from './usuarios.service';
+import {
+  ApiDocAtualizarSenhaUsuario,
+  ApiDocAtualizarUsuario,
+  ApiDocBuscarUsuarioPorId,
+  ApiDocCriarUsuario,
+  ApiDocRemoverUsuario,
+} from './usuarios.swagger';
 
 @ApiTags('Usuarios')
 @Controller('usuarios')
@@ -37,17 +34,7 @@ export class UsuariosController {
 
   @Post()
   @Perfis(PerfilAcesso.ADMIN)
-  @ApiOperation({ summary: 'Criar um novo usuário' })
-  @ApiCreatedResponse({
-    description: 'O usuário foi criado com sucesso.',
-    type: UsuarioRespostaDto,
-  })
-  @ApiConflictResponse({
-    description: 'Já existe um usuário cadastrado com este e-mail.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Ocorreu um erro inesperado ao criar o usuário.',
-  })
+  @ApiDocCriarUsuario()
   async criar(
     @Body() criarUsuarioDto: CriarUsuarioDto,
   ): Promise<UsuarioRespostaDto> {
@@ -57,20 +44,7 @@ export class UsuariosController {
 
   @Get(':id')
   @Perfis(PerfilAcesso.ADMIN)
-  @ApiOperation({ summary: 'Buscar usuário pelo ID' })
-  @ApiOkResponse({
-    description: 'O usuário foi encontrado com sucesso.',
-    type: UsuarioRespostaDto,
-  })
-  @ApiNotFoundResponse({
-    description: 'Usuário não encontrado.',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Não autorizado.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Ocorreu um erro inesperado ao buscar o usuário.',
-  })
+  @ApiDocBuscarUsuarioPorId()
   async buscarPorId(@Param('id') id: string): Promise<UsuarioRespostaDto> {
     const usuario = await this.usuariosService.buscarPorId(id);
     return new UsuarioRespostaDto(usuario);
@@ -78,23 +52,7 @@ export class UsuariosController {
 
   @Patch(':id')
   @Perfis(PerfilAcesso.ADMIN)
-  @ApiOperation({ summary: 'Atualizar usuário pelo ID' })
-  @ApiOkResponse({
-    description: 'O usuário foi atualizado com sucesso.',
-    type: UsuarioRespostaDto,
-  })
-  @ApiNotFoundResponse({
-    description: 'Usuário não encontrado.',
-  })
-  @ApiConflictResponse({
-    description: 'Este e-mail já está em uso por outro usuário.',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Não autorizado.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Ocorreu um erro inesperado ao atualizar o usuário.',
-  })
+  @ApiDocAtualizarUsuario()
   async atualizar(
     @Param('id') id: string,
     @Body() atualizarUsuarioDto: AtualizarUsuarioDto,
@@ -108,19 +66,7 @@ export class UsuariosController {
 
   @Patch('alterar-senha')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Atualizar senha do usuário' })
-  @ApiNoContentResponse({
-    description: 'A senha foi atualizada com sucesso.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Usuário não encontrado.',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Não autorizado.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Ocorreu um erro inesperado ao atualizar a senha.',
-  })
+  @ApiDocAtualizarSenhaUsuario()
   async atualizarSenha(
     @Body() atualizarSenhaDto: AtualizarSenhaDto,
     @UsuarioDecorator() usuarioId: string,
@@ -131,19 +77,7 @@ export class UsuariosController {
   @Delete(':id')
   @Perfis(PerfilAcesso.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Deletar usuário pelo ID' })
-  @ApiNoContentResponse({
-    description: 'O usuário foi deletado com sucesso.',
-  })
-  @ApiNotFoundResponse({
-    description: 'Usuário não encontrado.',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Não autorizado.',
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Ocorreu um erro inesperado ao deletar o usuário.',
-  })
+  @ApiDocRemoverUsuario()
   async remover(@Param('id') id: string): Promise<void> {
     return this.usuariosService.remover(id);
   }
